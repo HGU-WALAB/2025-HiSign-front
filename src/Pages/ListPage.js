@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 import { PageContainer } from '../components/PageContainer';
 
 export const DocumentList = () => {
@@ -8,7 +8,7 @@ export const DocumentList = () => {
 
     useEffect(() => {
         axios
-            .get('http://localhost:8080/api/documents')
+            .get('http://localhost:8080/api/documents/list')
             .then((response) => setDocuments(response.data))
             .catch((error) => {
                 console.error('Error:', error.message);
