@@ -1,19 +1,17 @@
 // 필요한 라이브러리 및 컴포넌트 임포트
-import { useRef, useState } from "react";
-import Drop from "../Drop";
-import { Document, Page, pdfjs } from "react-pdf"; // PDF 처리를 위한 라이브러리
+import axios from "axios";
+import dayjs from "dayjs"; // 날짜 처리 라이브러리
 import { PDFDocument, rgb } from "pdf-lib"; // PDF 수정을 위한 라이브러리
-import { blobToURL } from "../utils/Utils";
-import PagingControl from "../components/PagingControl";
+import { useRef, useState } from "react";
+import { Document, Page, pdfjs } from "react-pdf"; // PDF 처리를 위한 라이브러리
 import { AddSigDialog } from "../components/AddSigDialog";
-import { AddHeader } from "../Header";
 import { BigButton } from "../components/BigButton";
 import DraggableSignature from "../components/DraggableSignature";
 import DraggableText from "../components/DraggableText";
-import dayjs from "dayjs"; // 날짜 처리 라이브러리
-import styled from "styled-components";
 import { PageContainer } from "../components/PageContainer";
-import axios from "axios";
+import PagingControl from "../components/PagingControl";
+import Drop from "../Drop";
+import { blobToURL } from "../utils/Utils";
 
 // PDF.js 워커 설정
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
@@ -64,30 +62,54 @@ function App() {
   const [pageDetails, setPageDetails] = useState(null); // 페이지 상세 정보
   const documentRef = useRef(null); // PDF 문서 요소 참조
 
-  const handlePostFiles = () => {
-    if (window.confirm("추가하시겠습니까?")) {
-      const formData = new FormData();
+  // const handlePostFiles = () => {
+  //   if (window.confirm("추가하시겠습니까?")) {
+  //     const formData = new FormData();
       
-      // Blob URL을 Blob 객체로 변환
-      fetch(pdf)
-        .then(response => response.blob())  // Blob URL을 Blob 객체로 변환
-        .then(blob => {
-          // Blob 객체를 formData에 추가
-          formData.append("file", blob, "file.pdf"); // 파일 이름은 "file.pdf"로 지정
-          return axios.post("http://localhost:8080/api/files/upload", formData, {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          });
-        })
-        .then((response) => {
-          alert("등록 완료!");
-          console.log(response);
-        })
-        .catch((error) => {
-          console.error("Error:", error.message);
-        });
+  //     // Blob URL을 Blob 객체로 변환
+  //     fetch(pdf)
+  //       .then(response => response.blob())  // Blob URL을 Blob 객체로 변환
+  //       .then(blob => {
+  //         // Blob 객체를 formData에 추가
+  //         formData.append("file", blob, "file.pdf"); // 파일 이름은 "file.pdf"로 지정
+  //         return axios.post("http://localhost:8080/api/file/document/upload", formData, {
+  //           headers: {
+  //             "Content-Type": "multipart/form-data",
+  //           },
+  //         });
+  //       })
+  //       .then((response) => {
+  //         alert("등록 완료!");
+  //         console.log(response);
+  //       })
+  //       .catch((error) => {
+  //         console.error("Error:", error.message);
+  //       });
+  //   }
+  // };
+  const handlePostFiles = (file) => {
+    if (!file) {
+      alert("업로드할 파일이 없습니다.");
+      return;
     }
+  
+    const formData = new FormData();
+    formData.append("file", file, file.name); // 파일 추가
+  
+    axios
+      .post("http://localhost:8080/api/files/document/upload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((response) => {
+        alert("파일 업로드 완료!");
+        console.log("Response Data:", response.data);
+      })
+      .catch((error) => {
+        console.error("Error uploading file:", error);
+        alert(`파일 업로드 실패: ${error.response?.data?.message || error.message}`);
+      });
   };
   
 
@@ -111,9 +133,21 @@ function App() {
         {!pdf ? (
           <Drop
             // 파일을 받아 Blob 객체로 저장
-            onLoaded={async (files) => {
-              const URL = await blobToURL(files[0]);
-              setPdf(URL);
+            // onLoaded={async (files) => {
+            //   const URL = await blobToURL(files[0]);
+            //   setPdf(URL);
+            // }}
+            // 파일 드롭 시 처리
+            onLoaded={(files) => {
+              const file = files[0];
+              if (file) {
+                // 파일 업로드 함수 호출
+                handlePostFiles(file);
+
+                // Blob URL 생성 후 상태 업데이트
+                const url = URL.createObjectURL(file);
+                setPdf(url); // 파일 URL 상태로 저장
+              }
             }}
           />
         ) : null}

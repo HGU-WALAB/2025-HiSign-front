@@ -97,7 +97,7 @@ export const DocumentList = () => {
                     <tr key={doc.id}>
                         {console.log(doc)}
                         <td style={styles.td}>{doc.id}</td>
-                        <td style={styles.td}>{doc.filePath.split('/').pop()}</td>
+                        <td style={styles.td}>{doc.fileName}</td>
                         <td style={styles.td}>{doc.version}</td>
                         <td style={styles.td}>{doc.createdAt}</td>
                         <td style={styles.td}>{doc.updatedAt}</td>
