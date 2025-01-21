@@ -1,5 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';  // Link 컴포넌트 추가
 import { PageContainer } from '../components/PageContainer';
 
 export const DocumentList = () => {
@@ -20,8 +21,7 @@ export const DocumentList = () => {
                 console.error('Error:', error.message);
                 setError('문서를 불러오는 중 문제가 발생했습니다: ' + error.message);
             });
-    }, [itemsPerPage]);  // itemsPerPage를 의존성 배열에 추가
-    
+    }, []);
 
     // 현재 페이지에 해당하는 데이터만 반환
     const getCurrentPageData = () => {
@@ -34,14 +34,14 @@ export const DocumentList = () => {
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     // 이전 페이지로 이동
-    const prevPage = () => {
+    const goToPreviousPage = () => {
         if (currentPage > 1) {
             setCurrentPage(currentPage - 1);
         }
     };
 
     // 다음 페이지로 이동
-    const nextPage = () => {
+    const goToNextPage = () => {
         if (currentPage < totalPages) {
             setCurrentPage(currentPage + 1);
         }
@@ -118,16 +118,18 @@ export const DocumentList = () => {
             padding: '5px 10px',
             cursor: 'pointer',
         },
-        paginationControls: {
-            display: 'inline-flex',
-            alignItems: 'center',
-            marginTop: '20px',
-        },
-        prevNextButton: {
+        navButton: {
             padding: '5px 10px',
-            margin: '0 5px',
-            cursor: 'pointer',
+            fontSize: '16px',
             fontWeight: 'bold',
+            cursor: 'pointer',
+            backgroundColor: '#f1f1f1',
+            border: '1px solid #ddd',
+            margin: '0 5px',
+        },
+        disabledButton: {
+            backgroundColor: '#e0e0e0',
+            cursor: 'not-allowed',
         }
     };
 
@@ -150,7 +152,11 @@ export const DocumentList = () => {
                     {getCurrentPageData().map((doc) => (
                         <tr key={doc.id}>
                             <td style={styles.td}>{doc.id}</td>
-                            <td style={styles.td}>{doc.fileName}</td>
+                            <td style={styles.td}>
+                                <Link to={`/detail/${doc.id}`} style={{ textDecoration: 'none', color: '#2196F3' }}>
+                                    {doc.fileName}
+                                </Link>
+                            </td>
                             <td style={styles.td}>{doc.version}</td>
                             <td style={styles.td}>{doc.createdAt}</td>
                             <td style={styles.td}>{doc.updatedAt}</td>
@@ -165,19 +171,17 @@ export const DocumentList = () => {
             </table>
 
             {/* 페이지네이션 버튼 */}
-            <div style={styles.paginationControls}>
+            <div style={styles.pagination}>
                 <button
-                    onClick={prevPage}
+                    onClick={goToPreviousPage}
                     style={{
-                        ...styles.prevNextButton,
-                        backgroundColor: currentPage === 1 ? '#ccc' : '#4CAF50',
-                        cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                        ...styles.navButton,
+                        ...(currentPage === 1 ? styles.disabledButton : {}),
                     }}
                     disabled={currentPage === 1}
                 >
                     {'<'}
                 </button>
-
                 {[...Array(totalPages)].map((_, index) => (
                     <button
                         key={index}
@@ -191,13 +195,11 @@ export const DocumentList = () => {
                         {index + 1}
                     </button>
                 ))}
-
                 <button
-                    onClick={nextPage}
+                    onClick={goToNextPage}
                     style={{
-                        ...styles.prevNextButton,
-                        backgroundColor: currentPage === totalPages ? '#ccc' : '#4CAF50',
-                        cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+                        ...styles.navButton,
+                        ...(currentPage === totalPages ? styles.disabledButton : {}),
                     }}
                     disabled={currentPage === totalPages}
                 >
