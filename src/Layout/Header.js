@@ -6,9 +6,11 @@ function Header() {
     return (
         <HeaderContainer>
             <HeaderTitle>
-                <span>파일 서명 사이트</span>
-                <MenuLink to = "/list">파일 목록</MenuLink>
+                <span>HI-Sign   |  </span>
+             
+                <MenuLink to = "/list">   파일 목록  |</MenuLink>
                 <MenuLink to = "/add">파일 추가</MenuLink>
+                <MenuLink to = "/login" 로그인></MenuLink>
             </HeaderTitle>
             <OutletContainer>
                 <Outlet/>
