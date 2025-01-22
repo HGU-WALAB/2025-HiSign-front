@@ -1,7 +1,7 @@
-import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';  // Link 컴포넌트 추가
+import { Link } from 'react-router-dom'; // Link 컴포넌트 추가
 import { PageContainer } from '../components/PageContainer';
+import apiWithAuth from '../utils/apiWithAuth';
 
 export const DocumentList = () => {
     const [documents, setDocuments] = useState([]);
@@ -11,17 +11,21 @@ export const DocumentList = () => {
     const [totalPages, setTotalPages] = useState(0);  // 총 페이지 수
 
     useEffect(() => {
-        axios
-            .get('http://localhost:8080/api/documents/list')
-            .then((response) => {
+        const fetchDocuments = async () => {
+            try {
+                const response = await apiWithAuth.get('/documents/list');
+                console.log(response.data);
                 setDocuments(response.data);
-                setTotalPages(Math.ceil(response.data.length / itemsPerPage)); // 총 페이지 계산
-            })
-            .catch((error) => {
+                setTotalPages(Math.ceil(response.data.length / itemsPerPage));
+            } catch (error) {
                 console.error('Error:', error.message);
                 setError('문서를 불러오는 중 문제가 발생했습니다: ' + error.message);
-            });
-    }, []);
+            }
+        };
+
+        fetchDocuments();
+    }, [itemsPerPage]);
+
 
     // 현재 페이지에 해당하는 데이터만 반환
     const getCurrentPageData = () => {
@@ -142,7 +146,6 @@ export const DocumentList = () => {
                     <tr>
                         <th style={styles.th}>ID</th>
                         <th style={styles.th}>File Name</th>
-                        <th style={styles.th}>Version</th>
                         <th style={styles.th}>Created At</th>
                         <th style={styles.th}>Updated At</th>
                         <th style={styles.th}>Status</th>
@@ -157,7 +160,6 @@ export const DocumentList = () => {
                                     {doc.fileName}
                                 </Link>
                             </td>
-                            <td style={styles.td}>{doc.version}</td>
                             <td style={styles.td}>{doc.createdAt}</td>
                             <td style={styles.td}>{doc.updatedAt}</td>
                             <td style={styles.td}>

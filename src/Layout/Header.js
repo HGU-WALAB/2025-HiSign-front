@@ -1,16 +1,22 @@
 import { Link, Outlet } from "react-router-dom";
+import { useRecoilValue } from "recoil";
 import styled from "styled-components";
+import HisnetLoginButton from "../components/HisnetLoginButton";
+import LogoutButton from "../components/LogoutButton";
+import { authState } from "../recoil/atom/authState";
 import { primary45 } from "../utils/colors";
 
 function Header() {
+    const auth = useRecoilValue(authState);
+
     return (
         <HeaderContainer>
             <HeaderTitle>
-                <span>HI-Sign   |  </span>
-             
-                <MenuLink to = "/list">   파일 목록  |</MenuLink>
+                <MenuLink to = "/">HI-Sign</MenuLink>
+                <MenuLink to = "/list">파일 목록</MenuLink>
                 <MenuLink to = "/add">파일 추가</MenuLink>
-                <MenuLink to = "/login" 로그인></MenuLink>
+                <MenuLink to = "/upload">파일 업로드</MenuLink>
+                {auth.isAuthenticated ? <LogoutButton/> : <HisnetLoginButton/>}
             </HeaderTitle>
             <OutletContainer>
                 <Outlet/>
@@ -39,7 +45,7 @@ const HeaderTitle = styled.div`
 const MenuLink = styled(Link)`
     text-decoration: none;
     color: black;
-    margin-right: 30px;
+    margin: 0 15px 0 15px;
     &:hover{
         color: green;
     }
