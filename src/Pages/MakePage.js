@@ -8,9 +8,9 @@ import { AddSigDialog } from "../components/AddSigDialog";
 import { BigButton } from "../components/BigButton";
 import DraggableSignature from "../components/DraggableSignature";
 import DraggableText from "../components/DraggableText";
+import Drop from "../components/Drop";
 import { PageContainer } from "../components/PageContainer";
 import PagingControl from "../components/PagingControl";
-import Drop from "../Drop";
 import { blobToURL } from "../utils/Utils";
 
 // PDF.js 워커 설정
@@ -138,15 +138,15 @@ function App() {
             //   setPdf(URL);
             // }}
             // 파일 드롭 시 처리
-            onLoaded={(files) => {
+            onLoaded={async (files) => {
               const file = files[0];
               if (file) {
                 // 파일 업로드 함수 호출
                 handlePostFiles(file);
 
                 // Blob URL 생성 후 상태 업데이트
-                const url = URL.createObjectURL(file);
-                setPdf(url); // 파일 URL 상태로 저장
+                const URL = await blobToURL(file);
+                setPdf(URL); // 파일 URL 상태로 저장
               }
             }}
           />
@@ -199,7 +199,7 @@ function App() {
                   inverted={true}
                   title={"다운로드"}
                   onClick={() => {
-                    downloadURI(pdf, "file.pdf"); // 다운 받아지는 파일 이름 생각해보기 
+                    downloadURI(pdf, "file.pdf"); // 다운 받아지는 파일 이름 생각해보기
                   }}
                 />
               ) : null}
