@@ -8,7 +8,8 @@ function IntroPage() {
             <Link to = "/list">리스트 페이지</Link>
             <Link to = "/add">등록 페이지</Link>
             <Link to = "/upload">등록 페이지</Link>
-            <Link to = "/request"> 서명자 등록 </Link>
+            <Link to = "/request">서명자 등록</Link>
+            <Link to = "/align">얼라인</Link>
             <HisnetLoginButton/>
         </CenteredContainer>
     )
