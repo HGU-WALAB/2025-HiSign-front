@@ -1,12 +1,13 @@
 import React from 'react';
 import { Route, Routes } from "react-router-dom";
+import LoginCallback from "./auth/LoginCallback";
 import Header from "./Layout/Header";
 import DetailPage from "./Pages/DetailPage";
 import IntroPage from "./Pages/IntroPage";
 import ListPage from "./Pages/ListPage";
 import MakePage from "./Pages/MakePage";
+import RequestPage from "./Pages/RequestPage";
 import UploadPage from "./Pages/UploadPage";
-import LoginCallback from "./auth/LoginCallback";
 
 function MyRoutes() {
     return (
@@ -18,6 +19,7 @@ function MyRoutes() {
                 <Route path="/add" element={<MakePage />} />
                 <Route path="/detail/:documentId" element={<DetailPage />} />
                 <Route path="/login-ing" element={<LoginCallback />} />
+                <Route path="/request" element={<RequestPage />} />
             </Route>
         </Routes>
     );
