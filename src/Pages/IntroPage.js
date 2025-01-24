@@ -10,6 +10,7 @@ function SideBar() {
     };
 
     return (
+
         <>
             {/* 햄버거 버튼 추가 */}
             <HamburgerButton onClick={toggleSidebar}>
@@ -29,6 +30,7 @@ function SideBar() {
             </SidebarContainer>
         </>
     );
+
 }
 
 export default SideBar;

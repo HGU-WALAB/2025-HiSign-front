@@ -241,3 +241,4 @@ const DeleteButton = styled.button`
   border-radius: 3px;
   z-index: 10; /* 다른 요소 위에 배치 */
 `;
+
