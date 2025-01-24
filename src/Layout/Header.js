@@ -2,56 +2,65 @@ import { Link, Outlet } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import styled from "styled-components";
 import HisnetLoginButton from "../components/HisnetLoginButton";
-import LogoutButton from "../components/LogoutButton";
+import HisnetLogoutButton from "../components/HisnetLogoutButton";
 import { authState } from "../recoil/atom/authState";
 import { primary45 } from "../utils/colors";
 
-function Header() {
-    const auth = useRecoilValue(authState);
+function HeaderBar() {
+    const auth = useRecoilValue(authState);     
 
     return (
-        <HeaderContainer>
-            <HeaderTitle>
-                <MenuLink to = "/">HI-Sign</MenuLink>
-                <MenuLink to = "/list">파일 목록</MenuLink>
-                <MenuLink to = "/add">파일 추가</MenuLink>
-                <MenuLink to = "/upload">파일 업로드</MenuLink>
-                {auth.isAuthenticated ? <LogoutButton/> : <HisnetLoginButton/>}
-            </HeaderTitle>
+        <HeaderBarContainer>
+            <HeaderBarTitle>
+                <MenuLink to="/">HI-Sign</MenuLink>
+                <ButtonContainer>
+                    <HisnetLoginButton/>
+                    <HisnetLogoutButton/>
+                </ButtonContainer>
+            </HeaderBarTitle>
             <OutletContainer>
                 <Outlet/>
             </OutletContainer>
-        </HeaderContainer>
+        </HeaderBarContainer>
     )
 }
 
-const HeaderContainer = styled.div`
+const HeaderBarContainer = styled.div`
     width: 100%;
-    display: flex;
     flex-direction: column;
+    
 `;
 
-const HeaderTitle = styled.div`
+const HeaderBarTitle = styled.div`
     width: 100%;
-    height : 50px;
-    background-color: ${primary45};
+    height: 50px;
+    background-color: skyblue;
     display: flex;
     align-items: center;
-
-    padding-left: 30px;
+    padding-left: 15px;
     box-sizing: border-box;
+    justify-content: space-between;
+`;
+
+const ButtonContainer = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-right: 15px;
+    
 `;
 
 const MenuLink = styled(Link)`
     text-decoration: none;
     color: black;
-    margin: 0 15px 0 15px;
-    &:hover{
+    margin: 0 15px 0 0;
+    &:hover {
         color: green;
     }
 `;
 
 const OutletContainer = styled.div`
-    width: 100%;
+    width: 100%; 
 `;
-export default Header;
+
+export default HeaderBar;

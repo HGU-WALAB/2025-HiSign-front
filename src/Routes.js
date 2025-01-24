@@ -10,6 +10,8 @@ import MakePage from "./Pages/MakePage";
 import RequestPage from "./Pages/RequestPage";
 import UploadPage from "./Pages/UploadPage";
 
+
+
 function MyRoutes() {
     return (
         <Routes>
@@ -22,6 +24,7 @@ function MyRoutes() {
                 <Route path="/login-ing" element={<LoginCallback />} />
                 <Route path="/request" element={<RequestPage />} />
                 <Route path="/align" element={<AlignPage />} />
+                <Route path="/request" element={<RequestPage />} />
             </Route>
         </Routes>
     );

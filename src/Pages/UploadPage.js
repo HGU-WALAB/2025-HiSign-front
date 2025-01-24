@@ -94,7 +94,7 @@ const UploadPage = () => {
               </button>
               <button
                 style={styles.button}
-                onClick={() => navigate("/align")}
+                onClick={() => navigate("/request")}
               >
                 다음
               </button>
