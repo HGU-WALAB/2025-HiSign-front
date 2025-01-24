@@ -9,6 +9,9 @@ import ListPage from "./Pages/ListPage";
 import MakePage from "./Pages/MakePage";
 import RequestPage from "./Pages/RequestPage";
 import UploadPage from "./Pages/UploadPage";
+// import FileUpload from "./components/signRequest/FileUpload";
+// import AddSigner from "./components/signRequest/AddSigner";
+// import AlignSign from "./components/signRequest/AlignSign";
 
 
 
@@ -24,9 +27,10 @@ function MyRoutes() {
                 <Route path="/login-ing" element={<LoginCallback />} />
                 <Route path="/request" element={<RequestPage />} />
                 <Route path="/align" element={<AlignPage />} />
-                
-            
                 <Route path="/request" element={<RequestPage />} />
+                {/*<Route path="/add-file" element={<FileUpload />} />*/}
+                {/*<Route path="/add-signers" element={<AddSigner />} />*/}
+                {/*<Route path="/align-sign" element={<AlignSign />} />*/}
             </Route>
         </Routes>
     );
