@@ -6,6 +6,7 @@ import HisnetLoginButton from "../components/HisnetLoginButton";
 function SideBar() {
     return (
         <SidebarContainer>
+            <img src = "/assets/Csee.png" alt = "image"/>
             <NavigationLinks>
                 <Link to="/list">List Page</Link>
                 <Link to="/add">Add Sign Page</Link>
