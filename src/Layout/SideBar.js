@@ -1,4 +1,8 @@
 
+// 이 파일은 안 쓰는 것으로 간주
+//사이드바를 제거하고 인트로페이지에 합침
+
+
 
 // import { Link } from "react-router-dom";
 // import styled from 'styled-components';

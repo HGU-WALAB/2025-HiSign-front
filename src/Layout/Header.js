@@ -28,6 +28,7 @@ function HeaderBar() {
 const HeaderBarContainer = styled.div`
     width: 100%;
     flex-direction: column;
+    
 `;
 
 const HeaderBarTitle = styled.div`
@@ -46,6 +47,7 @@ const ButtonContainer = styled.div`
     align-items: center;
     gap: 10px;
     margin-right: 15px;
+    
 `;
 
 const MenuLink = styled(Link)`
