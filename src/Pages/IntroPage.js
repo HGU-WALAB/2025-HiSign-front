@@ -11,6 +11,7 @@ function SideBar() {
                 <Link to="/add">서명 추가하기</Link>
                 <Link to="/upload">서명 업로드하기</Link>
                 <Link to = "/request">서명자 등록하기</Link>
+                <Link to = "/align">얼라인</Link>
             </NavigationLinks>
         </SidebarContainer>
     )

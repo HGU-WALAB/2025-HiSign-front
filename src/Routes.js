@@ -8,6 +8,8 @@ import ListPage from "./Pages/ListPage";
 import MakePage from "./Pages/MakePage";
 import UploadPage from "./Pages/UploadPage";
 import RequestPage from "./Pages/RequestPage";
+import AlignPage from './Pages/AlignPage';
+
 
 
 function MyRoutes() {
@@ -21,6 +23,8 @@ function MyRoutes() {
                 <Route path="/detail/:documentId" element={<DetailPage />} />
                 <Route path="/login-ing" element={<LoginCallback />} />
                 <Route path="/request" element={<RequestPage />} />
+                <Route path="/align" element={<AlignPage />} />
+                
             
             </Route>
         </Routes>
