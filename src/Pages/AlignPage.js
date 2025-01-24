@@ -5,7 +5,6 @@ import { Rnd } from "react-rnd";
 import { useRecoilState, useRecoilValue } from "recoil";
 import styled from 'styled-components';
 import CompleteButton from '../components/AlignPage/CompleteButton';
-import { PageContainer } from "../components/PageContainer";
 import PagingControl from "../components/PagingControl";
 import { documentState } from "../recoil/atom/documentState";
 import { signerState } from "../recoil/atom/signerState";

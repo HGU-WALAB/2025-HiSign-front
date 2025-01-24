@@ -1,18 +1,19 @@
 import { Button } from '@mui/material';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useRecoilState } from 'recoil';
+import { useRecoilValue } from 'recoil';
 import { documentState } from '../../recoil/atom/documentState';
+import { signatureState } from '../../recoil/atom/signatureState';
 import { signerState } from '../../recoil/atom/signerState';
-import ApiService from '../../utils/ApiService';
 import CompleteModal from './CompleteModal';
 
 const CompleteButton = () => {
-  const [document, setDocument]= useRecoilState(documentState);
-  const [signers, setSigners] = useRecoilState(signerState);
+  const document = useRecoilValue(documentState);
+  const signers = useRecoilValue(signerState);
+  const signatureFields = useRecoilValue(signatureState);
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
-
+  
   const handleOpenModal = () => {
     setOpen(true);
   };
@@ -44,6 +45,7 @@ const CompleteButton = () => {
 
     console.log("요청이 완료되었습니다.");
     setOpen(false);
+    // 완료 처리 로직 추가 가능 (예: API 호출)
   };
 
   return (
