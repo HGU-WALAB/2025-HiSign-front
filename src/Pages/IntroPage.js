@@ -8,9 +8,10 @@ function SideBar() {
         <SidebarContainer>
             <img src = "/assets/Csee.png" alt = "image"/>
             <NavigationLinks>
-                <Link to="/list">List Page</Link>
-                <Link to="/add">Add Sign Page</Link>
-                <Link to="/upload">Upload Page</Link>
+                <Link to="/list">리스 페지</Link>
+                <Link to="/add">서명 추가하기</Link>
+                <Link to="/upload">서명 업로드하기</Link>
+                <Link to = "/request">서명자 등록하기</Link>
             </NavigationLinks>
 
         </SidebarContainer>
