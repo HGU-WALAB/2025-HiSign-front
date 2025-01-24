@@ -1,19 +1,17 @@
 
 import { Link } from "react-router-dom";
 import styled from 'styled-components';
-import HisnetLoginButton from "../components/HisnetLoginButton";
 
 function SideBar() {
     return (
         <SidebarContainer>
             <img src = "/assets/Csee.png" alt = "image"/>
             <NavigationLinks>
-                <Link to="/list">리스 페지</Link>
+                <Link to="/list">리스트 페이지</Link>
                 <Link to="/add">서명 추가하기</Link>
                 <Link to="/upload">서명 업로드하기</Link>
                 <Link to = "/request">서명자 등록하기</Link>
             </NavigationLinks>
-
         </SidebarContainer>
     )
 }

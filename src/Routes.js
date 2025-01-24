@@ -9,6 +9,7 @@ import MakePage from "./Pages/MakePage";
 import UploadPage from "./Pages/UploadPage";
 import RequestPage from "./Pages/RequestPage";
 
+
 function MyRoutes() {
     return (
         <Routes>
@@ -20,6 +21,7 @@ function MyRoutes() {
                 <Route path="/detail/:documentId" element={<DetailPage />} />
                 <Route path="/login-ing" element={<LoginCallback />} />
                 <Route path="/request" element={<RequestPage />} />
+            
             </Route>
         </Routes>
     );
