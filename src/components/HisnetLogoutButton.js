@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSetRecoilState } from 'recoil';
 import { authState } from '../recoil/atom/authState';
 
-const LogoutButton = () => {
+const HisnetLogoutButton = () => {
   const setAuth = useSetRecoilState(authState);
   const navigate = useNavigate();
 
@@ -34,6 +34,9 @@ const LogoutButton = () => {
     backgroundColor: '#E64A19',
   };
 
+
+
+  
   return (
     <button
       onClick={handleLogout}
@@ -46,4 +49,4 @@ const LogoutButton = () => {
   );
 };
 
-export default LogoutButton;
+export default HisnetLogoutButton;
