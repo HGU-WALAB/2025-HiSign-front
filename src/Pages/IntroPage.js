@@ -21,10 +21,10 @@ function SideBar() {
                 <img src="/assets/Csee.png" alt="image" />
                 <NavigationLinks>
                     <StyledLink to="/list">리스트 페이지</StyledLink>
-                    <StyledLink to="/add">서명 추가하기</StyledLink>
-                    <StyledLink to="/upload">서명 업로드하기</StyledLink>
+                    <StyledLink to="/upload">문서 업로드하기</StyledLink>
                     <StyledLink to="/request">서명자 등록하기</StyledLink>
-                    <StyledLink to="/align">얼라인</StyledLink>
+                    <StyledLink to="/align">서명구역 지정정하기</StyledLink>
+                    <StyledLink to="/add">문서 편집하기</StyledLink>
                 </NavigationLinks>
             </SidebarContainer>
         </>
@@ -54,7 +54,7 @@ const HamburgerButton = styled.div`
     font-size: 30px;
     cursor: pointer;
     position: fixed; /* 화면 고정 */
-    top: 20px; /* 위쪽 위치 */
+    top: 5px; /* 위쪽 위치 */
     left: 20px; /* 왼쪽 위치 */
     color: black;
     z-index: 2000; /* 사이드바보다 위에 고정 */
