@@ -56,5 +56,6 @@
     "react-pdf": "^5.7.2",
     "react-signature-canvas": "^1.0.7",
     "web-vitals": "^0.2.4"
-  }
+  },
+  "proxy": "http://walab.handong.edu:8080"
 }

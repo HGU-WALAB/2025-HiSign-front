@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+const BASE_URL = '/hisign_1/api';
 const HISNET_LOGIN_URL = `${process.env.REACT_APP_HISNET_URL}/HisnetLogin/hisnet-login`;
 const HISET_RETURN_URL = process.env.REACT_APP_HISET_RETURN_URL
 const HISNET_ACCESS_KEY = process.env.REACT_APP_HISNET_ACCESS_KEY;
