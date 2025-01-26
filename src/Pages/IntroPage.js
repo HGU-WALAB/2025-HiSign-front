@@ -14,6 +14,7 @@ function SideBar() {
     };
 
     return (
+
         <>
             {/* 햄버거 버튼 */}
             {/* <HamburgerButton onClick={toggleSidebar} aria-label="사이드바 열기">
@@ -41,6 +42,7 @@ function SideBar() {
             </CenterContainer>
         </>
     );
+
 }
 
 export default SideBar;
