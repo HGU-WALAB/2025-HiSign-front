@@ -12,7 +12,7 @@ import UploadPage from "./Pages/UploadPage";
 
 function App() {
   return (
-    <BrowserRouter basename='/hisign'>
+    <BrowserRouter>
       <RecoilRoot>
         <Routes>
               <Route element={<Header />}>
