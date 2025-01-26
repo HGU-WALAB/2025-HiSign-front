@@ -2,7 +2,7 @@ import { Viewer, Worker } from '@react-pdf-viewer/core';
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import apiWithAuth from '../utils/apiWithAuth';
+import ApiService from '../utils/ApiService';
 
 const pdfjsWorkerUrl = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
@@ -11,31 +11,15 @@ const DetailPage = () => {
     const [fileUrl, setFileUrl] = useState(null);
     const [error, setError] = useState(null);
 
-    // useEffect(() => {
-    //     axios
-    //         .get(`http://localhost:8080/api/documents/${documentId}`, { responseType: 'arraybuffer' })
-    //         .then((response) => {
-    //             const fileBlob = new Blob([response.data], { type: 'application/pdf' });
-    //             const fileUrl = URL.createObjectURL(fileBlob);
-    //             setFileUrl(fileUrl);
-    //         })
-    //         .catch((error) => {
-    //             setError('문서를 로드하는 중 오류가 발생했습니다: ' + error.message);
-    //         });
-    // }, [documentId]);
     useEffect(() => {
-        const fetchDocument = async () => {
-            try {
-                const response = await apiWithAuth.get(`/documents/${documentId}`, { responseType: 'arraybuffer' });
+        ApiService.fetchDocument(documentId)
+            .then(response => {
                 const fileBlob = new Blob([response.data], { type: 'application/pdf' });
-                const fileUrl = URL.createObjectURL(fileBlob);
-                setFileUrl(fileUrl);
-            } catch (error) {
+                setFileUrl(URL.createObjectURL(fileBlob));
+            })
+            .catch(error => {
                 setError('문서를 로드하는 중 오류가 발생했습니다: ' + error.message);
-            }
-        };
-
-        fetchDocument();
+            });
     }, [documentId]);
     
     return (

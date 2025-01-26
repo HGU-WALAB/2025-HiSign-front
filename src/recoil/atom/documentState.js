@@ -5,6 +5,6 @@ export const documentState = atom({
   default: {
     id: null,          // 문서 ID (업로드 시 생성됨)
     name: '',          // 문서 이름
-    file: null,        // 선택한 파일 객체 (Blob or File)
+    fileUrl: null,        // 선택한 파일 URL 객체 (URL)
   },
 });

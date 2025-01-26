@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { useRecoilState } from 'recoil';
-import { signerState } from '../../recoil/atom/signerState';
-import { documentState } from '../../recoil/atom/documentState'; // 문서 상태 가져오기
-import { Document, Page } from 'react-pdf';
 import Draggable from 'react-draggable';
+import { Document, Page } from 'react-pdf';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { documentState } from '../../recoil/atom/documentState'; // 문서 상태 가져오기
+import { signerState } from '../../recoil/atom/signerState';
 
 const AlignSign = () => {
     const [signersState] = useRecoilState(signerState); // 서명자 상태 가져오기
-    const [documentStateValue] = useRecoilState(documentState); // 문서 상태 가져오기
+    const document = useRecoilValue(documentState); // 문서 상태 가져오기
     const [showOptions, setShowOptions] = useState(false); // 버튼 표시 상태 관리
     const [elements, setElements] = useState([]); // 서명 또는 텍스트 요소 관리
     const [currentElement, setCurrentElement] = useState(null); // 현재 선택된 요소 타입 (서명/텍스트)
@@ -145,7 +145,7 @@ const AlignSign = () => {
                 }}
                 onClick={handlePDFClick} // PDF 클릭 시 위치 지정
             >
-                {documentStateValue.fileUrl && (
+                {document.fileUrl && (
                     <div style={{
                         maxWidth: '90%',
                         height: '91vh',
@@ -154,7 +154,7 @@ const AlignSign = () => {
                         borderRadius: '10px',
                         position: 'relative',
                     }}>
-                        <Document file={documentStateValue.fileUrl}>
+                        <Document file={document.fileUrl}>
                             <Page pageNumber={1} width={800} />
                         </Document>
 
