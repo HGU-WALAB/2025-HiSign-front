@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom'; // Link 컴포넌트 추가
+import CancelButton from '../components/ListPage/CancelButton';
+import DeleteButton from '../components/ListPage/DeleteButton';
 import { PageContainer } from '../components/PageContainer';
-import apiWithAuth from '../utils/apiWithAuth';
+import ApiService from '../utils/ApiService';
 
 export const DocumentList = () => {
     const [documents, setDocuments] = useState([]);
@@ -9,23 +11,19 @@ export const DocumentList = () => {
     const [currentPage, setCurrentPage] = useState(1);  // 현재 페이지
     const [itemsPerPage] = useState(5);  // 페이지당 항목 수
     const [totalPages, setTotalPages] = useState(0);  // 총 페이지 수
-
+    
     useEffect(() => {
-        const fetchDocuments = async () => {
-            try {
-                const response = await apiWithAuth.get('/documents/list');
+        ApiService.fetchDocuments()
+            .then(response => {
                 console.log(response.data);
                 setDocuments(response.data);
                 setTotalPages(Math.ceil(response.data.length / itemsPerPage));
-            } catch (error) {
+            })
+            .catch(error => {
                 console.error('Error:', error.message);
                 setError('문서를 불러오는 중 문제가 발생했습니다: ' + error.message);
-            }
-        };
-
-        fetchDocuments();
+            });
     }, [itemsPerPage]);
-
 
     // 현재 페이지에 해당하는 데이터만 반환
     const getCurrentPageData = () => {
@@ -68,9 +66,22 @@ export const DocumentList = () => {
             0: '대기 중',
             1: '완료',
             2: '거절됨',
-            3: '요청자 취소',
+            3: '요청 취소됨',
         };
         return statusLabels[status] || '알 수 없음';
+    };
+    
+    //요청 취소시 다시 불러올 서버 문서목록
+    const refreshDocuments = () => {
+        ApiService.fetchDocuments()
+            .then(response => {
+                setDocuments(response.data);
+                setTotalPages(Math.ceil(response.data.length / itemsPerPage));
+            })
+            .catch(error => {
+                console.error('Error:', error.message);
+                setError('문서를 불러오는 중 문제가 발생했습니다: ' + error.message);
+            });
     };
 
     // 스타일
@@ -144,17 +155,21 @@ export const DocumentList = () => {
             <table style={styles.table}>
                 <thead>
                     <tr>
-                        <th style={styles.th}>ID</th>
+                        <th style={styles.th}>Status</th>
                         <th style={styles.th}>File Name</th>
                         <th style={styles.th}>Created At</th>
                         <th style={styles.th}>Updated At</th>
-                        <th style={styles.th}>Status</th>
+                        <th style={styles.th}></th>
                     </tr>
                 </thead>
                 <tbody>
                     {getCurrentPageData().map((doc) => (
                         <tr key={doc.id}>
-                            <td style={styles.td}>{doc.id}</td>
+                            <td style={styles.td}>
+                                <span style={{ ...styles.button, ...getStatusStyle(doc.status) }}>
+                                    {getStatusLabel(doc.status)}
+                                </span>
+                            </td>
                             <td style={styles.td}>
                                 <Link to={`/detail/${doc.id}`} style={{ textDecoration: 'none', color: '#2196F3' }}>
                                     {doc.fileName}
@@ -163,8 +178,14 @@ export const DocumentList = () => {
                             <td style={styles.td}>{doc.createdAt}</td>
                             <td style={styles.td}>{doc.updatedAt}</td>
                             <td style={styles.td}>
-                                <span style={{ ...styles.button, ...getStatusStyle(doc.status) }}>
-                                    {getStatusLabel(doc.status)}
+                            <span>
+                                {doc.status === 0 ? (
+                                    // 상태가 "대기 중"(0)일 경우 취소 버튼 표시
+                                    <CancelButton documentId={doc.id} backgroundColor="#FF9800" refreshDocuments={refreshDocuments} />
+                                ) : (
+                                    // 그 외의 상태에서는 삭제 버튼 표시
+                                    <DeleteButton documentId={doc.id} backgroundColor="#F44336" refreshDocuments={refreshDocuments} />
+                                )}
                                 </span>
                             </td>
                         </tr>

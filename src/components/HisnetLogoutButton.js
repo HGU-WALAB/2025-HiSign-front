@@ -1,15 +1,22 @@
 import { useNavigate } from 'react-router-dom';
 import { useSetRecoilState } from 'recoil';
 import { authState } from '../recoil/atom/authState';
+import { memberState } from '../recoil/atom/memberState';
 
 const HisnetLogoutButton = () => {
   const setAuth = useSetRecoilState(authState);
+  const setMember = useSetRecoilState(memberState);
   const navigate = useNavigate();
 
   const handleLogout = () => {
     setAuth({
       isAuthenticated: false,
-      user: null,
+    });
+    setMember({
+      unique_id: null,          // 사용자 ID
+      name: '',          // 사용자 이름
+      email: '',         // 사용자 이메일
+      level: '',         // 사용자 권한
     });
     sessionStorage.removeItem('token'); // 로그아웃 시 토큰 삭제
     navigate('/'); // 로그아웃 후 로그인 페이지로 이동

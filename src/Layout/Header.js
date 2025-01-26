@@ -4,18 +4,16 @@ import styled from "styled-components";
 import HisnetLoginButton from "../components/HisnetLoginButton";
 import HisnetLogoutButton from "../components/HisnetLogoutButton";
 import { authState } from "../recoil/atom/authState";
-import { primary45 } from "../utils/colors";
 
 function HeaderBar() {
-    const auth = useRecoilValue(authState);     
+    const auth = useRecoilValue(authState);
 
     return (
         <HeaderBarContainer>
             <HeaderBarTitle>
                 <MenuLink to="/">HI-Sign</MenuLink>
                 <ButtonContainer>
-                    <HisnetLoginButton/>
-                    <HisnetLogoutButton/>
+                {auth.isAuthenticated ? <HisnetLogoutButton /> : <HisnetLoginButton />}
                 </ButtonContainer>
             </HeaderBarTitle>
             <OutletContainer>
@@ -53,7 +51,7 @@ const ButtonContainer = styled.div`
 const MenuLink = styled(Link)`
     text-decoration: none;
     color: black;
-    margin: 0 15px 0 0;
+    margin: 0 15px 0 30px;
     &:hover {
         color: green;
     }
