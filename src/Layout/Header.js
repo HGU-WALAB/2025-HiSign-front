@@ -13,8 +13,7 @@ function HeaderBar() {
             <HeaderBarTitle>
                 <MenuLink to="/">HI-Sign</MenuLink>
                 <ButtonContainer>
-                    <HisnetLoginButton/>
-                    <HisnetLogoutButton/>
+                {auth.isAuthenticated ? <HisnetLogoutButton /> : <HisnetLoginButton />}
                 </ButtonContainer>
             </HeaderBarTitle>
             <OutletContainer>

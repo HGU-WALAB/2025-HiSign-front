@@ -1,7 +1,6 @@
-
-
 import React from 'react';
 import styled from 'styled-components';
+import ApiService from '../utils/ApiService';
 
 // 스타일이 적용된 버튼 컴포넌트
 const StyledButton = styled.button`
@@ -26,15 +25,9 @@ const StyledButton = styled.button`
 `;
 
 const HisnetLoginButton = () => {
-  // 로그인 API로 리디렉션하는 함수
-  const handleCardClickHisnet = (returnUrl, accessKey) => {
-    const url = `https://walab.info:8443/HisnetLogin/hisnet-login?returnUrl=${encodeURIComponent(returnUrl)}&accessKey=${encodeURIComponent(accessKey)}`;
-    window.location.href = url;
-  };
-
   return (
-    <StyledButton 
-      onClick={() => handleCardClickHisnet('http://localhost:3000/login-ing', 'a0QGSkE5zFwJqIJncS9y')}
+    <StyledButton
+      onClick={() => ApiService.loginWithHisnet()}
     >
       히즈넷으로 로그인
     </StyledButton>

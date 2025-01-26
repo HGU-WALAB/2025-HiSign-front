@@ -32,5 +32,5 @@ const CompleteModal = ({ open, onClose, onConfirm }) => {
     </Modal>
   );
 };
-
 export default CompleteModal;
+
