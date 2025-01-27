@@ -18,6 +18,7 @@ module.exports = async function handler(req, res) {
 
     console.log('Received token:', hisnetToken);
     console.log('API Base URL:', process.env.REACT_APP_API_BASE_URL);
+    console.log('ACCESS API URL:', `${process.env.REACT_APP_API_BASE_URL}/auth/login`);
 
     const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/auth/login`, { hisnetToken });
 
