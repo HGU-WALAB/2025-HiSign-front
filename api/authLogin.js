@@ -22,7 +22,7 @@ async function handler(req, res) {
     const response = await axios.post(
       `${process.env.REACT_APP_API_BASE_URL}/auth/login`, 
       { hisnetToken },
-      { timeout: 20000 }
+      { timeout: 8000 }
     );
 
     return res.status(200).json(response.data);
