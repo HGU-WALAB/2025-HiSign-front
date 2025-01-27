@@ -99,7 +99,7 @@ const ApiService = {
 
   // 로그인 요청 (히즈넷 토큰 전송)
   login: async (hisnetToken) => {
-    return apiInstance.post('/authLogin', { hisnetToken });
+    return apiInstance.post('/authLogin', { hisnetToken }, { timeout: 20000 });
   },
 };
 
