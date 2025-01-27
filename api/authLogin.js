@@ -1,6 +1,6 @@
-import axios from 'axios';
+const axios = require('axios');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', process.env.FRONTEND_URL);
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -26,4 +26,4 @@ export default async function handler(req, res) {
     console.error('API 요청 중 오류 발생:', error.response?.data || error.message);
     return res.status(500).json({ message: 'Failed to authenticate', error: error.message });
   }
-}
+};
