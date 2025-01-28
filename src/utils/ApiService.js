@@ -1,7 +1,6 @@
 import axios from 'axios';
 
-//.env: REACT_APP_API_SERVERLESS_URL=https://hisign.vercel.app/api
-const BASE_URL = process.env.REACT_APP_API_SERVERLESS_URL;
+const BASE_URL = process.env.REACT_APP_API_BASE_URL;
 const HISNET_LOGIN_URL = `${process.env.REACT_APP_HISNET_URL}/HisnetLogin/hisnet-login`;
 const HISET_RETURN_URL = process.env.REACT_APP_HISET_RETURN_URL;
 const HISNET_ACCESS_KEY = process.env.REACT_APP_HISNET_ACCESS_KEY;
@@ -65,10 +64,10 @@ const ApiService = {
   // 문서 삭제
   deleteDocument: async (documentId) => {
     if (!documentId) throw new Error('문서 ID가 필요합니다.');
-
+  
     try {
       const response = await apiInstance.delete(`/documents/${documentId}`);
-      return response.data; // 성공 메시지 반환
+      return response.data;  // 성공 메시지 반환
     } catch (error) {
       console.error('문서 삭제 중 오류 발생:', error);
       throw new Error(error.response?.data || '문서 삭제 실패');
@@ -91,23 +90,28 @@ const ApiService = {
     return apiInstance.put(`/signature-requests/cancel/${documentId}`);
   },
 
-  // 히즈넷 로그인 리다이렉트
+  // 히즈넷 로그인
   loginWithHisnet: () => {
     const url = `${HISNET_LOGIN_URL}?returnUrl=${encodeURIComponent(HISET_RETURN_URL)}&accessKey=${encodeURIComponent(HISNET_ACCESS_KEY)}`;
     window.location.href = url;
   },
 
-  // 로그인 요청 (히즈넷 토큰 전송)
+  // 로그인 요청
   login: async (hisnetToken) => {
-    return apiInstance.post('/authLogin', { hisnetToken }, { timeout: 20000 });
+    return axios.post(`${BASE_URL}/auth/login`, { hisnetToken }, {
+      headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+    });
   },
 };
 
-export default ApiService;
+export default ApiService ;
 
+
+//버셀 서버리스 함수 사용 버전
 // import axios from 'axios';
 
-// const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+// //.env: REACT_APP_API_SERVERLESS_URL=https://hisign.vercel.app/api
+// const BASE_URL = process.env.REACT_APP_API_SERVERLESS_URL;
 // const HISNET_LOGIN_URL = `${process.env.REACT_APP_HISNET_URL}/HisnetLogin/hisnet-login`;
 // const HISET_RETURN_URL = process.env.REACT_APP_HISET_RETURN_URL;
 // const HISNET_ACCESS_KEY = process.env.REACT_APP_HISNET_ACCESS_KEY;
@@ -171,10 +175,10 @@ export default ApiService;
 //   // 문서 삭제
 //   deleteDocument: async (documentId) => {
 //     if (!documentId) throw new Error('문서 ID가 필요합니다.');
-  
+
 //     try {
 //       const response = await apiInstance.delete(`/documents/${documentId}`);
-//       return response.data;  // 성공 메시지 반환
+//       return response.data; // 성공 메시지 반환
 //     } catch (error) {
 //       console.error('문서 삭제 중 오류 발생:', error);
 //       throw new Error(error.response?.data || '문서 삭제 실패');
@@ -197,19 +201,16 @@ export default ApiService;
 //     return apiInstance.put(`/signature-requests/cancel/${documentId}`);
 //   },
 
-//   // 히즈넷 로그인
+//   // 히즈넷 로그인 리다이렉트
 //   loginWithHisnet: () => {
 //     const url = `${HISNET_LOGIN_URL}?returnUrl=${encodeURIComponent(HISET_RETURN_URL)}&accessKey=${encodeURIComponent(HISNET_ACCESS_KEY)}`;
 //     window.location.href = url;
 //   },
 
-//   // 로그인 요청
+//   // 로그인 요청 (히즈넷 토큰 전송)
 //   login: async (hisnetToken) => {
-//     return axios.post(`${BASE_URL}/auth/login`, { hisnetToken }, {
-//       headers: { 'Content-Type': 'application/json; charset=UTF-8' },
-//     });
+//     return apiInstance.post('/authLogin', { hisnetToken }, { timeout: 20000 });
 //   },
 // };
 
-// export default ApiService ;
-
+// export default ApiService;
