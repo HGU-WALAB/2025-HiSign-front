@@ -44,7 +44,7 @@ const UploadPage = () => {
     console.log("before API, file:", file);
     ApiService.uploadDocument(file,member.unique_id)
       .then((response) => {
-        alert("파일 업로드 완료!");
+        alert("파일이 업로드 되었습니다!");
         console.log("Response Data:", response.data);
         console.log("Aftoer API, file:", file);
         const blobUrl = URL.createObjectURL(file);
@@ -82,13 +82,13 @@ const UploadPage = () => {
                 style={styles.button}
                 onClick={() => setDocumentState({ id: null, name: "", fileUrl: null })}
               >
-                다른 파일 업로드
+                다른 파일 업로드하기
               </button>
               <button
                 style={styles.button}
                 onClick={() => navigate("/request")}
               >
-                다음
+                서명자 추가하기
               </button>
             </div>
           </div>

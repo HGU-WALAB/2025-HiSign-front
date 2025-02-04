@@ -21,6 +21,7 @@ function MyRoutes() {
                 <Route path="/request" element={<RequestPage />} />
                 <Route path="/align" element={<AlignPage />} />
             </Route>
+            
         </Routes>
     );
 }

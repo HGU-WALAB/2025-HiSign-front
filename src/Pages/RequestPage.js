@@ -7,6 +7,7 @@ import { documentState } from '../recoil/atom/documentState';
 import { signerState } from '../recoil/atom/signerState';
 
 const RequestPage = () => {
+  
   const navigate = useNavigate();
   const document = useRecoilValue(documentState);
   const [signers, setSigners] = useRecoilState(signerState);
@@ -20,18 +21,29 @@ const RequestPage = () => {
   // 다음 단계 버튼 활성화 여부 (서명자가 있을 때 활성화)
   const isNextButtonEnabled = signers.length > 0;
 
+  const validateEmail = (email) => {
+    return email.endsWith('@handong.ac.kr');
+  };
+
   // 서명자 추가 핸들러 (Recoil 상태에 추가)
   const handleAddSigner = () => {
-    if (newName && newEmail) {
+    if (newName && newEmail && validateEmail(newEmail)) {
       const newSigner = {
         name: newName,
         email: newEmail,
         signatureFields: [],
       };
-      setSigners([...signers, newSigner]);  // 상태 업데이트
-      setNewName("");  // 입력 초기화
+      setSigners([...signers, newSigner]);
+      setNewName("");
       setNewEmail("");
+    } else if (!validateEmail(newEmail)) {
+      alert('이메일은 @handong.ac.kr로 끝나야 합니다.');
     }
+  };
+
+  // 이메일 입력 처리 함수 수정
+  const handleEmailChange = (e) => {
+    setNewEmail(e.target.value);
   };
 
   // 서명자 삭제 핸들러 (Recoil 상태에서 제거)
@@ -48,7 +60,7 @@ const RequestPage = () => {
     <Container>
       <StyledBody>
         <MainArea>
-        <FileName>{document.name}</FileName>
+        <FileName>업로드 한 파일: {document.name}</FileName>
           <AddSignerSection>
             <AddSignerTitle>서명자 추가하기</AddSignerTitle>
             <RowContainer>
@@ -57,11 +69,16 @@ const RequestPage = () => {
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
               />
-              <Input
-                placeholder="이메일"
+             <Input
+                placeholder="이메일 (@handong.ac.kr)"
                 value={newEmail}
-                onChange={(e) => setNewEmail(e.target.value)}
-              />
+                onChange={handleEmailChange}
+                onBlur={() => {
+                if (newEmail && !validateEmail(newEmail)) {
+                     alert('이메일은 @handong.ac.kr로 끝나야 합니다.');
+      } 
+    }}
+  />
             </RowContainer>
             <AddButton onClick={handleAddSigner} disabled={!isAddButtonEnabled}>
               추가하기
@@ -85,6 +102,7 @@ const RequestPage = () => {
 
       <Footer>
         <FooterButtons>
+        <NavButton onClick={() => navigate(`/upload`)}>이전으로</NavButton>
           <NavButton onClick={() => navigate(`/list`)}>나가기</NavButton>
           <NextButton onClick={handleNextStep} disabled={!isNextButtonEnabled}>
             추가 완료
@@ -161,8 +179,9 @@ const AddButton = styled.button`
   background-color: ${props => (props.disabled ? '#ccc' : '#03A3FF')}; /* 비활성화 시 회색, 활성화 시 파란색 */
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 3px;
   cursor: ${props => (props.disabled ? 'not-allowed' : 'pointer')}; /* 비활성화 시 커서 변경 */
+  
   pointer-events: ${props => (props.disabled ? 'none' : 'auto')}; /* 비활성화 시 클릭 불가 */
 `;
 
