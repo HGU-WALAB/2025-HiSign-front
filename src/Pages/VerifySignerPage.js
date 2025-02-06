@@ -47,9 +47,11 @@ function EmailInputForm({ token }) {
 
     ApiService.validateSignatureRequest(token, email)
     .then((response) => {
-      console.log(response.data); // 서명할 문서 정보 받아서 처리
+      console.log("응답 객체:", response);
+      console.log("응답 데이터:", response.data); // 서명할 문서 정보 받아서 처리
     })
     .catch((err) => {
+      console.error("API 요청 실패:", err.response?.data || err.message);
       setError(err.message);
     });
   };

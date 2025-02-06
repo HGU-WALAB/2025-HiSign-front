@@ -121,7 +121,7 @@ const ApiService = {
     if (!token) throw new Error('토큰이 없습니다.');
   
     try {
-      const response = await apiInstance.get(`/signatureRequest/check?token=${token}`);
+      const response = await apiInstance.get(`/signature-requests/check?token=${token}`);
       return response.data;
     } catch (error) {
       console.error('서명 요청 토큰 검증 실패:', error);
@@ -133,7 +133,7 @@ const ApiService = {
     if (!token || !email) throw new Error('토큰과 이메일이 필요합니다.');
 
     try {
-      const response = await apiInstance.post('/signatureRequest/validate', { token, email });
+      const response = await apiInstance.post('/signature-requests/validate', { token, email });
       return response.data; // 서명할 문서 정보 반환
     } catch (error) {
       console.error('서명 요청 검증 실패:', error);
