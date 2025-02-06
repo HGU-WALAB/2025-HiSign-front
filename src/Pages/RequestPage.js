@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { IoClose } from "react-icons/io5";
-import { useNavigate } from 'react-router-dom';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useNavigate } from "react-router-dom";
+import { useRecoilState, useRecoilValue } from "recoil";
 import styled from "styled-components";
-import { documentState } from '../recoil/atom/documentState';
-import { signerState } from '../recoil/atom/signerState';
+import { documentState } from "../recoil/atom/documentState";
+import { signerState } from "../recoil/atom/signerState";
 
 const RequestPage = () => {
   const navigate = useNavigate();
@@ -18,7 +18,7 @@ const RequestPage = () => {
   const isNextButtonEnabled = signers.length > 0;
 
   const validateEmail = (email) => {
-    return email.endsWith('@handong.ac.kr') || email.endsWith('@handong.edu');
+    return email.endsWith("@handong.ac.kr") || email.endsWith("@handong.edu");
   };
 
   const handleAddSigner = () => {
@@ -32,18 +32,13 @@ const RequestPage = () => {
       setNewName("");
       setNewEmail("");
     } else if (!validateEmail(newEmail)) {
-      alert('이메일은 @handong.ac.kr 또는 @handong.edu로 끝나야 합니다.');
+      alert("이메일은 @handong.ac.kr 또는 @handong.edu로 끝나야 합니다.");
     }
   };
 
-  const handleEmailChange = (e) => {
-    setNewEmail(e.target.value);
-  };
-
   const handleDeleteSigner = (emailToDelete) => {
-    console.log('Deleting signer with email:', emailToDelete);
-    setSigners(prevSigners => 
-      prevSigners.filter(signer => signer.email !== emailToDelete)
+    setSigners((prevSigners) =>
+        prevSigners.filter((signer) => signer.email !== emailToDelete)
     );
   };
 
@@ -52,86 +47,61 @@ const RequestPage = () => {
   };
 
   return (
-    <Container>
-      <StyledBody>
-        <MainArea>
-          <FileName>업로드 한 파일: {document.name}</FileName>
-          <AddSignerSection>
-            <AddSignerTitle>서명자 추가하기</AddSignerTitle>
-            <RowContainer>
-              <Input
-                placeholder="이름"
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-              />
-              <br />
-              <Input
-                placeholder="이메일 (@handong.ac.kr 또는 .edu)"
-                value={newEmail}
-                onChange={handleEmailChange}
-                onBlur={() => {
-                  if (newEmail && !validateEmail(newEmail)) {
-                    alert('이메일은 @handong.ac.kr 또는 @handong.edu로 끝나야 합니다.');
-                  }
-                }}
-              />
-            </RowContainer>
-            <br />
-            <AddButton onClick={handleAddSigner} disabled={!isAddButtonEnabled}>
-              추가하기
-            </AddButton>
-          </AddSignerSection>
+      <Container>
+        <StyledBody>
+          <MainArea>
+            <FileName>업로드 한 파일: {document.name}</FileName>
+            <AddSignerSection>
+              <AddSignerTitle>서명자 추가하기</AddSignerTitle>
+              <RowContainer>
+                <Input
+                    placeholder="이름"
+                    value={newName}
+                    onChange={(e) => setNewName(e.target.value)}
+                />
+                <Input
+                    placeholder="이메일 (@handong.ac.kr 또는 .edu)"
+                    value={newEmail}
+                    onChange={(e) => setNewEmail(e.target.value)}
+                    onBlur={() => {
+                      if (newEmail && !validateEmail(newEmail)) {
+                        alert("이메일은 @handong.ac.kr 또는 @handong.edu로 끝나야 합니다.");
+                      }
+                    }}
+                />
+              </RowContainer>
+              <AddButton onClick={handleAddSigner} disabled={!isAddButtonEnabled}>
+                추가하기
+              </AddButton>
+            </AddSignerSection>
 
-          <AddSignerTitle>추가된 서명자 목록</AddSignerTitle>
-          {signers.map((signer) => (
-            <SignerBox key={signer.email}>
-              <SignerInfo>
-                <SignerName>{signer.name}</SignerName>
-                <SignerEmail>{signer.email}</SignerEmail>
-              </SignerInfo>
-              <DeleteButton
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDeleteSigner(signer.email);
-                }}
-              >
-                <IoClose />
-              </DeleteButton>
-            </SignerBox>
-          ))}
-        </MainArea>
-      </StyledBody>
+            <AddSignerTitle>추가된 서명자 목록</AddSignerTitle>
+            {signers.map((signer) => (
+                <SignerBox key={signer.email}>
+                  <SignerInfo>
+                    <SignerName>{signer.name}</SignerName>
+                    <SignerEmail>{signer.email}</SignerEmail>
+                  </SignerInfo>
+                  <DeleteButton onClick={() => handleDeleteSigner(signer.email)}>
+                    <IoClose />
+                  </DeleteButton>
+                </SignerBox>
+            ))}
+          </MainArea>
+        </StyledBody>
 
-      <FloatingButtonContainer>
-        <FloatingButton 
-          onClick={() => navigate(`/upload`)} 
-          backgroundColor="#ccc"
-          position="left"
-        >
-          이전으로
-        </FloatingButton>
-        
-        <FloatingButton 
-          onClick={() => navigate(`/request-document`)} 
-          backgroundColor="#ccc"
-          position="center"
-        >
-          나가기
-        </FloatingButton>
-        
-        <FloatingButton 
-          onClick={handleNextStep} 
-          backgroundColor="#03A3FF"
-          disabled={!isNextButtonEnabled}
-          position="right"
-        >
-          추가 완료
-        </FloatingButton>
-      </FloatingButtonContainer>
-    </Container>
+        <FloatingButtonContainer>
+          <GrayButton onClick={() => navigate(`/upload`)}>이전으로</GrayButton>
+          <GrayButton onClick={() => navigate(`/request-document`)}>나가기</GrayButton>
+          <NextButton onClick={handleNextStep} disabled={!isNextButtonEnabled}>
+            추가 완료
+          </NextButton>
+        </FloatingButtonContainer>
+      </Container>
   );
 };
 
+// 📌 **Styled Components 적용**
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -147,7 +117,6 @@ const StyledBody = styled.main`
   align-items: center;
   background-color: #e5e5e5;
   padding: 20px;
-  padding-bottom: 80px;
 `;
 
 const MainArea = styled.div`
@@ -188,21 +157,20 @@ const RowContainer = styled.div`
 `;
 
 const Input = styled.input`
-  border: none;
-  background: none;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
   width: 100%;
-  padding: 5px;
   font-size: 14px;
 `;
 
 const AddButton = styled.button`
   padding: 10px 20px;
-  background-color: ${props => (props.disabled ? '#ccc' : '#03A3FF')};
+  background-color: ${({ disabled }) => (disabled ? "#ccc" : "#03A3FF")};
   color: white;
   border: none;
   border-radius: 3px;
-  cursor: ${props => (props.disabled ? 'not-allowed' : 'pointer')};
-  pointer-events: ${props => (props.disabled ? 'none' : 'auto')};
+  cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
 `;
 
 const SignerBox = styled.div`
@@ -214,18 +182,15 @@ const SignerBox = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position: relative;
 `;
 
 const SignerInfo = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 5px;
 `;
 
 const SignerName = styled.span`
   font-weight: bold;
-  margin-right: 10px;
 `;
 
 const SignerEmail = styled.span`
@@ -236,10 +201,6 @@ const DeleteButton = styled.button`
   background: none;
   border: none;
   cursor: pointer;
-  padding: 5px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   color: #666;
   transition: color 0.2s;
 
@@ -263,25 +224,22 @@ const FloatingButtonContainer = styled.div`
   z-index: 1000;
 `;
 
-const FloatingButton = styled.button`
+const ButtonBase = styled.button`
   padding: 12px 24px;
-  background-color: ${props => props.disabled ? '#ccc' : props.backgroundColor};
   color: white;
   border: none;
   border-radius: 25px;
-  cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
+  cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   transition: transform 0.2s, box-shadow 0.2s;
+`;
 
-  &:hover {
-    transform: ${props => props.disabled ? 'none' : 'translateY(-2px)'};
-    box-shadow: ${props => props.disabled ? '0 4px 8px rgba(0, 0, 0, 0.2)' : '0 6px 12px rgba(0, 0, 0, 0.3)'};
-  }
+const GrayButton = styled(ButtonBase)`
+  background-color: #ccc;
+`;
 
-  &:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  }
+const NextButton = styled(ButtonBase)`
+  background-color: ${({ disabled }) => (disabled ? "#ccc" : "#03A3FF")};
 `;
 
 export default RequestPage;

@@ -11,10 +11,10 @@ const CompleteModal = ({ open, onClose, onConfirm }) => {
 
     onConfirm(); // 비동기 작업 실행 (필요하면 수정)
 
-    // 3초 후 자동으로 닫히도록 설정
+    // 3.5초 후 자동으로 닫히도록 설정
     setTimeout(() => {
       setLoadingModalOpen(false);
-    }, 3000);
+    }, 3500);
   };
 
   return (

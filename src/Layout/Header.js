@@ -14,7 +14,8 @@ function HeaderBar() {
                 <MenuLink to="/">HI-Sign</MenuLink>
                 {auth.isAuthenticated && (
                     <NavigationLinks>
-                        <MenuLink to="/list">리스트 페이지</MenuLink>
+                        <MenuLink to="/request-document">요청한 리스트 페이지</MenuLink>
+                        <MenuLink to="/receive-document">요청받은 리스트 페이지</MenuLink>
                         <MenuLink to="/upload">문서 업로드하기</MenuLink>
                         <MenuLink to="/request">서명자 등록하기</MenuLink>
                         <MenuLink to="/align">서명 할당하기</MenuLink>
