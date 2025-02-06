@@ -29,7 +29,7 @@ const CompleteButton = () => {
   
       if (response.status === 200) {
         alert("서명 요청이 성공적으로 전송되었습니다.");
-        navigate('/list');
+        navigate('/request-document');
       }
     } catch (error) {
       console.error("서명 요청 중 오류 발생:", error);

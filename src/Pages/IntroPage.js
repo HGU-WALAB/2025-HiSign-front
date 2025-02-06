@@ -33,7 +33,9 @@ function SideBar() {
                 </NavigationLinks>
             </SidebarContainer> */}
              {/* 중앙 링크 컨테이너 */}
+             
             <CenterContainer>
+            <img src="/assets/frame.png" alt="CSEE 로고" />
                 {auth.isAuthenticated ? (
                     <CenterLink to="/upload">서명 요청 시작하기</CenterLink>
                 ) : (

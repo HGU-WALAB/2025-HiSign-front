@@ -15,6 +15,7 @@
     "react-rnd": "^10.4.14",
     "react-router-dom": "^7.1.1",
     "react-scripts": "5.0.1",
+    "react-spinners": "^0.15.0",
     "recoil": "^0.7.7",
     "styled-components": "^6.1.14"
   },

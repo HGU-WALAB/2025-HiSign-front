@@ -49,116 +49,158 @@ const AlignPage = () => {
   }, [signers]);
 
   return (
-    <PageContainer>
-      <Container>
-        <StyledDrawer variant="permanent" anchor="left">
-          <StyledTitle variant="h6">서명 인원</StyledTitle>
-          <List>
-            {signers.map((signer) => (
-              <ListItem button key={signer.email} onClick={(e) => handleMenuClick(e, signer)}>
-                <ListItemText primary={signer.name} secondary={signer.email} />
-              </ListItem>
-            ))}
-          </List>
-        </StyledDrawer>
+    <MainContainer>
+      <ContentWrapper>
+        <Container>
+          <StyledDrawer variant="permanent" anchor="left">
+            <DrawerHeader>
+              <StyledTitle variant="h6">서명 인원</StyledTitle>
+              <Divider />
+              <StyledServTitle variant="h7">대상을 선택후 위치를 지정하세요</StyledServTitle>
+              <Divider />
+            </DrawerHeader>
+            <List>
+              {signers.map((signer) => (
+                <ListItem button key={signer.email} onClick={(e) => handleMenuClick(e, signer)}>
+                  <ListItemText primary={signer.name} secondary={signer.email} />
+                </ListItem>
+              ))}
+            </List>
+          </StyledDrawer>
 
-        <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={handleMenuClose}>
-          <MenuItem onClick={addSignatureBox}>서명 추가</MenuItem>
-        </Menu>
+          <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={handleMenuClose}>
+            <MenuItem onClick={addSignatureBox}>서명 추가</MenuItem>
+          </Menu>
 
-        {pdf ? (
-          <DocumentContainer ref={documentRef}>
-            <Document file={pdf} onLoadSuccess={(data) => setTotalPages(data.numPages)}>
-              <Page pageNumber={pageNum + 1} width={800} />
-            </Document>
+          <DocumentSection>
+            {pdf ? (
+              <DocumentContainer ref={documentRef}>
+                <Document file={pdf} onLoadSuccess={(data) => setTotalPages(data.numPages)}>
+                  <Page pageNumber={pageNum + 1} width={800} />
+                </Document>
 
-            {signers.length > 0 &&
-              signers.map((signer) =>
-                signer.signatureFields
-                  .map((box, originalIndex) => ({ ...box, originalIndex })) // 원래 인덱스를 보존
-                  .filter((box) => box.position.pageNumber === pageNum + 1)
-                  .map(({ width, height, position, originalIndex }) => (
-                    <Rnd
-                      key={`${signer.email}-${originalIndex}`}
-                      bounds="parent"
-                      size={{ width, height }}
-                      position={{ x: position.x, y: position.y }}
-                      onDragStop={(e, d) => {
-                        SignatureService.updateSignaturePosition(
-                          signers,
-                          setSigners,
-                          signer.email,
-                          originalIndex, // 필터링 전의 원래 인덱스를 전달
-                          { x: d.x, y: d.y }
-                        );
-                        setTimeout(() => {
-                          const updatedSigner = signers.find((s) => s.email === signer.email);
-                          const updatedBox = updatedSigner?.signatureFields[originalIndex];
-                          console.log("Updated position to:", {
-                            name: updatedSigner?.name,
-                            page: updatedBox?.position.pageNumber,
-                            x: updatedBox?.position.x,
-                            y: updatedBox?.position.y
-                          });
-                        }, 0);
-                      }}
-                      onResizeStop={(e, direction, ref, delta, pos) => {
-                        SignatureService.updateSignatureSize(
-                          signers,
-                          setSigners,
-                          signer.email,
-                          originalIndex,
-                          ref.offsetWidth,
-                          ref.offsetHeight,
-                          pos
-                        );
-                        setTimeout(() => {
-                          const updatedSigner = signers.find((s) => s.email === signer.email);
-                          const updatedBox = updatedSigner?.signatureFields[originalIndex];
-                          console.log("Updated size to:", {
-                            name: updatedSigner?.name,
-                            page: updatedBox?.position.pageNumber,
-                            width: updatedBox?.width,
-                            height: updatedBox?.height
-                          });
-                        }, 0);
-                      }}
-                    >
-                      <SignatureBoxContainer>
-                        {signer.name}의 서명
-                        <DeleteButton
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            SignatureService.removeSignatureBox(signers, setSigners, signer.email, originalIndex);
+                {signers.length > 0 &&
+                  signers.map((signer) =>
+                    signer.signatureFields
+                      .map((box, originalIndex) => ({ ...box, originalIndex }))
+                      .filter((box) => box.position.pageNumber === pageNum + 1)
+                      .map(({ width, height, position, originalIndex }) => (
+                        <Rnd
+                          key={`${signer.email}-${originalIndex}`}
+                          bounds="parent"
+                          size={{ width, height }}
+                          position={{ x: position.x, y: position.y }}
+                          onDragStop={(e, d) => {
+                            SignatureService.updateSignaturePosition(
+                              signers,
+                              setSigners,
+                              signer.email,
+                              originalIndex,
+                              { x: d.x, y: d.y }
+                            );
+                            setTimeout(() => {
+                              const updatedSigner = signers.find((s) => s.email === signer.email);
+                              const updatedBox = updatedSigner?.signatureFields[originalIndex];
+                              console.log("Updated position to:", {
+                                name: updatedSigner?.name,
+                                page: updatedBox?.position.pageNumber,
+                                x: updatedBox?.position.x,
+                                y: updatedBox?.position.y
+                              });
+                            }, 0);
+                          }}
+                          onResizeStop={(e, direction, ref, delta, pos) => {
+                            SignatureService.updateSignatureSize(
+                              signers,
+                              setSigners,
+                              signer.email,
+                              originalIndex,
+                              ref.offsetWidth,
+                              ref.offsetHeight,
+                              pos
+                            );
+                            setTimeout(() => {
+                              const updatedSigner = signers.find((s) => s.email === signer.email);
+                              const updatedBox = updatedSigner?.signatureFields[originalIndex];
+                              console.log("Updated size to:", {
+                                name: updatedSigner?.name,
+                                page: updatedBox?.position.pageNumber,
+                                width: updatedBox?.width,
+                                height: updatedBox?.height
+                              });
+                            }, 0);
                           }}
                         >
-                          삭제
-                        </DeleteButton>
-                      </SignatureBoxContainer>
-                    </Rnd>
-                  ))
-              )}
+                          <SignatureBoxContainer>
+                            {signer.name}의 서명
+                            <DeleteButton
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                SignatureService.removeSignatureBox(signers, setSigners, signer.email, originalIndex);
+                              }}
+                            >
+                              삭제
+                            </DeleteButton>
+                          </SignatureBoxContainer>
+                        </Rnd>
+                      ))
+                  )}
+              </DocumentContainer>
+            ) : (
+              <LoadingMessage>문서를 불러오는 중입니다...</LoadingMessage>
+            )}
 
-          </DocumentContainer>
-        ) : (
-          <p>문서를 불러오는 중입니다...</p>
-        )}
+            <PagingControl pageNum={pageNum} setPageNum={setPageNum} totalPages={totalPages} />
+          </DocumentSection>
+        </Container>
 
-        <PagingControl pageNum={pageNum} setPageNum={setPageNum} totalPages={totalPages} />
-      </Container>
-
-      <ButtonContainer>
-        <CompleteButton />
-      </ButtonContainer>
-    </PageContainer>
+        <ButtonContainer>
+          <CompleteButton />
+        </ButtonContainer>
+      </ContentWrapper>
+    </MainContainer>
   );
 };
 
-export default AlignPage;
+const MainContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+`;
+
+const ContentWrapper = styled.div`
+  flex: 1;
+  padding-top: 64px;
+`;
 
 const Container = styled.div`
   max-width: 900px;
   margin: 0 auto;
+  padding: 20px;
+  position: relative;
+`;
+
+const DocumentSection = styled.div`
+  margin-left: 250px;
+  padding: 20px;
+`;
+
+const DrawerHeader = styled.div`
+  padding: 16px;
+`;
+
+const Divider = styled.hr`
+  margin: 10px 0;
+  border: none;
+  border-top: 1px solid #e0e0e0;
+  width: 100%;
+`;
+
+const LoadingMessage = styled.p`
+  text-align: center;
+  padding: 20px;
+  color: #666;
 `;
 
 const DocumentContainer = styled.div`
@@ -166,6 +208,8 @@ const DocumentContainer = styled.div`
   margin: 20px auto;
   border: 1px solid #999;
   position: relative;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 `;
 
 const SignatureBoxContainer = styled.div`
@@ -195,17 +239,33 @@ const DeleteButton = styled.button`
 
 const StyledDrawer = styled(Drawer)`
   && {
-    width: 250px;
+    width: 300px;
     flex-shrink: 0;
+    
+    .MuiDrawer-paper {
+      width: 250px;
+      margin-top: 64px;
+      background-color: white;
+      border-right: 1px solid #e0e0e0;
+    }
   }
 `;
 
 const StyledTitle = styled(Typography)`
-  padding: 16px;
+  font-weight: bold;
+  margin-bottom: 8px;
+`;
+
+const StyledServTitle = styled(Typography)`
+  color: #666;
+  font-size: 0.9rem;
+  margin: 8px 0;
 `;
 
 const ButtonContainer = styled.div`
   text-align: center;
-  margin-top: 20px;
+  margin: 20px 0;
+  padding: 20px;
 `;
 
+export default AlignPage;

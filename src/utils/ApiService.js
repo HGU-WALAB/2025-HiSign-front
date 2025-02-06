@@ -52,9 +52,18 @@ const ApiService = {
   },
 
   // 문서 목록 가져오기
-  fetchDocuments: async () => {
-    return apiInstance.get('/documents/list');
+  fetchDocuments: async (type) => {
+    if (type === 'requested') {
+      // 요청한 문서 리스트 API 호출
+      return apiInstance.get('/documents/requested-documents');
+    } else if (type === 'received') {
+      // 요청받은 문서 리스트 API 호출
+      return apiInstance.get('/documents/received-documents');
+    } else {
+      throw new Error('Invalid document type specified');
+    }
   },
+
 
   // 특정 문서 가져오기 (PDF 다운로드)
   fetchDocument: async (documentId) => {
@@ -72,6 +81,10 @@ const ApiService = {
       console.error('문서 삭제 중 오류 발생:', error);
       throw new Error(error.response?.data || '문서 삭제 실패');
     }
+  },
+  rejectSignatureRequest: async (documentId) => {
+    if (!documentId) throw new Error("문서 ID가 필요합니다.");
+    return apiInstance.put(`/signature-requests/reject/${documentId}`);
   },
 
   // 서명 요청 전송
