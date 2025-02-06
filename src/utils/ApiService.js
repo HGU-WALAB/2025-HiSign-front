@@ -115,6 +115,31 @@ const ApiService = {
       headers: { 'Content-Type': 'application/json; charset=UTF-8' },
     });
   },
+
+  // 서명 요청 토큰 유효성 확인
+  checkSignatureToken: async (token) => {
+    if (!token) throw new Error('토큰이 없습니다.');
+  
+    try {
+      const response = await apiInstance.get(`/signatureRequest/check?token=${token}`);
+      return response.data;
+    } catch (error) {
+      console.error('서명 요청 토큰 검증 실패:', error);
+      throw new Error(error.response?.data || '토큰이 유효하지 않습니다.');
+    }
+  },
+  // 서명 요청 검증 (이메일 입력 후)
+  validateSignatureRequest: async (token, email) => {
+    if (!token || !email) throw new Error('토큰과 이메일이 필요합니다.');
+
+    try {
+      const response = await apiInstance.post('/signatureRequest/validate', { token, email });
+      return response.data; // 서명할 문서 정보 반환
+    } catch (error) {
+      console.error('서명 요청 검증 실패:', error);
+      throw new Error(error.response?.data || '인증 실패');
+    }
+  },
 };
 
 export default ApiService ;
