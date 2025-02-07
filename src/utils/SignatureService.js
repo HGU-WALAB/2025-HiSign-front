@@ -41,7 +41,7 @@ const SignatureService = {
                   ? {
                       ...field,
                       position: { 
-                        ...field.position, // 기존 position 값 유지
+                        ...field.position,
                         x: position.x, 
                         y: position.y 
                       },

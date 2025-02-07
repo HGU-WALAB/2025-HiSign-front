@@ -1,5 +1,4 @@
 // 필요한 라이브러리 및 컴포넌트 임포트
-import axios from "axios";
 import dayjs from "dayjs"; // 날짜 처리 라이브러리
 import { PDFDocument, rgb } from "pdf-lib"; // PDF 수정을 위한 라이브러리
 import { useRef, useState } from "react";
@@ -88,28 +87,28 @@ function App() {
   //   }
   // };
   const handlePostFiles = (file) => {
-    if (!file) {
-      alert("업로드할 파일이 없습니다.");
-      return;
-    }
+    // if (!file) {
+    //   alert("업로드할 파일이 없습니다.");
+    //   return;
+    // }
   
-    const formData = new FormData();
-    formData.append("file", file, file.name); // 파일 추가
+    // const formData = new FormData();
+    // formData.append("file", file, file.name); // 파일 추가
   
-    axios
-      .post("http://localhost:8080/api/files/document/upload", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
-      .then((response) => {
-        alert("파일 업로드 완료!");
-        console.log("Response Data:", response.data);
-      })
-      .catch((error) => {
-        console.error("Error uploading file:", error);
-        alert(`파일 업로드 실패: ${error.response?.data?.message || error.message}`);
-      });
+    // axios
+    //   .post("http://localhost:8080/api/files/document/upload", formData, {
+    //     headers: {
+    //       "Content-Type": "multipart/form-data",
+    //     },
+    //   })
+    //   .then((response) => {
+    //     alert("파일 업로드 완료!");
+    //     console.log("Response Data:", response.data);
+    //   })
+    //   .catch((error) => {
+    //     console.error("Error uploading file:", error);
+    //     alert(`파일 업로드 실패: ${error.response?.data?.message || error.message}`);
+    //   });
   };
   
 
