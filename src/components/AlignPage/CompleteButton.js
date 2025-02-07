@@ -1,9 +1,8 @@
 import { Button } from '@mui/material';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState } from 'recoil';
 import { documentState } from '../../recoil/atom/documentState';
-import { signatureState } from '../../recoil/atom/signatureState';
 import { signerState } from '../../recoil/atom/signerState';
 import ApiService from '../../utils/ApiService';
 import CompleteModal from './CompleteModal';
@@ -11,7 +10,6 @@ import CompleteModal from './CompleteModal';
 const CompleteButton = () => {
   const [document,setDocument] = useRecoilState(documentState);
   const[signers, setSigners] = useRecoilState(signerState);
-  const signatureFields = useRecoilValue(signatureState);
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   
