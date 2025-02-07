@@ -8,11 +8,11 @@ import ApiService from '../../utils/ApiService';
 import CompleteModal from './CompleteModal';
 
 const CompleteButton = () => {
-  const [document, setDocument]= useRecoilState(documentState);
-  const [signers, setSigners] = useRecoilState(signerState);
+  const [document,setDocument] = useRecoilState(documentState);
+  const[signers, setSigners] = useRecoilState(signerState);
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
-
+  
   const handleOpenModal = () => {
     setOpen(true);
   };
