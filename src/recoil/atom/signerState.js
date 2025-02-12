@@ -5,7 +5,7 @@ export const signerState = atom({
   default: [],         // 기본값: 빈 배열
 });
 
-// {
+// [{
 //   name: '홍길동',       // 서명자의 이름
 //   email: 'hong@example.com',  // 서명자의 이메일
 //   signatureFields: [
@@ -20,4 +20,4 @@ export const signerState = atom({
 //      height: 50
 //    }
 //    ]
-// }
+// }]
