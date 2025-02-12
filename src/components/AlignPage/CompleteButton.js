@@ -53,25 +53,27 @@ const CompleteButton = () => {
       const documentId = uploadResponse.data;
       // 3 서명 요청 API 호출 (업로드 완료 후 실행)
       const signatureResponse = await ApiService.sendSignatureRequest(documentId, member.name, signers);
+      
+      console.log("서명 요청 결과:", signatureResponse);
 
       if (signatureResponse.status === 200) {
         alert("서명 요청이 성공적으로 전송되었습니다.");
-        navigate("/request-document");
+        setDocument({
+            requestName: "",
+            ownerId: null,
+            fileName: null,
+            fileUrl: "",
+            file: null,
+        });
+        setSigners([]);
+          navigate("/request-document");
+        } else {
+          console.error("서명 요청 실패:", signatureResponse);
+          alert("서명 요청 중 오류가 발생했습니다.");
       }
     } catch (error) {
       console.error("요청 처리 중 오류 발생:", error);
       alert("요청 처리 중 오류가 발생했습니다.");
-    } finally {
-      // 4 상태 초기화
-      setDocument({
-        requestName: "",
-        ownerId: null,
-        fileName: null,
-        fileUrl: "",
-        file: null,
-      });
-      setSigners([]);
-      setOpen(false);
     }
   };
 

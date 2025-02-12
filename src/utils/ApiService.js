@@ -104,7 +104,7 @@ const ApiService = {
     const requestData = { documentId,memberName, signers };
     try {
       const response = await apiInstance.post("/signature-requests/request", requestData);
-      return response.data;
+      return response;
     } catch (error) {
       if (error.response) {
           const errorMessage = error.response.data.message;
