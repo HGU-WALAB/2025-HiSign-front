@@ -50,7 +50,8 @@ const RequestPage = () => {
       <Container>
         <StyledBody>
           <MainArea>
-            <FileName>업로드 한 파일: {document.name}</FileName>
+            <RequestName>{document.requestName}</RequestName>
+            <FileName>선택된 문서: {document.fileName}</FileName>
             <AddSignerSection>
               <AddSignerTitle>서명자 추가하기</AddSignerTitle>
               <RowContainer>
@@ -127,8 +128,16 @@ const MainArea = styled.div`
   width: 600px;
 `;
 
-const FileName = styled.h2`
+const RequestName = styled.h2`
   font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+  color: #333;
+  margin-bottom: 20px;
+`;
+
+const FileName = styled.h3`
+  font-size: 16px;
   font-weight: bold;
   text-align: center;
   color: #333;

@@ -47,11 +47,12 @@ apiInstance.interceptors.response.use(
 
 const ApiService = {
   // 파일 업로드
-  uploadDocument: async (file, uniqueId) => {
+  uploadDocument: async (file, uniqueId,requestName) => {
     if (!file) throw new Error('업로드할 파일이 없습니다.');
     const formData = new FormData();
     formData.append('file', file, file.name);
     formData.append('unique_id', uniqueId);
+    formData.append('request_name', requestName);
 
     return apiInstance.post('/files/document/upload', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
@@ -95,12 +96,24 @@ const ApiService = {
   },
 
   // 서명 요청 전송
-  sendSignatureRequest: async (documentId, signers) => {
+  sendSignatureRequest: async (documentId, memberName, signers) => {
     if (!documentId) throw new Error('문서 정보가 없습니다.');
     if (signers.length === 0) throw new Error('서명자를 추가해주세요.');
+    if (!memberName) throw new Error('이름 정보가 없습니다. 다시 로그인해주세요.');
 
-    const requestData = { documentId, signers };
-    return apiInstance.post('/signature-requests/request', requestData);
+    const requestData = { documentId,memberName, signers };
+    try {
+      const response = await apiInstance.post("/signature-requests/request", requestData);
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+          const errorMessage = error.response.data.message;
+          alert(errorMessage); // 사용자에게 오류 메시지 표시
+      } else {
+          alert("서명 요청 중 알 수 없는 오류가 발생했습니다.");
+      }
+      throw error;
+    }
   },
 
   // 서명 요청 취소

@@ -43,6 +43,7 @@ const LoginCallback = () => {
             unique_id: payload.uniqueId,
             name: payload.name,
             email: payload.email,
+            level: payload.level,
           });
           // 페이지 이동
           navigate('/');
