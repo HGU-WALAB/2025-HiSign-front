@@ -12,7 +12,6 @@ export const signingState = atom({
   },
 });
 
-
 /*
 예제:
 {
@@ -44,5 +43,34 @@ export const signingState = atom({
     }
   ],
   "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgA..." // ✅ 단일 이미지 관리
+}
+
+
+{
+  signerEmail: "",
+  documentId: null,
+  signatureFields: [
+      {
+      "type": 0,
+      "position": {
+        "pageNumber": 1,
+        "x": 100,
+        "y": 150
+      },
+      "width": 200,
+      "height": 50,
+      imagePath: ""
+    },
+    {
+      "type": 1,
+      "position": {
+        "pageNumber": 2,
+        "x": 150,
+        "y": 200
+      },
+      "width": 150,
+      "height": 40,
+      "text": "홍길동"  // ✅ 서명 필드 내부에 텍스트 직접 저장
+    }],
 }
 */

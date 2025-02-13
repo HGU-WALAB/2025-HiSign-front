@@ -47,17 +47,20 @@ apiInstance.interceptors.response.use(
 
 const ApiService = {
   // 서명 이미지 업로드
-  uploadSignatureFile: async (blob) => {
+  //const signatureBlob = FileService.base64ToBlob(base64Image); // Base64 → Blob 변환
+  //const filePath = await ApiService.uploadSignatureFile(signatureBlob); // API로 업로드
+  //이런식으로 fileService.js에서 base64ToBlob 함수를 가져와서 Apiservice.uploadSignatureFile 함수를 사용할 수 있습니다.
+  uploadSignatureFile: async (blob,uniqueId) => {
     if (!blob) throw new Error('업로드할 서명 이미지가 없습니다.');
   
     const formData = new FormData();
-    formData.append('file', blob, 'signature.png'); // Blob 데이터를 FormData에 추가
+    formData.append('file', blob, `${uniqueId}.png`); // Blob 데이터를 FormData에 추가
   
     try {
-      const response = await apiInstance.post('/signature/upload', formData, {
+      const response = await PublicaApiInstance.post('/signature/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }, // 멀티파트 전송
       });
-      return response.data.filePath; // 저장된 파일 경로 반환
+      return response.data.fileName; // 저장된 파일 이름 반환
     } catch (error) {
       console.error('서명 업로드 실패:', error);
       throw new Error(error.response?.data || '서명 업로드 중 오류 발생');
@@ -184,7 +187,7 @@ const ApiService = {
     return PublicaApiInstance.post(`/signature/fields`, { documentId, signerEmail });
   },
 
-  // 🔹 서명을 위한 문서 불러오기 
+  // 🔹 서명을 위한 문서 불러오기
   fetchDocumentForSigning: async (documentId) => {
     return PublicaApiInstance.get(`/documents/sign/${documentId}`, { responseType: "arraybuffer" });
   },
