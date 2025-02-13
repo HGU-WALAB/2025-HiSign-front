@@ -9,14 +9,18 @@ const RequestedDocuments = () => {
     const [documents, setDocuments] = useState([]);
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(10);  // 한 페이지에 5개씩
+    const [itemsPerPage] = useState(10);  // 한 페이지에 10개씩
     const [totalPages, setTotalPages] = useState(0);
 
     useEffect(() => {
         ApiService.fetchDocuments('requested')
             .then(response => {
-                setDocuments(response.data);
-                setTotalPages(Math.ceil(response.data.length / itemsPerPage));
+                // 날짜 기준으로 내림차순 정렬 (최신순)
+                const sortedDocuments = response.data.sort((a, b) => 
+                    new Date(b.createdAt) - new Date(a.createdAt)
+                );
+                setDocuments(sortedDocuments);
+                setTotalPages(Math.ceil(sortedDocuments.length / itemsPerPage));
             })
             .catch(error => {
                 setError('문서를 불러오는 중 문제가 발생했습니다: ' + error.message);
@@ -41,8 +45,12 @@ const RequestedDocuments = () => {
     const refreshDocuments = () => {
         ApiService.fetchDocuments('requested')
             .then(response => {
-                setDocuments(response.data);
-                setTotalPages(Math.ceil(response.data.length / itemsPerPage));
+                // 날짜 기준으로 내림차순 정렬 (최신순)
+                const sortedDocuments = response.data.sort((a, b) => 
+                    new Date(b.createdAt) - new Date(a.createdAt)
+                );
+                setDocuments(sortedDocuments);
+                setTotalPages(Math.ceil(sortedDocuments.length / itemsPerPage));
             })
             .catch(error => {
                 setError('문서를 불러오는 중 문제가 발생했습니다: ' + error.message);

@@ -15,8 +15,12 @@ const ReceivedDocuments = () => {
     useEffect(() => {
         ApiService.fetchDocuments("received")
             .then((response) => {
-                setDocuments(response.data);
-                setTotalPages(Math.ceil(response.data.length / itemsPerPage));
+                // 날짜 기준으로 내림차순 정렬 (최신순)
+                const sortedDocuments = response.data.sort((a, b) => 
+                    new Date(b.createdAt) - new Date(a.createdAt)
+                );
+                setDocuments(sortedDocuments);
+                setTotalPages(Math.ceil(sortedDocuments.length / itemsPerPage));
             })
             .catch((error) => {
                 setError("문서를 불러오는 중 문제가 발생했습니다: " + error.message);
@@ -48,8 +52,12 @@ const ReceivedDocuments = () => {
     const refreshDocuments = () => {
         ApiService.fetchDocuments("received")
             .then((response) => {
-                setDocuments(response.data);
-                setTotalPages(Math.ceil(response.data.length / itemsPerPage));
+                // 날짜 기준으로 내림차순 정렬 (최신순)
+                const sortedDocuments = response.data.sort((a, b) => 
+                    new Date(b.createdAt) - new Date(a.createdAt)
+                );
+                setDocuments(sortedDocuments);
+                setTotalPages(Math.ceil(sortedDocuments.length / itemsPerPage));
             })
             .catch((error) => {
                 console.error("Error:", error.message);
