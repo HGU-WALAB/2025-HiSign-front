@@ -7,7 +7,7 @@ import { authState } from "../recoil/atom/authState";
 
 function HeaderBar() {
     const auth = useRecoilValue(authState);
-
+    
     return (
         <HeaderBarContainer>
             <HeaderBarTitle>
@@ -26,9 +26,9 @@ function HeaderBar() {
                     {auth.isAuthenticated ? <HisnetLogoutButton /> : <HisnetLoginButton />}
                 </ButtonContainer>
             </HeaderBarTitle>
-            <OutletContainer>
+            <MainContent>
                 <Outlet/>
-            </OutletContainer>
+            </MainContent>
         </HeaderBarContainer>
     )
 }
@@ -42,6 +42,7 @@ const NavigationLinks = styled.div`
 
 const HeaderBarContainer = styled.div`
     width: 100%;
+    display: flex;
     flex-direction: column;
 `;
 
@@ -54,6 +55,10 @@ const HeaderBarTitle = styled.div`
     padding-left: 20px;
     box-sizing: border-box;
     justify-content: space-between;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
 `;
 
 const ButtonContainer = styled.div`
@@ -67,13 +72,27 @@ const MenuLink = styled(Link)`
     text-decoration: none;
     color: black;
     margin: 0 15px 0 45px;
+    padding: 8px 16px;
+    background-color: white;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    
     &:hover {
-        color: green;
+        color: white;
+        background-color: #4CAF50;
+        transform: translateY(-2px);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    &:active {
+        transform: translateY(0);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
     }
 `;
 
-const OutletContainer = styled.div`
-    width: 100%; 
+const MainContent = styled.div`
+    width: 100%;
+    margin-top: 80px; // HeaderBarTitle의 height와 동일한 값
 `;
 
 export default HeaderBar;
