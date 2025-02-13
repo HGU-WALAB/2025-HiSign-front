@@ -46,7 +46,25 @@ apiInstance.interceptors.response.use(
 );
 
 const ApiService = {
-  // 파일 업로드
+  // 서명 이미지 업로드
+  uploadSignatureFile: async (blob) => {
+    if (!blob) throw new Error('업로드할 서명 이미지가 없습니다.');
+  
+    const formData = new FormData();
+    formData.append('file', blob, 'signature.png'); // Blob 데이터를 FormData에 추가
+  
+    try {
+      const response = await apiInstance.post('/signature/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }, // 멀티파트 전송
+      });
+      return response.data.filePath; // 저장된 파일 경로 반환
+    } catch (error) {
+      console.error('서명 업로드 실패:', error);
+      throw new Error(error.response?.data || '서명 업로드 중 오류 발생');
+    }
+  },
+
+  // 문서 업로드
   uploadDocument: async (file, uniqueId,requestName) => {
     if (!file) throw new Error('업로드할 파일이 없습니다.');
     const formData = new FormData();
