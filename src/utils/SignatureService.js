@@ -13,7 +13,7 @@ const SignatureService = {
                 {
                   type: 0,
                   position: {
-                    pageNumber: pageNum + 1,
+                    pageNumber: pageNum,
                     x: 100,
                     y: 150,
                   },

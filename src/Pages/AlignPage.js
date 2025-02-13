@@ -14,7 +14,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/$
 
 const AlignPage = () => {
   const [pdf, setPdf] = useState(null);
-  const [pageNum, setPageNum] = useState(0);
+  const [pageNum, setPageNum] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const document = useRecoilValue(documentState);
   const [signers, setSigners] = useRecoilState(signerState);
@@ -75,14 +75,14 @@ const AlignPage = () => {
             {pdf ? (
               <DocumentContainer ref={documentRef}>
                 <Document file={pdf} onLoadSuccess={(data) => setTotalPages(data.numPages)}>
-                  <Page pageNumber={pageNum + 1} width={800} />
+                  <Page pageNumber={pageNum} width={800} />
                 </Document>
 
                 {signers.length > 0 &&
                   signers.map((signer) =>
                     signer.signatureFields
                       .map((box, originalIndex) => ({ ...box, originalIndex }))
-                      .filter((box) => box.position.pageNumber === pageNum + 1)
+                      .filter((box) => box.position.pageNumber === pageNum)
                       .map(({ width, height, position, originalIndex }) => (
                         <Rnd
                           key={`${signer.email}-${originalIndex}`}
@@ -170,11 +170,10 @@ const MainContainer = styled.div`
 
 const ContentWrapper = styled.div`
   flex: 1;
-  padding-top: 64px;
+  margin-top: 80px; // 헤더바 높이만큼 마진 추가
 `;
 
 const Container = styled.div`
-  /* max-width: 900px; */
   margin: 0 auto;
   padding: 20px;
   position: relative;
@@ -243,7 +242,8 @@ const StyledDrawer = styled(Drawer)`
     
     .MuiDrawer-paper {
       width: 250px;
-      margin-top: 64px;
+      top: 80px; // 헤더바 높이만큼 top 값 설정
+      height: calc(100% - 80px); // 전체 높이에서 헤더바 높이만큼 뺌
       background-color: white;
       border-right: 1px solid #e0e0e0;
     }

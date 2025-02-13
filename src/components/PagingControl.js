@@ -24,15 +24,15 @@ export default function PagingControl({totalPages, pageNum, setPageNum}) {
         <BigButton
           title={"<"}
           onClick={() => {setPageNum(pageNum - 1); console.log("paging control:", pageNum+1);}}
-          disabled={pageNum-1===-1}
+          disabled={pageNum <= 1}
         />
         <div style={styles.pageInfo}>
-          Page: {pageNum + 1}/{totalPages}
+          Page: {pageNum}/{totalPages}
         </div>
         <BigButton
           title={">"}
           onClick={() => {setPageNum(pageNum + 1); console.log("paging control:", pageNum+1);}}
-          disabled={pageNum+1>totalPages-1}
+          disabled={pageNum >= totalPages}
         />
       </div>
     </div>
