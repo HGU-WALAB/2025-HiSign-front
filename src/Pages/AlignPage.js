@@ -14,7 +14,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/$
 
 const AlignPage = () => {
   const [pdf, setPdf] = useState(null);
-  const [pageNum, setPageNum] = useState(0);
+  const [pageNum, setPageNum] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const document = useRecoilValue(documentState);
   const [signers, setSigners] = useRecoilState(signerState);
@@ -75,14 +75,14 @@ const AlignPage = () => {
             {pdf ? (
               <DocumentContainer ref={documentRef}>
                 <Document file={pdf} onLoadSuccess={(data) => setTotalPages(data.numPages)}>
-                  <Page pageNumber={pageNum + 1} width={800} />
+                  <Page pageNumber={pageNum} width={800} />
                 </Document>
 
                 {signers.length > 0 &&
                   signers.map((signer) =>
                     signer.signatureFields
                       .map((box, originalIndex) => ({ ...box, originalIndex }))
-                      .filter((box) => box.position.pageNumber === pageNum + 1)
+                      .filter((box) => box.position.pageNumber === pageNum)
                       .map(({ width, height, position, originalIndex }) => (
                         <Rnd
                           key={`${signer.email}-${originalIndex}`}

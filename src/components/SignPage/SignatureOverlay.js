@@ -18,7 +18,7 @@ const SignatureOverlay = () => {
   };
 
   return (
-    <div style={{ position: "relative" }}>
+    <div>
       {signing.signatureFields.map((field, index) => (
         <div
           key={index}

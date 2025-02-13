@@ -31,7 +31,7 @@ function EmailInputModal({ open, onSubmit, onClose }) {
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          width: 400,
+          width: 500,
           bgcolor: "background.paper",
           borderRadius: 2,
           boxShadow: 24,
@@ -44,7 +44,15 @@ function EmailInputModal({ open, onSubmit, onClose }) {
           이메일 인증
         </Typography>
 
-        <div style={{ display: "flex", justifyContent: "center", gap: "10px" }}>
+        {/* 안내문 추가 */}
+        <Typography
+          variant="body1"
+          sx={{ mb: 2 }}
+        >
+          <strong>서명 요청을 수신한 본인의 이메일 주소</strong>를 입력하여 주세요.
+        </Typography>
+
+        <div style={{ width: "100%", display: "flex", justifyContent: "center", gap: "10px" }}>
           <input
             type="email"
             value={email}
@@ -53,7 +61,13 @@ function EmailInputModal({ open, onSubmit, onClose }) {
               setError(null); // 입력이 바뀌면 에러 초기화
             }}
             placeholder="이메일 입력"
-            style={{ padding: "8px", borderRadius: "4px", border: "1px solid #ccc" }}
+            style={{
+              width: "50%",
+              padding: "8px",
+              borderRadius: "4px",
+              border: "1px solid #ccc",
+              fontSize: "16px",
+            }}
           />
           <Button
             onClick={handleValidate}
