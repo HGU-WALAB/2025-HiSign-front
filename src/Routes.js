@@ -11,6 +11,7 @@ import RequestedDocuments from "./Pages/RequestListPage"; // 요청한 문서 �
 import RequestPage from "./Pages/RequestPage";
 import SignaturePage from './Pages/SignaturePage';
 import UploadPage from "./Pages/UploadPage";
+import ContactPage from './Pages/ContactPage';
 
 function MyRoutes() {
     return (
@@ -25,7 +26,7 @@ function MyRoutes() {
                 <Route path="/request-document" element={<RequestedDocuments />} /> {/* 요청한 문서 리스트 */}
                 <Route path="/receive-document" element={<ReceivedDocuments />} /> {/* 요청받은 문서 리스트 */}
                 <Route path="/sign" element={<SignaturePage />} />
-
+                <Route path="/contact" element={<ContactPage />} />
                 <Route path="/make" element={<MakePage />} />
             </Route>
             

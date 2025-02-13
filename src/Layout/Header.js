@@ -20,6 +20,7 @@ function HeaderBar() {
                         <MenuLink to="/request">서명자 등록하기</MenuLink>
                         <MenuLink to="/align">서명 할당하기</MenuLink>
                         <MenuLink to="/make">예제 페이지</MenuLink>
+                        <MenuLink to="/contact">문의 페이지</MenuLink>
                     </NavigationLinks>
                 )}
                 <ButtonContainer>
