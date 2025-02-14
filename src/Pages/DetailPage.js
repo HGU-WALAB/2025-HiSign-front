@@ -28,7 +28,7 @@ const DetailPage = () => {
             {fileUrl ? (
                 <div style={{ height: '100vh', width: '100%' }}>
                     <Worker workerUrl={pdfjsWorkerUrl}>
-                        <Viewer fileUrl={fileUrl} />
+                        <Viewer fileUrl={fileUrl} />f
                     </Worker>
                 </div>
             ) : (
