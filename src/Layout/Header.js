@@ -39,6 +39,9 @@ const NavigationLinks = styled.div`
     flex-direction: row;
     gap: 15px;
     flex-grow: 1;
+    flex-wrap: nowrap; // 줄바꿈 방지
+    overflow-x: auto; // 가로 스크롤 가능
+    white-space: nowrap; // 텍스트 줄바꿈 방지
 `;
 
 const HeaderBarContainer = styled.div`
@@ -60,6 +63,8 @@ const HeaderBarTitle = styled.div`
     top: 0;
     left: 0;
     z-index: 1000;
+    min-width: 800px; // 최소 너비 설정
+    overflow: hidden;
 `;
 
 const ButtonContainer = styled.div`

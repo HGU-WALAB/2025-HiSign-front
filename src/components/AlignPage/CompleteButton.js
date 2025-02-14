@@ -40,6 +40,8 @@ const CompleteButton = () => {
 
       console.log("파일 변환 완료:", file);
 
+      
+
       // 2 문서 업로드 API 호출 (순차 실행 보장)
       const uploadResponse = await ApiService.uploadDocument(file, document.ownerId, document.requestName);
 
@@ -51,6 +53,7 @@ const CompleteButton = () => {
       console.log("documentId 타입:", typeof uploadResponse.data);
 
       const documentId = uploadResponse.data.documentId;
+      
       // 3 서명 요청 API 호출 (업로드 완료 후 실행)
       const signatureResponse = await ApiService.sendSignatureRequest(documentId, member.name, signers);
       
