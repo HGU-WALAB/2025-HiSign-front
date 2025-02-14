@@ -48,7 +48,6 @@ const RequestedDocuments = () => {
     const refreshDocuments = () => {
         ApiService.fetchDocuments('requested')
             .then(response => {
-                // ✅ status === 5 (삭제된 문서) 제외
                 const filteredDocuments = response.data.filter(doc => doc.status !== 5);
 
                 // 날짜 기준으로 내림차순 정렬 (최신순)
@@ -90,10 +89,9 @@ const RequestedDocuments = () => {
             <table style={{ borderCollapse: 'collapse', width: '100%', margin: '20px 0', fontFamily: 'Arial, sans-serif' }}>
                 <thead>
                 <tr>
-                    <th style={{ backgroundColor: '#86CFFA', color: 'white', padding: '10px', textAlign: 'center', fontWeight: 'bold' }}>Status</th>
-                    <th style={{ backgroundColor: '#86CFFA', color: 'white', padding: '10px', textAlign: 'center', fontWeight: 'bold' }}>File Name</th>
-                    <th style={{ backgroundColor: '#86CFFA', color: 'white', padding: '10px', textAlign: 'center', fontWeight: 'bold' }}>Created At</th>
-                    <th style={{ backgroundColor: '#86CFFA', color: 'white', padding: '10px', textAlign: 'center', fontWeight: 'bold' }}>Updated At</th>
+                    <th style={{ backgroundColor: '#86CFFA', color: 'white', padding: '10px', textAlign: 'center', fontWeight: 'bold' }}>상태</th>
+                    <th style={{ backgroundColor: '#86CFFA', color: 'white', padding: '10px', textAlign: 'center', fontWeight: 'bold' }}>파일명</th>
+                    <th style={{ backgroundColor: '#86CFFA', color: 'white', padding: '10px', textAlign: 'center', fontWeight: 'bold' }}>요청 생성일</th>
                     <th style={{ backgroundColor: '#86CFFA', color: 'white', padding: '10px', textAlign: 'center', fontWeight: 'bold' }}>Action</th>
                 </tr>
                 </thead>
@@ -109,7 +107,6 @@ const RequestedDocuments = () => {
                             <Link to={`/detail/${doc.id}`} style={{ textDecoration: 'none', color: '#2196F3' }}>{doc.fileName}</Link>
                         </td>
                         <td style={{ padding: '10px', textAlign: 'center', borderBottom: '1px solid #ddd' }}>{doc.createdAt}</td>
-                        <td style={{ padding: '10px', textAlign: 'center', borderBottom: '1px solid #ddd' }}>{doc.updatedAt}</td>
                         <td style={{ padding: '10px', textAlign: 'center', borderBottom: '1px solid #ddd' }}>
                             {doc.status === 0 ? <CancelButton documentId={doc.id} refreshDocuments={refreshDocuments} /> : <DeleteButton documentId={doc.id} refreshDocuments={refreshDocuments} />}
                         </td>
