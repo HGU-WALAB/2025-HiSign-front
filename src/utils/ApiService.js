@@ -191,6 +191,28 @@ const ApiService = {
   fetchDocumentForSigning: async (documentId) => {
     return PublicaApiInstance.get(`/documents/sign/${documentId}`, { responseType: "arraybuffer" });
   },
+
+  // 서명 저장 API 요청
+  saveSignatures: async (documentId, signingData) => {
+    if (!documentId || !signingData) {
+      throw new Error('문서 ID와 서명자가 필요합니다.');
+    }
+
+    try {
+      const response = await PublicaApiInstance.post(
+        "/api/signature/sign",
+        signingData,
+        {
+          params: { documentId }, // Query Parameter로 전달
+        }
+      );
+      return response.data; // 성공 메시지 반환
+    } catch (error) {
+      console.error('서명 저장 실패:', error);
+      throw new Error(error.response?.data || '서명 저장 중 오류 발생');
+    }
+  },
 };
+
 
 export default ApiService ;
