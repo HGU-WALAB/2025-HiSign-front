@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import RejectButton from "../components/ListPage/RejectButton";
 import { PageContainer } from "../components/PageContainer";
 import ApiService from "../utils/ApiService";
-import { FaFilePdf } from "react-icons/fa";
 
 const ReceivedDocuments = () => {
     const [documents, setDocuments] = useState([]);
@@ -28,8 +27,6 @@ const ReceivedDocuments = () => {
                 setError("문서를 불러오는 중 문제가 발생했습니다: " + error.message);
             });
     }, [itemsPerPage]);
-
-
 
     // 현재 페이지 데이터 가져오기
     const getCurrentPageData = () => {
@@ -60,6 +57,18 @@ const ReceivedDocuments = () => {
         return statusLabels[status] || "알 수 없음";
     };
 
+    // 날짜 포맷팅 함수
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const year = date.getFullYear();
+        const month = ("0" + (date.getMonth() + 1)).slice(-2); // 월은 0부터 시작하므로 +1을 해줌
+        const day = ("0" + date.getDate()).slice(-2);
+        const hours = ("0" + date.getHours()).slice(-2);
+        const minutes = ("0" + date.getMinutes()).slice(-2);
+        const seconds = ("0" + date.getSeconds()).slice(-2);
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    };
+
     // 페이지 변경 함수
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
     const goToPreviousPage = () => { if (currentPage > 1) setCurrentPage(currentPage - 1); };
@@ -72,7 +81,14 @@ const ReceivedDocuments = () => {
             </h1>
             {error && <p style={{ color: "red", textAlign: "center", marginTop: "20px" }}>{error}</p>}
 
-            <table style={{ borderCollapse: "collapse", width: "100%", margin: "20px 0", fontFamily: "Arial, sans-serif" }}>
+            <table style={{
+                borderCollapse: "collapse", // 경계선 충돌을 방지
+                width: "100%",
+                margin: "20px 0",
+                fontFamily: "Arial, sans-serif",
+                tableLayout: "fixed", // 셀 크기를 고정
+                borderSpacing: "0", // 셀 간 간격 제거
+            }}>
                 <thead>
                 <tr>
                     <th style={{ backgroundColor: "#86CFFA", color: "white", padding: "10px", textAlign: "center", fontWeight: "bold" }}>상태</th>
@@ -85,30 +101,37 @@ const ReceivedDocuments = () => {
                 <tbody>
                 {getCurrentPageData().map((doc) => (
                     <tr key={doc.id}>
-                        <td style={{ padding: "10px", textAlign: "center", borderBottom: "1px solid #ddd" }}>
-                            <span
-                                style={{
-                                    padding: "5px 10px",
-                                    borderRadius: "5px",
-                                    fontSize: "14px",
-                                    fontWeight: "bold",
-                                    textTransform: "uppercase",
-                                    ...getStatusStyle(doc.status),
-                                }}
-                            >
-                                {getStatusLabel(doc.status)}
-                            </span>
+                        <td style={{ padding: "10px", textAlign: "center", borderBottom: "1px solid #ddd", height: "50px" }}>
+                                <span
+                                    style={{
+                                        padding: "5px 10px",
+                                        borderRadius: "5px",
+                                        fontSize: "14px",
+                                        fontWeight: "bold",
+                                        textTransform: "uppercase",
+                                        ...getStatusStyle(doc.status),
+                                    }}
+                                >
+                                    {getStatusLabel(doc.status)}
+                                </span>
                         </td>
-                        <td style={{ padding: "10px", textAlign: "center", borderBottom: "1px solid #ddd", display: "flex", justifyContent: "center", alignItems: "center", gap: "8px" }}>
-                            <span>{doc.fileName}</span>
+                        <td style={{
+                            padding: "10px",
+                            textAlign: "center",
+                            borderBottom: "1px solid #ddd",
+                            height: "50px"
+                        }}>
                             <Link to={`/detail/${doc.id}`} style={{ textDecoration: "none", color: "#2196F3" }}>
-                                <FaFilePdf size={18} />
+                                {doc.fileName}
                             </Link>
                         </td>
-                        <td style={{ padding: "10px", textAlign: "center", borderBottom: "1px solid #ddd" }}>{doc.createdAt}</td>
-                        <td style={{ padding: "10px", textAlign: "center", borderBottom: "1px solid #ddd" }}>{doc.requesterName || "알 수 없음"}</td>
-                        <td style={{ padding: "10px", textAlign: "center", borderBottom: "1px solid #ddd" }}>
-                            {/* 요청 거절 버튼을 상태에 따라 활성화 또는 비활성화 */}
+                        <td style={{ padding: "10px", textAlign: "center", borderBottom: "1px solid #ddd", height: "50px" }}>
+                            {formatDate(doc.createdAt)}
+                        </td>
+                        <td style={{ padding: "10px", textAlign: "center", borderBottom: "1px solid #ddd", height: "50px" }}>
+                            {doc.requesterName || "알 수 없음"}
+                        </td>
+                        <td style={{ padding: "10px", textAlign: "center", borderBottom: "1px solid #ddd", height: "50px" }}>
                             {doc.status === 0 ? (
                                 <RejectButton documentId={doc.id} status={doc.status} refreshDocuments={() => {}} />
                             ) : (
@@ -151,7 +174,14 @@ const ReceivedDocuments = () => {
                 <button
                     onClick={goToPreviousPage}
                     disabled={currentPage === 1}
-                    style={{ margin: "0 5px", padding: "10px 15px", backgroundColor: "#4CAF50", color: "white", border: "none", cursor: "pointer" }}
+                    style={{
+                        margin: "0 5px",
+                        padding: "10px 15px",
+                        backgroundColor: "#4CAF50",
+                        color: "white",
+                        border: "none",
+                        cursor: "pointer"
+                    }}
                 >
                     이전
                 </button>
@@ -186,4 +216,3 @@ const ReceivedDocuments = () => {
 };
 
 export default ReceivedDocuments;
-

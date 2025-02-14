@@ -25,10 +25,10 @@ function HeaderBar() {
                 {auth.isAuthenticated && (
                     <div className="d-flex gap-3">
                         <Link to="/request-document" className="nav-link text-dark">
-                            요청한 리스트 페이지
+                            요청한 문서
                         </Link>
                         <Link to="/receive-document" className="nav-link text-dark">
-                            요청받은 리스트 페이지
+                            요청받은 문서
                         </Link>
                         <Link to="/upload" className="nav-link text-dark">
                             문서 업로드하기
