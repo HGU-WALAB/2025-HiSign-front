@@ -10,7 +10,7 @@ function PDFViewer({ pdfUrl }) {
 
   return (
     <>
-      <div style={{ position: "relative", width: "800px", margin: "0 auto" }}>
+      <div style={{ position: "relative", width: "800px", margin: "0 auto", border: "1px solid #999"}}>
         <Document
           file={pdfUrl}
           onLoadSuccess={(data) => setTotalPages(data.numPages)}

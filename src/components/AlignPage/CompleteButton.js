@@ -50,7 +50,7 @@ const CompleteButton = () => {
       }
 
       console.log("문서 업로드 성공:", uploadResponse.data);
-      console.log("documentId 타입:", typeof uploadResponse.data);
+      console.log("documentId 타입:", typeof uploadResponse.data.documentId);
 
       const documentId = uploadResponse.data.documentId;
       
