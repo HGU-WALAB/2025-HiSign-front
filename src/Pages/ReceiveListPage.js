@@ -3,66 +3,39 @@ import { Link } from "react-router-dom";
 import RejectButton from "../components/ListPage/RejectButton";
 import { PageContainer } from "../components/PageContainer";
 import ApiService from "../utils/ApiService";
-import axios from 'axios';
+import { FaFilePdf } from "react-icons/fa";
 
 const ReceivedDocuments = () => {
     const [documents, setDocuments] = useState([]);
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(10); // 한 페이지에 10개씩
+    const [itemsPerPage] = useState(10);
     const [totalPages, setTotalPages] = useState(0);
 
     useEffect(() => {
-        ApiService.fetchDocuments("received")
+        ApiService.fetchDocuments("received-with-requester")
             .then((response) => {
-                // 날짜 기준으로 내림차순 정렬 (최신순)
-                const sortedDocuments = response.data.sort((a, b) => 
+                const filteredDocuments = response.data.filter(doc => doc.status !== 5);
+                const sortedDocuments = filteredDocuments.sort((a, b) =>
                     new Date(b.createdAt) - new Date(a.createdAt)
                 );
+
                 setDocuments(sortedDocuments);
                 setTotalPages(Math.ceil(sortedDocuments.length / itemsPerPage));
             })
             .catch((error) => {
+                console.error("문서 불러오기 오류:", error);
                 setError("문서를 불러오는 중 문제가 발생했습니다: " + error.message);
             });
     }, [itemsPerPage]);
 
-    // 현재 페이지에 해당하는 데이터만 반환
+
+
+    // 현재 페이지 데이터 가져오기
     const getCurrentPageData = () => {
         const indexOfLastItem = currentPage * itemsPerPage;
         const indexOfFirstItem = indexOfLastItem - itemsPerPage;
         return documents.slice(indexOfFirstItem, indexOfLastItem);
-    };
-
-    // 페이지 번호 클릭 시 페이지 변경
-    const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-    const goToPreviousPage = () => {
-        if (currentPage > 1) {
-            setCurrentPage(currentPage - 1);
-        }
-    };
-
-    const goToNextPage = () => {
-        if (currentPage < totalPages) {
-            setCurrentPage(currentPage + 1);
-        }
-    };
-
-    const refreshDocuments = () => {
-        ApiService.fetchDocuments("received")
-            .then((response) => {
-                // 날짜 기준으로 내림차순 정렬 (최신순)
-                const sortedDocuments = response.data.sort((a, b) => 
-                    new Date(b.createdAt) - new Date(a.createdAt)
-                );
-                setDocuments(sortedDocuments);
-                setTotalPages(Math.ceil(sortedDocuments.length / itemsPerPage));
-            })
-            .catch((error) => {
-                console.error("Error:", error.message);
-                setError("문서를 불러오는 중 문제가 발생했습니다: " + error.message);
-            });
     };
 
     // 상태 스타일 설정
@@ -87,51 +60,78 @@ const ReceivedDocuments = () => {
         return statusLabels[status] || "알 수 없음";
     };
 
+    // 페이지 변경 함수
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+    const goToPreviousPage = () => { if (currentPage > 1) setCurrentPage(currentPage - 1); };
+    const goToNextPage = () => { if (currentPage < totalPages) setCurrentPage(currentPage + 1); };
+
     return (
         <PageContainer>
             <h1 style={{ textAlign: "center", color: "#333", marginBottom: "20px", fontSize: "24px", fontWeight: "bold" }}>
                 요청받은 문서 리스트
             </h1>
             {error && <p style={{ color: "red", textAlign: "center", marginTop: "20px" }}>{error}</p>}
+
             <table style={{ borderCollapse: "collapse", width: "100%", margin: "20px 0", fontFamily: "Arial, sans-serif" }}>
                 <thead>
-                    <tr>
-                        <th style={{ backgroundColor: "#4CAF50", color: "white", padding: "10px", textAlign: "center", fontWeight: "bold" }}>Status</th>
-                        <th style={{ backgroundColor: "#4CAF50", color: "white", padding: "10px", textAlign: "center", fontWeight: "bold" }}>File Name</th>
-                        <th style={{ backgroundColor: "#4CAF50", color: "white", padding: "10px", textAlign: "center", fontWeight: "bold" }}>Created At</th>
-                        <th style={{ backgroundColor: "#4CAF50", color: "white", padding: "10px", textAlign: "center", fontWeight: "bold" }}>Updated At</th>
-                        <th style={{ backgroundColor: "#4CAF50", color: "white", padding: "10px", textAlign: "center", fontWeight: "bold" }}>Action</th>
-                    </tr>
+                <tr>
+                    <th style={{ backgroundColor: "#86CFFA", color: "white", padding: "10px", textAlign: "center", fontWeight: "bold" }}>상태</th>
+                    <th style={{ backgroundColor: "#86CFFA", color: "white", padding: "10px", textAlign: "center", fontWeight: "bold" }}>파일명</th>
+                    <th style={{ backgroundColor: "#86CFFA", color: "white", padding: "10px", textAlign: "center", fontWeight: "bold" }}>요청 생성일</th>
+                    <th style={{ backgroundColor: "#86CFFA", color: "white", padding: "10px", textAlign: "center", fontWeight: "bold" }}>요청자</th>
+                    <th style={{ backgroundColor: "#86CFFA", color: "white", padding: "10px", textAlign: "center", fontWeight: "bold" }}>Action</th>
+                </tr>
                 </thead>
                 <tbody>
-                    {getCurrentPageData().map((doc) => (
-                        <tr key={doc.id}>
-                            <td style={{ padding: "10px", textAlign: "center", borderBottom: "1px solid #ddd" }}>
-                                <span
+                {getCurrentPageData().map((doc) => (
+                    <tr key={doc.id}>
+                        <td style={{ padding: "10px", textAlign: "center", borderBottom: "1px solid #ddd" }}>
+                            <span
+                                style={{
+                                    padding: "5px 10px",
+                                    borderRadius: "5px",
+                                    fontSize: "14px",
+                                    fontWeight: "bold",
+                                    textTransform: "uppercase",
+                                    ...getStatusStyle(doc.status),
+                                }}
+                            >
+                                {getStatusLabel(doc.status)}
+                            </span>
+                        </td>
+                        <td style={{ padding: "10px", textAlign: "center", borderBottom: "1px solid #ddd", display: "flex", justifyContent: "center", alignItems: "center", gap: "8px" }}>
+                            <span>{doc.fileName}</span>
+                            <Link to={`/detail/${doc.id}`} style={{ textDecoration: "none", color: "#2196F3" }}>
+                                <FaFilePdf size={18} />
+                            </Link>
+                        </td>
+                        <td style={{ padding: "10px", textAlign: "center", borderBottom: "1px solid #ddd" }}>{doc.createdAt}</td>
+                        <td style={{ padding: "10px", textAlign: "center", borderBottom: "1px solid #ddd" }}>{doc.requesterName || "알 수 없음"}</td>
+                        <td style={{ padding: "10px", textAlign: "center", borderBottom: "1px solid #ddd" }}>
+                            {/* 요청 거절 버튼을 상태에 따라 활성화 또는 비활성화 */}
+                            {doc.status === 0 ? (
+                                <RejectButton documentId={doc.id} status={doc.status} refreshDocuments={() => {}} />
+                            ) : (
+                                <button
                                     style={{
                                         padding: "5px 10px",
                                         borderRadius: "5px",
+                                        cursor: "not-allowed",
                                         fontSize: "14px",
                                         fontWeight: "bold",
                                         textTransform: "uppercase",
-                                        ...getStatusStyle(doc.status),
+                                        backgroundColor: "#ccc", // 비활성화된 버튼
+                                        color: "#fff",
+                                        border: "none",
                                     }}
+                                    disabled
                                 >
-                                    {getStatusLabel(doc.status)}
-                                </span>
-                            </td>
-                            <td style={{ padding: "10px", textAlign: "center", borderBottom: "1px solid #ddd" }}>
-                                <Link to={`/detail/${doc.id}`} style={{ textDecoration: "none", color: "#2196F3" }}>
-                                    {doc.fileName}
-                                </Link>
-                            </td>
-                            <td style={{ padding: "10px", textAlign: "center", borderBottom: "1px solid #ddd" }}>{doc.createdAt}</td>
-                            <td style={{ padding: "10px", textAlign: "center", borderBottom: "1px solid #ddd" }}>{doc.updatedAt}</td>
-                            <td style={{ padding: "10px", textAlign: "center", borderBottom: "1px solid #ddd" }}>
-                                {doc.status === 0 ? <RejectButton documentId={doc.id} status={doc.status} refreshDocuments={refreshDocuments} /> : null}
-                            </td>
-                        </tr>
-                    ))}
+                                    거절됨
+                                </button>
+                            )}
+                        </td>
+                    </tr>
+                ))}
                 </tbody>
             </table>
 
@@ -148,25 +148,24 @@ const ReceivedDocuments = () => {
                 boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
                 borderRadius: "5px",
             }}>
-                <button 
-                    onClick={goToPreviousPage} 
+                <button
+                    onClick={goToPreviousPage}
                     disabled={currentPage === 1}
                     style={{ margin: "0 5px", padding: "10px 15px", backgroundColor: "#4CAF50", color: "white", border: "none", cursor: "pointer" }}
                 >
                     이전
                 </button>
 
-                {/* 페이지 번호 표시 */}
                 {[...Array(totalPages)].map((_, index) => (
-                    <button 
-                        key={index} 
-                        onClick={() => paginate(index + 1)} 
+                    <button
+                        key={index}
+                        onClick={() => paginate(index + 1)}
                         style={{
-                            margin: "0 5px", 
-                            padding: "10px 15px", 
-                            backgroundColor: currentPage === index + 1 ? "#2196F3" : "#fff", 
-                            color: currentPage === index + 1 ? "white" : "#4CAF50", 
-                            border: "1px solid #ddd", 
+                            margin: "0 5px",
+                            padding: "10px 15px",
+                            backgroundColor: currentPage === index + 1 ? "#2196F3" : "#fff",
+                            color: currentPage === index + 1 ? "white" : "#4CAF50",
+                            border: "1px solid #ddd",
                             cursor: "pointer"
                         }}
                     >
@@ -174,8 +173,8 @@ const ReceivedDocuments = () => {
                     </button>
                 ))}
 
-                <button 
-                    onClick={goToNextPage} 
+                <button
+                    onClick={goToNextPage}
                     disabled={currentPage === totalPages}
                     style={{ margin: "0 5px", padding: "10px 15px", backgroundColor: "#4CAF50", color: "white", border: "none", cursor: "pointer" }}
                 >
@@ -187,3 +186,4 @@ const ReceivedDocuments = () => {
 };
 
 export default ReceivedDocuments;
+

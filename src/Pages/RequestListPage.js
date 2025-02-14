@@ -15,8 +15,11 @@ const RequestedDocuments = () => {
     useEffect(() => {
         ApiService.fetchDocuments('requested')
             .then(response => {
+                // ✅ status === 5 (삭제된 문서) 제외
+                const filteredDocuments = response.data.filter(doc => doc.status !== 5);
+
                 // 날짜 기준으로 내림차순 정렬 (최신순)
-                const sortedDocuments = response.data.sort((a, b) => 
+                const sortedDocuments = filteredDocuments.sort((a, b) =>
                     new Date(b.createdAt) - new Date(a.createdAt)
                 );
                 setDocuments(sortedDocuments);
@@ -45,8 +48,11 @@ const RequestedDocuments = () => {
     const refreshDocuments = () => {
         ApiService.fetchDocuments('requested')
             .then(response => {
+                // ✅ status === 5 (삭제된 문서) 제외
+                const filteredDocuments = response.data.filter(doc => doc.status !== 5);
+
                 // 날짜 기준으로 내림차순 정렬 (최신순)
-                const sortedDocuments = response.data.sort((a, b) => 
+                const sortedDocuments = filteredDocuments.sort((a, b) =>
                     new Date(b.createdAt) - new Date(a.createdAt)
                 );
                 setDocuments(sortedDocuments);
@@ -83,32 +89,32 @@ const RequestedDocuments = () => {
             {error && <p style={{ color: 'red', textAlign: 'center', marginTop: '20px' }}>{error}</p>}
             <table style={{ borderCollapse: 'collapse', width: '100%', margin: '20px 0', fontFamily: 'Arial, sans-serif' }}>
                 <thead>
-                    <tr>
-                        <th style={{ backgroundColor: '#4CAF50', color: 'white', padding: '10px', textAlign: 'center', fontWeight: 'bold' }}>Status</th>
-                        <th style={{ backgroundColor: '#4CAF50', color: 'white', padding: '10px', textAlign: 'center', fontWeight: 'bold' }}>File Name</th>
-                        <th style={{ backgroundColor: '#4CAF50', color: 'white', padding: '10px', textAlign: 'center', fontWeight: 'bold' }}>Created At</th>
-                        <th style={{ backgroundColor: '#4CAF50', color: 'white', padding: '10px', textAlign: 'center', fontWeight: 'bold' }}>Updated At</th>
-                        <th style={{ backgroundColor: '#4CAF50', color: 'white', padding: '10px', textAlign: 'center', fontWeight: 'bold' }}>Action</th>
-                    </tr>
+                <tr>
+                    <th style={{ backgroundColor: '#86CFFA', color: 'white', padding: '10px', textAlign: 'center', fontWeight: 'bold' }}>Status</th>
+                    <th style={{ backgroundColor: '#86CFFA', color: 'white', padding: '10px', textAlign: 'center', fontWeight: 'bold' }}>File Name</th>
+                    <th style={{ backgroundColor: '#86CFFA', color: 'white', padding: '10px', textAlign: 'center', fontWeight: 'bold' }}>Created At</th>
+                    <th style={{ backgroundColor: '#86CFFA', color: 'white', padding: '10px', textAlign: 'center', fontWeight: 'bold' }}>Updated At</th>
+                    <th style={{ backgroundColor: '#86CFFA', color: 'white', padding: '10px', textAlign: 'center', fontWeight: 'bold' }}>Action</th>
+                </tr>
                 </thead>
                 <tbody>
-                    {getCurrentPageData().map((doc) => (
-                        <tr key={doc.id}>
-                            <td style={{ padding: '10px', textAlign: 'center', borderBottom: '1px solid #ddd' }}>
+                {getCurrentPageData().map((doc) => (
+                    <tr key={doc.id}>
+                        <td style={{ padding: '10px', textAlign: 'center', borderBottom: '1px solid #ddd' }}>
                                 <span style={{ padding: '5px 10px', borderRadius: '5px', cursor: 'pointer', fontSize: '14px', fontWeight: 'bold', textTransform: 'uppercase', ...getStatusStyle(doc.status) }}>
                                     {getStatusLabel(doc.status)}
                                 </span>
-                            </td>
-                            <td style={{ padding: '10px', textAlign: 'center', borderBottom: '1px solid #ddd' }}>
-                                <Link to={`/detail/${doc.id}`} style={{ textDecoration: 'none', color: '#2196F3' }}>{doc.fileName}</Link>
-                            </td>
-                            <td style={{ padding: '10px', textAlign: 'center', borderBottom: '1px solid #ddd' }}>{doc.createdAt}</td>
-                            <td style={{ padding: '10px', textAlign: 'center', borderBottom: '1px solid #ddd' }}>{doc.updatedAt}</td>
-                            <td style={{ padding: '10px', textAlign: 'center', borderBottom: '1px solid #ddd' }}>
-                                {doc.status === 0 ? <CancelButton documentId={doc.id} refreshDocuments={refreshDocuments} /> : <DeleteButton documentId={doc.id} refreshDocuments={refreshDocuments} />}
-                            </td>
-                        </tr>
-                    ))}
+                        </td>
+                        <td style={{ padding: '10px', textAlign: 'center', borderBottom: '1px solid #ddd' }}>
+                            <Link to={`/detail/${doc.id}`} style={{ textDecoration: 'none', color: '#2196F3' }}>{doc.fileName}</Link>
+                        </td>
+                        <td style={{ padding: '10px', textAlign: 'center', borderBottom: '1px solid #ddd' }}>{doc.createdAt}</td>
+                        <td style={{ padding: '10px', textAlign: 'center', borderBottom: '1px solid #ddd' }}>{doc.updatedAt}</td>
+                        <td style={{ padding: '10px', textAlign: 'center', borderBottom: '1px solid #ddd' }}>
+                            {doc.status === 0 ? <CancelButton documentId={doc.id} refreshDocuments={refreshDocuments} /> : <DeleteButton documentId={doc.id} refreshDocuments={refreshDocuments} />}
+                        </td>
+                    </tr>
+                ))}
                 </tbody>
             </table>
 
@@ -124,32 +130,31 @@ const RequestedDocuments = () => {
                 borderRadius: '5px',
                 boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
             }}>
-                <button 
-                    onClick={goToPreviousPage} 
+                <button
+                    onClick={goToPreviousPage}
                     disabled={currentPage === 1}
-                    style={{ 
-                        margin: '0 5px', 
-                        padding: '10px 15px', 
-                        backgroundColor: '#4CAF50', 
-                        color: 'white', 
-                        border: 'none', 
-                        cursor: 'pointer' 
+                    style={{
+                        margin: '0 5px',
+                        padding: '10px 15px',
+                        backgroundColor: '#4CAF50',
+                        color: 'white',
+                        border: 'none',
+                        cursor: 'pointer'
                     }}
                 >
                     이전
                 </button>
 
-                {/* 페이지 번호 표시 */}
                 {[...Array(totalPages)].map((_, index) => (
-                    <button 
-                        key={index} 
-                        onClick={() => paginate(index + 1)} 
+                    <button
+                        key={index}
+                        onClick={() => paginate(index + 1)}
                         style={{
-                            margin: '0 5px', 
-                            padding: '10px 15px', 
-                            backgroundColor: currentPage === index + 1 ? '#2196F3' : '#fff', 
-                            color: currentPage === index + 1 ? 'white' : '#4CAF50', 
-                            border: '1px solid #ddd', 
+                            margin: '0 5px',
+                            padding: '10px 15px',
+                            backgroundColor: currentPage === index + 1 ? '#2196F3' : '#fff',
+                            color: currentPage === index + 1 ? 'white' : '#4CAF50',
+                            border: '1px solid #ddd',
                             cursor: 'pointer'
                         }}
                     >
@@ -157,17 +162,10 @@ const RequestedDocuments = () => {
                     </button>
                 ))}
 
-                <button 
-                    onClick={goToNextPage} 
+                <button
+                    onClick={goToNextPage}
                     disabled={currentPage === totalPages}
-                    style={{ 
-                        margin: '0 5px', 
-                        padding: '10px 15px', 
-                        backgroundColor: '#4CAF50', 
-                        color: 'white', 
-                        border: 'none', 
-                        cursor: 'pointer' 
-                    }}
+                    style={{ margin: '0 5px', padding: '10px 15px', backgroundColor: '#4CAF50', color: 'white', border: 'none', cursor: 'pointer' }}
                 >
                     다음
                 </button>

@@ -88,10 +88,14 @@ const ApiService = {
     } else if (type === 'received') {
       // 요청받은 문서 리스트 API 호출
       return apiInstance.get('/documents/received-documents');
+    } else if (type === 'received-with-requester') {
+      return apiInstance.get('/documents/received-with-requester');
     } else {
       throw new Error('Invalid document type specified');
     }
   },
+
+
 
 
   // 특정 문서 가져오기 (PDF 다운로드)

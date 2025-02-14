@@ -1,104 +1,63 @@
 import { Link, Outlet } from "react-router-dom";
 import { useRecoilValue } from "recoil";
-import styled from "styled-components";
+import { authState } from "../recoil/atom/authState";
 import HisnetLoginButton from "../components/HisnetLoginButton";
 import HisnetLogoutButton from "../components/HisnetLogoutButton";
-import { authState } from "../recoil/atom/authState";
 
 function HeaderBar() {
     const auth = useRecoilValue(authState);
-    
+
     return (
-        <HeaderBarContainer>
-            <HeaderBarTitle>
-                <MenuLink to="/">HI-Sign</MenuLink>
+        <div className="d-flex flex-column w-100">
+            <header
+                className="d-flex align-items-center justify-content-between p-3"
+                style={{
+                    height: "80px",
+                    backgroundColor: "white",
+                    borderBottom: "1px solid #ddd",
+                    boxShadow: "0px 1px 4px rgba(0, 0, 0, 0.08)"
+                }}
+            >
+                <Link to="/" className="text-decoration-none text-dark fs-4 ms-3">
+                    HI-Sign
+                </Link>
+
                 {auth.isAuthenticated && (
-                    <NavigationLinks>
-                        <MenuLink to="/request-document">요청한 리스트 페이지</MenuLink>
-                        <MenuLink to="/receive-document">요청받은 리스트 페이지</MenuLink>
-                        <MenuLink to="/upload">문서 업로드하기</MenuLink>
-                        <MenuLink to="/request">서명자 등록하기</MenuLink>
-                        <MenuLink to="/align">서명 할당하기</MenuLink>
-                        <MenuLink to="/make">예제 페이지</MenuLink>
-                        <MenuLink to="/contact">문의 페이지</MenuLink>
-                    </NavigationLinks>
+                    <div className="d-flex gap-3">
+                        <Link to="/request-document" className="nav-link text-dark">
+                            요청한 리스트 페이지
+                        </Link>
+                        <Link to="/receive-document" className="nav-link text-dark">
+                            요청받은 리스트 페이지
+                        </Link>
+                        <Link to="/upload" className="nav-link text-dark">
+                            문서 업로드하기
+                        </Link>
+                        <Link to="/request" className="nav-link text-dark">
+                            서명자 등록하기
+                        </Link>
+                        <Link to="/align" className="nav-link text-dark">
+                            서명 할당하기
+                        </Link>
+                        <Link to="/make" className="nav-link text-dark">
+                            예제 페이지
+                        </Link>
+                        <Link to="/contact" className="nav-link text-dark">
+                            문의 페이지
+                        </Link>
+                    </div>
                 )}
-                <ButtonContainer>
+
+                <div className="d-flex align-items-center gap-3 me-3">
                     {auth.isAuthenticated ? <HisnetLogoutButton /> : <HisnetLoginButton />}
-                </ButtonContainer>
-            </HeaderBarTitle>
-            <MainContent>
+                </div>
+            </header>
+
+            <div className="w-100" style={{ marginTop: "20px" }}>
                 <Outlet/>
-            </MainContent>
-        </HeaderBarContainer>
-    )
+            </div>
+        </div>
+    );
 }
-
-const NavigationLinks = styled.div`
-    display: flex;
-    flex-direction: row;
-    gap: 15px;
-    flex-grow: 1;
-    flex-wrap: nowrap; // 줄바꿈 방지
-    overflow-x: auto; // 가로 스크롤 가능
-    white-space: nowrap; // 텍스트 줄바꿈 방지
-`;
-
-const HeaderBarContainer = styled.div`
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-`;
-
-const HeaderBarTitle = styled.div`
-    width: 100%;
-    height: 80px;
-    background-color: skyblue;
-    display: flex;
-    align-items: center;
-    padding-left: 20px;
-    box-sizing: border-box;
-    justify-content: space-between;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 1000;
-    min-width: 800px; // 최소 너비 설정
-    overflow: hidden;
-`;
-
-const ButtonContainer = styled.div`
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-right: 15px;
-`;
-
-const MenuLink = styled(Link)`
-    text-decoration: none;
-    color: black;
-    margin: 0 15px 0 45px;
-    padding: 8px 16px;
-    background-color: white;
-    border-radius: 4px;
-    transition: all 0.3s ease;
-    
-    &:hover {
-        color: white;
-        background-color: #4CAF50;
-        transform: translateY(-2px);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    }
-    
-    &:active {
-        transform: translateY(0);
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-    }
-`;
-
-const MainContent = styled.div`
-    width: 100%;
-    margin-top: 80px; // HeaderBarTitle의 height와 동일한 값
-`;
 
 export default HeaderBar;
