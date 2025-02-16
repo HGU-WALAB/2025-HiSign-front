@@ -15,7 +15,12 @@ function HeaderBar() {
                     height: "80px",
                     backgroundColor: "white",
                     borderBottom: "1px solid #ddd",
-                    boxShadow: "0px 1px 4px rgba(0, 0, 0, 0.08)"
+                    boxShadow: "0px 1px 4px rgba(0, 0, 0, 0.08)",
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    zIndex: 1000
                 }}
             >
                 <Link to="/" className="text-decoration-none text-dark fs-4 ms-3">
@@ -53,7 +58,7 @@ function HeaderBar() {
                 </div>
             </header>
 
-            <div className="w-100" style={{ marginTop: "20px" }}>
+            <div className="w-100" style={{ marginTop: "100px" }}>
                 <Outlet/>
             </div>
         </div>

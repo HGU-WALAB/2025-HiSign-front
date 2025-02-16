@@ -50,14 +50,14 @@ const ApiService = {
   //const signatureBlob = FileService.base64ToBlob(base64Image); // Base64 → Blob 변환
   //const filePath = await ApiService.uploadSignatureFile(signatureBlob); // API로 업로드
   //이런식으로 fileService.js에서 base64ToBlob 함수를 가져와서 Apiservice.uploadSignatureFile 함수를 사용할 수 있습니다.
-  uploadSignatureFile: async (blob,uniqueId) => {
+  uploadSignatureFile: async (blob,uniqueId) => { // -> unniqueID 이 아니라 이메일로 바꾸어야함 
     if (!blob) throw new Error('업로드할 서명 이미지가 없습니다.');
   
     const formData = new FormData();
-    formData.append('file', blob, `${uniqueId}.png`); // Blob 데이터를 FormData에 추가
+    formData.append('file', blob, `${uniqueId}.png`); // Blob 데이터를 FormData에 추가 // 얘도 email.png 
   
     try {
-      const response = await PublicaApiInstance.post('/signature/upload', formData, {
+      const response = await PublicaApiInstance.post('/files/signature/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }, // 멀티파트 전송
       });
       return response.data.fileName; // 저장된 파일 이름 반환
