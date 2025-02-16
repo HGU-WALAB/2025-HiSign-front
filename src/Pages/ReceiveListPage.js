@@ -91,17 +91,57 @@ const ReceivedDocuments = () => {
             }}>
                 <thead>
                 <tr>
-                    <th style={{ backgroundColor: "#86CFFA", color: "white", padding: "10px", textAlign: "center", fontWeight: "bold" }}>상태</th>
+                    <th style={{ backgroundColor: "#86CFFA", color: "white", padding: "10px", textAlign: "center", fontWeight: "bold" }}>작업명</th>
                     <th style={{ backgroundColor: "#86CFFA", color: "white", padding: "10px", textAlign: "center", fontWeight: "bold" }}>파일명</th>
                     <th style={{ backgroundColor: "#86CFFA", color: "white", padding: "10px", textAlign: "center", fontWeight: "bold" }}>요청 생성일</th>
                     <th style={{ backgroundColor: "#86CFFA", color: "white", padding: "10px", textAlign: "center", fontWeight: "bold" }}>요청자</th>
+                    <th style={{ backgroundColor: "#86CFFA", color: "white", padding: "10px", textAlign: "center", fontWeight: "bold" }}>상태</th>
                     <th style={{ backgroundColor: "#86CFFA", color: "white", padding: "10px", textAlign: "center", fontWeight: "bold" }}>Action</th>
                 </tr>
                 </thead>
                 <tbody>
                 {getCurrentPageData().map((doc) => (
                     <tr key={doc.id}>
-                        <td style={{ padding: "10px", textAlign: "center", borderBottom: "1px solid #ddd", height: "50px" }}>
+                        <td style={{
+                            padding: "10px",
+                            textAlign: "center",
+                            borderBottom: "1px solid #ddd",
+                            height: "50px"
+                        }}>
+                            {doc.requestName}
+                        </td>
+                        <td style={{
+                            padding: "10px",
+                            textAlign: "center",
+                            borderBottom: "1px solid #ddd",
+                            height: "50px"
+                        }}>
+                            <Link to={`/detail/${doc.id}`} style={{textDecoration: "none", color: "#2196F3"}}>
+                                {doc.fileName}
+                            </Link>
+                        </td>
+                        <td style={{
+                            padding: "10px",
+                            textAlign: "center",
+                            borderBottom: "1px solid #ddd",
+                            height: "50px"
+                        }}>
+                            {formatDate(doc.createdAt)}
+                        </td>
+                        <td style={{
+                            padding: "10px",
+                            textAlign: "center",
+                            borderBottom: "1px solid #ddd",
+                            height: "50px"
+                        }}>
+                            {doc.requesterName || "알 수 없음"}
+                        </td>
+                        <td style={{
+                            padding: "10px",
+                            textAlign: "center",
+                            borderBottom: "1px solid #ddd",
+                            height: "50px"
+                        }}>
                                 <span
                                     style={{
                                         padding: "5px 10px",
@@ -121,19 +161,9 @@ const ReceivedDocuments = () => {
                             borderBottom: "1px solid #ddd",
                             height: "50px"
                         }}>
-                            <Link to={`/detail/${doc.id}`} style={{ textDecoration: "none", color: "#2196F3" }}>
-                                {doc.fileName}
-                            </Link>
-                        </td>
-                        <td style={{ padding: "10px", textAlign: "center", borderBottom: "1px solid #ddd", height: "50px" }}>
-                            {formatDate(doc.createdAt)}
-                        </td>
-                        <td style={{ padding: "10px", textAlign: "center", borderBottom: "1px solid #ddd", height: "50px" }}>
-                            {doc.requesterName || "알 수 없음"}
-                        </td>
-                        <td style={{ padding: "10px", textAlign: "center", borderBottom: "1px solid #ddd", height: "50px" }}>
                             {doc.status === 0 ? (
-                                <RejectButton documentId={doc.id} status={doc.status} refreshDocuments={() => {}} />
+                                <RejectButton documentId={doc.id} status={doc.status} refreshDocuments={() => {
+                                }}/>
                             ) : (
                                 <button
                                     style={{
