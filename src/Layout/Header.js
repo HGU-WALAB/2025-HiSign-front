@@ -35,7 +35,7 @@ function HeaderBar() {
                         <Link to="/receive-document" className="nav-link text-dark">
                             요청받은 문서
                         </Link>
-                        <Link to="/setup" className="nav-link text-dark">
+                        <Link to="/tasksetup" className="nav-link text-dark">
                             문서 업로드하기
                         </Link>
                         <Link to="/request" className="nav-link text-dark">

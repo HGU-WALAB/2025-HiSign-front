@@ -37,7 +37,7 @@ function SideBar() {
             <CenterContainer>
             <img src="/assets/frame.png" alt="CSEE 로고" />
                 {auth.isAuthenticated ? (
-                    <CenterLink to="/setup">서명 요청 시작하기</CenterLink>
+                    <CenterLink to="/tasksetup">서명 요청 시작하기</CenterLink>
                 ) : (
                     <HisnetLoginButton>히즈넷으로 로그인</HisnetLoginButton>
                 )}

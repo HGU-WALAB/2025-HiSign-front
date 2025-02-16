@@ -10,7 +10,8 @@ const TaskSetupPage = () => {
   const [document, setDocumentState] = useRecoilState(documentState);
   const member = useRecoilValue(memberState);
   const [requestName, setRequestName] = useState("");
-  const [isConfirmed, setIsConfirmed] = useState(false);
+  const [description, setDescription] = useState("");
+  const [isRejectable, setIsRejectable] = useState(0); // ✅ 기본값: 거절 불가능 (0)
   const navigate = useNavigate();
 
   const handlePostFiles = (file) => {
@@ -29,46 +30,97 @@ const TaskSetupPage = () => {
     }));
   };
 
-  const handleRequestNameConfirm = () => {
-    if (!isConfirmed) {
-      if (!requestName.trim()) {
-        alert("요청명을 입력해 주세요.");
-        return;
-      }
+  const handleNextStep = () => {
+    if (!requestName.trim()) {
+      alert("요청명을 입력해 주세요.");
+      return;
+    }
+    if (!description.trim()) {
+      alert("문서 설명을 입력해 주세요.");
+      return;
+    }
+    if (!document.fileUrl) {
+      alert("문서를 선택해 주세요.");
+      return;
     }
 
     setDocumentState((previousDocument) => ({
       ...previousDocument,
       requestName: requestName,
+      description: description,
+      isRejectable: isRejectable, // ✅ 라디오 버튼 값 전달
     }));
-    setIsConfirmed(!isConfirmed);
+
+    navigate(`/request`);
   };
 
   useEffect(() => {
-    console.log(document); 
+    console.log(document);
   }, [document]);
 
   return (
     <Container>
       <StyledBody>
         <MainArea>
-          <Title>{isConfirmed ? "문서 선택" : "요청 이름 지정"}</Title>
+          <Title>작업 정보 입력</Title>
 
           {/* 요청 이름 입력 */}
           <InputRow>
-            <Input
-              placeholder="요청 이름 입력"
+          <RequiredNotice>* 항목은 필수 입력란입니다.</RequiredNotice>
+            <Label>
+              작업명 <RequiredMark>*</RequiredMark>
+            </Label>
+            <InputField
+              placeholder="예: 2024년 1분기 계약서 서명 요청"
               value={requestName}
               onChange={(e) => setRequestName(e.target.value)}
-              disabled={isConfirmed}
             />
-            <ConfirmButton isConfirmed={isConfirmed} onClick={handleRequestNameConfirm}>
-              {isConfirmed ? "수정" : "완료"}
-            </ConfirmButton>
           </InputRow>
 
-          {/* 요청명이 확정된 경우 파일 선택 UI 표시 */}
-          {isConfirmed && (
+          {/* 문서 설명 입력 */}
+          <InputRow>
+            <Label>
+              작업 요청 설명 <RequiredMark>*</RequiredMark>
+            </Label>
+            <Textarea
+              placeholder="예: 최대한 빠르게 서명을 완료해주세요."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+          </InputRow>
+
+          {/* 작업 설정 (라디오 버튼) */}
+          <InputRow>
+            <Label>작업 설정</Label>
+            <RadioContainer>
+              <RadioLabel>
+                <RadioInput
+                  type="radio"
+                  name="rejectable"
+                  value={0}
+                  checked={isRejectable === 0}
+                  onChange={() => setIsRejectable(0)}
+                />
+                거절 불가능
+              </RadioLabel>
+              <RadioLabel>
+                <RadioInput
+                  type="radio"
+                  name="rejectable"
+                  value={1}
+                  checked={isRejectable === 1}
+                  onChange={() => setIsRejectable(1)}
+                />
+                거절 가능
+              </RadioLabel>
+            </RadioContainer>
+          </InputRow>
+
+          {/* 문서 선택 (파일 업로드) */}
+          <InputRow>
+            <Label>
+              문서 선택 <RequiredMark>*</RequiredMark>
+            </Label>
             <UploadSection>
               {!document.fileUrl ? (
                 <Drop
@@ -98,14 +150,14 @@ const TaskSetupPage = () => {
                 </SelectedFileBox>
               )}
             </UploadSection>
-          )}
+          </InputRow>
         </MainArea>
       </StyledBody>
 
       {/* 하단 이동 버튼 */}
       <FloatingButtonContainer>
         <GrayButton onClick={() => navigate(`/request-document`)}>나가기</GrayButton>
-        <NextButton onClick={() => (navigate(`/request`))} disabled={!document.fileUrl}>
+        <NextButton onClick={handleNextStep}>
           서명자 추가
         </NextButton>
       </FloatingButtonContainer>
@@ -114,6 +166,7 @@ const TaskSetupPage = () => {
 };
 export default TaskSetupPage;
 
+// ✅ 스타일 수정
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -148,32 +201,64 @@ const Title = styled.h2`
 
 const InputRow = styled.div`
   display: flex;
-  align-items: center;
-  gap: 20px;
+  flex-direction: column;
+  gap: 5px;
   margin-bottom: 20px;
 `;
 
-const Input = styled.input`
+const Label = styled.label`
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+`;
+
+const RequiredMark = styled.span`
+  color: #ff4d4f;
+  margin-left: 4px;
+`;
+
+const InputField = styled.input`
+  width: 100%;
+  height: 40px;
   border: 1px solid #ddd;
   border-radius: 5px;
   padding: 10px;
-  width: 100%;
   font-size: 14px;
+  outline: none;
 `;
 
-const ConfirmButton = styled.button`
-  width: 80px;
-  padding: 10px 20px;
-  background-color: ${({ isConfirmed }) => (isConfirmed ? "#6c757d" : "#007bff")};
-  color: white;
-  border: none;
-  border-radius: 3px;
-  cursor: pointer;
-  transition: background-color 0.2s;
+const Textarea = styled.textarea`
+  width: 100%;
+  height: 80px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+  font-size: 14px;
+  resize: none;
+  overflow: hidden;
+`;
 
-  &:hover {
-    background-color: ${({ isConfirmed }) => (isConfirmed ? "#5a6268" : "#0056b3")};
-  }
+const RadioContainer = styled.div`
+  display: flex;
+  gap: 20px;
+`;
+
+const RadioLabel = styled.label`
+  font-size: 14px;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+`;
+
+const RadioInput = styled.input`
+  cursor: pointer;
+`;
+
+const RequiredNotice = styled.p`
+  font-size: 12px;
+  color: #ff4d4f;
+  text-align: right;
 `;
 
 const UploadSection = styled.div`
@@ -226,20 +311,20 @@ const FloatingButtonContainer = styled.div`
   z-index: 1000;
 `;
 
-const ButtonBase = styled.button`
+const GrayButton = styled.button`
+  background-color: #ccc;
   padding: 12px 24px;
   color: white;
   border: none;
   border-radius: 25px;
-  cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
 `;
 
-const GrayButton = styled(ButtonBase)`
-  background-color: #ccc;
-`;
-
-const NextButton = styled(ButtonBase)`
+const NextButton = styled.button`
   background-color: ${({ disabled }) => (disabled ? "#ccc" : "#03A3FF")};
+  padding: 12px 24px;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
 `;

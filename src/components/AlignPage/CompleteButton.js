@@ -39,11 +39,9 @@ const CompleteButton = () => {
       const file = new File([blob], document.fileName, { type: blob.type });
 
       console.log("파일 변환 완료:", file);
-
-      
-
+      console.log("문서 정보:", document);
       // 2 문서 업로드 API 호출 (순차 실행 보장)
-      const uploadResponse = await ApiService.uploadDocument(file, document.ownerId, document.requestName);
+      const uploadResponse = await ApiService.uploadDocument(file, document.ownerId, document.requestName, document.description, document.isRejectable);
 
       if (uploadResponse.status !== 200) {
         throw new Error("문서 업로드에 실패했습니다.");
@@ -63,10 +61,12 @@ const CompleteButton = () => {
         alert("서명 요청이 성공적으로 전송되었습니다.");
         setDocument({
             requestName: "",
+            description: "",
             ownerId: null,
             fileName: null,
             fileUrl: "",
             file: null,
+            isRejectable: null,
         });
         setSigners([]);
           navigate("/request-document");

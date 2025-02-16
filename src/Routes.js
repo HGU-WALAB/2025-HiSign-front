@@ -18,7 +18,7 @@ function MyRoutes() {
         <Routes>
             <Route element={<Header />}>
                 <Route path="/" index="index" element={<IntroPage />} />
-                <Route path="/setup" element={<TaskSetupPage />} />
+                <Route path="/tasksetup" element={<TaskSetupPage />} />
                 <Route path="/detail/:documentId" element={<DetailPage />} />
                 <Route path="/login-ing" element={<LoginCallback />} />
                 <Route path="/request" element={<RequestPage />} />
