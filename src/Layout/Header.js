@@ -1,8 +1,8 @@
 import { Link, Outlet } from "react-router-dom";
 import { useRecoilValue } from "recoil";
-import { authState } from "../recoil/atom/authState";
 import HisnetLoginButton from "../components/HisnetLoginButton";
 import HisnetLogoutButton from "../components/HisnetLogoutButton";
+import { authState } from "../recoil/atom/authState";
 
 function HeaderBar() {
     const auth = useRecoilValue(authState);
@@ -35,7 +35,7 @@ function HeaderBar() {
                         <Link to="/receive-document" className="nav-link text-dark">
                             요청받은 문서
                         </Link>
-                        <Link to="/upload" className="nav-link text-dark">
+                        <Link to="/setup" className="nav-link text-dark">
                             문서 업로드하기
                         </Link>
                         <Link to="/request" className="nav-link text-dark">

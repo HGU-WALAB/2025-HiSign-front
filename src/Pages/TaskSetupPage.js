@@ -6,7 +6,7 @@ import Drop from "../components/Drop";
 import { documentState } from "../recoil/atom/documentState";
 import { memberState } from "../recoil/atom/memberState";
 
-const UploadPage = () => {
+const TaskSetupPage = () => {
   const [document, setDocumentState] = useRecoilState(documentState);
   const member = useRecoilValue(memberState);
   const [requestName, setRequestName] = useState("");
@@ -112,7 +112,7 @@ const UploadPage = () => {
     </Container>
   );
 };
-export default UploadPage;
+export default TaskSetupPage;
 
 const Container = styled.div`
   display: flex;
