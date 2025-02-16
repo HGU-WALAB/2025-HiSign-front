@@ -92,7 +92,7 @@ const RequestPage = () => {
         </StyledBody>
 
         <FloatingButtonContainer>
-          <GrayButton onClick={() => navigate(`/upload`)}>이전으로</GrayButton>
+          <GrayButton onClick={() => navigate(`/tasksetup`)}>이전으로</GrayButton>
           <GrayButton onClick={() => navigate(`/request-document`)}>나가기</GrayButton>
           <NextButton onClick={handleNextStep} disabled={!isNextButtonEnabled}>
             추가 완료
