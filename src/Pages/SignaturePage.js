@@ -31,20 +31,15 @@ function SignaturePage() {
       })
       .catch((err) => {
         setIsValid(false);
-
-        // 백엔드 응답에서 에러 메시지 가져오기
         const errorMessage = err.response?.data?.message || "서명 요청 검증에 실패했습니다.";
-        
         setError(errorMessage);
-        alert(errorMessage); // 사용자에게 경고창 표시
-        setShowEmailModal(false); // 모달 닫기
       });
 
     console.log("전역 변수 signing:", signing);
   }, [token]);
 
   // ✅ 2. 이메일 인증 후 문서 + 서명 위치 불러오기
-  const handleEmailSubmit = (inputEmail, setError) => {
+  const handleEmailSubmit = (inputEmail, setModalError) => {
     setSigning((prevState) => ({
       ...prevState,
       signerEmail: inputEmail,
@@ -78,28 +73,23 @@ function SignaturePage() {
               ...prevState,
               signatureFields: fieldsResponse.data,
             }));
+            setShowEmailModal(false); // 성공시에만 모달 닫기
             console.log("서명 필드 정보:", fieldsResponse.data);
           });
       })
       .catch((err) => {
         console.error("서명 요청 검증 실패:", err);
-
-        // 백엔드 응답에서 에러 메시지 가져오기
         const errorMessage = err.response?.data?.message || "이메일 인증에 실패했습니다. 다시 시도해주세요.";
-
-        setError(errorMessage); // 상태 업데이트
-        alert(errorMessage); // 사용자에게 알림 표시
-        setShowEmailModal(false); // 모달 닫기
+        setModalError(errorMessage); // 모달 내부 에러 메시지만 설정
       });
   };
 
   const handleSubmitSignature = async () => {
     if (!signing.documentId || signing.signatureFields.length === 0) {
-      alert("서명할 필드가 없습니다.");
+      setError("서명할 필드가 없습니다.");
       return;
     }
   
-    // ✅ 요청 데이터 변환
     const signerData = {
       email: signing.signerEmail,
       name: signing.signerName,
@@ -116,22 +106,25 @@ function SignaturePage() {
   
     try {
       const response = await ApiService.saveSignatures(signing.documentId, signerData);
-      alert("서명이 성공적으로 저장되었습니다!");
+      setError("서명이 성공적으로 저장되었습니다!");
     } catch (error) {
       console.error("서명 저장 실패:", error);
-      alert("서명 저장 중 오류 발생");
+      setError("서명 저장 중 오류가 발생했습니다.");
     }
   };
-  
 
   return (
     <div>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {isValid === null && <p>로딩 중...</p>}
+      {error && <ErrorMessage>{error}</ErrorMessage>}
+      {isValid === null && <LoadingMessage>로딩 중...</LoadingMessage>}
 
-      {/* ✅ 이메일 모달 */}
-      {isValid && !signing.documentId && showEmailModal && (
-        <EmailInputModal open={showEmailModal} onSubmit={handleEmailSubmit} onClose={() => setShowEmailModal(false)} />
+      {/* ✅ 이메일 모달 - isValid가 true이고 documentId가 없을 때 표시 */}
+      {isValid && !signing.documentId && (
+        <EmailInputModal 
+          open={true} 
+          onSubmit={handleEmailSubmit} 
+          onClose={() => {}} // 닫기 버튼 비활성화
+        />
       )}
 
       {/* ✅ PDF 및 서명 영역 표시 */}
@@ -142,11 +135,11 @@ function SignaturePage() {
         </DocumentContainer>
       )}
 
-        {signing.documentId && signing.fileUrl&&(
-          <ButtonContainer>
-            <CompleteButton onClick={handleSubmitSignature}> 완료 </CompleteButton> 
-          </ButtonContainer>
-        )}
+      {signing.documentId && signing.fileUrl && (
+        <ButtonContainer>
+          <CompleteButton onClick={handleSubmitSignature}> 완료 </CompleteButton> 
+        </ButtonContainer>
+      )}
     </div>
   );
 }
@@ -178,4 +171,18 @@ const ButtonBase = styled.button`
 
 const CompleteButton = styled(ButtonBase)`
   background-color: ${({ disabled }) => (disabled ? "#ccc" : "#03A3FF")};
+`;
+
+const ErrorMessage = styled.p`
+  color: #dc3545;
+  text-align: center;
+  margin: 10px 0;
+  padding: 10px;
+`;
+
+const LoadingMessage = styled.p`
+  text-align: center;
+  margin: 10px 0;
+  padding: 10px;
+  color: #666;
 `;
