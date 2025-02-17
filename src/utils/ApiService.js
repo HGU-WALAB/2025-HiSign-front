@@ -117,10 +117,16 @@ const ApiService = {
       throw new Error(error.response?.data || '문서 삭제 실패');
     }
   },
-  rejectSignatureRequest: async (documentId) => {
+
+  rejectDocument: async (documentId, reason) => {
     if (!documentId) throw new Error("문서 ID가 필요합니다.");
-    return apiInstance.put(`/signature-requests/reject/${documentId}`);
+    if (!reason) throw new Error("거절 사유가 필요합니다.");
+
+    return apiInstance.put(`/signature-requests/reject/${documentId}`, { reason });
   },
+
+
+
 
   // 서명 요청 전송
   sendSignatureRequest: async (documentId, memberName, signers) => {
@@ -144,10 +150,11 @@ const ApiService = {
   },
 
   // 서명 요청 취소
-  cancelSignatureRequest: async (documentId) => {
+  cancelSignatureRequest: async (documentId, reason) => {
     if (!documentId) throw new Error('문서 ID가 필요합니다.');
+    if (!reason) throw new Error('취소 사유가 필요합니다.');
 
-    return apiInstance.put(`/signature-requests/cancel/${documentId}`);
+    return apiInstance.put(`/signature-requests/cancel/${documentId}`, { reason });
   },
 
   // 히즈넷 로그인
@@ -209,7 +216,7 @@ const ApiService = {
         "/api/signature/sign",
         signingData,
         {
-          params: { documentId }, // Query Parameter로 전달
+          params: { documentId },
         }
       );
       return response.data; // 성공 메시지 반환
