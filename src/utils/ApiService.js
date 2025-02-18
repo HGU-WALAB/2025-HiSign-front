@@ -213,7 +213,7 @@ const ApiService = {
 
     try {
       const response = await PublicaApiInstance.post(
-        "/api/signature/sign",
+        "/signature/sign",
         signingData,
         {
           params: { documentId },

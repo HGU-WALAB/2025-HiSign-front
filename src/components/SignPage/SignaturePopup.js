@@ -2,6 +2,7 @@
 import { useState, useRef } from "react";
 import { useRecoilState } from "recoil";
 import SignatureCanvas from "react-signature-canvas";
+import { useRecoilState } from "recoil";
 import { signingState } from "../../recoil/atom/signingState";
 import { BigButton } from "../BigButton";
 
