@@ -92,7 +92,7 @@ function SignaturePage() {
       alert("서명할 필드가 없습니다.");
       return;
     }
-  
+    console.log("서명 저장 상태태:", signing);
     const signerData = {
       email: signing.signerEmail,
       name: signing.signerName,
@@ -106,7 +106,7 @@ function SignaturePage() {
         textData: field.textData || null
       }))
     };
-  
+    console.log("서명 데이터:", signerData);
     try {
       const response = await ApiService.saveSignatures(signing.documentId, signerData);
       alert("서명이 성공적으로 저장되었습니다!");

@@ -1,6 +1,6 @@
-import { useState, useRef } from "react";
-import { useRecoilState } from "recoil";
+import { useRef } from "react";
 import SignatureCanvas from "react-signature-canvas";
+import { useRecoilState } from "recoil";
 import { signingState } from "../../recoil/atom/signingState";
 import { BigButton } from "../BigButton"; // 기존 버튼 스타일 적용
 
