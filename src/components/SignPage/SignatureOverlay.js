@@ -1,13 +1,14 @@
+// SignatureOverlay.js
 import { useState } from "react";
 import { useRecoilState } from "recoil";
 import { signingState } from "../../recoil/atom/signingState";
 import SignaturePopup from "./SignaturePopup";
-import DraggableSignature from "../DraggableSignature"; // 드래그 가능한 서명 컴포넌트
+import DraggableSignature from "../DraggableSignature";
 
 const SignatureOverlay = () => {
   const [signing, setSigning] = useRecoilState(signingState);
   const [selectedField, setSelectedField] = useState(null);
-  const [signatureURL, setSignatureURL] = useState(null); // 추가된 서명 이미지
+  const [signatureURL, setSignatureURL] = useState(null);
 
   // 서명 입력 팝업 열기
   const openPopup = (fieldIndex) => {
@@ -42,17 +43,25 @@ const SignatureOverlay = () => {
             top: field.position.y,
             width: field.width,
             height: field.height,
-            border: "2px dashed black",
+            border: field.image ? "none" : "2px dashed black",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            backgroundColor: "#f8f9fa",
             cursor: "pointer",
+            backgroundColor: field.image ? "transparent" : "#f8f9fa50", // 이미지가 있으면 투명, 없으면 반투명 배경
           }}
           onClick={() => openPopup(index)}
         >
           {field.type === 0 && field.image && (
-            <img src={field.image} alt="서명" style={{ width: "100%", height: "100%" }} />
+            <img 
+              src={field.image} 
+              alt="서명" 
+              style={{ 
+                width: "100%", 
+                height: "100%",
+                objectFit: "contain",
+              }} 
+            />
           )}
           {field.type === 1 && field.text && (
             <span style={{ fontSize: "16px", fontWeight: "bold" }}>{field.text}</span>

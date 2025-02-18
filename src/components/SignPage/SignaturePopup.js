@@ -1,17 +1,20 @@
-import { useRef } from "react";
+// SignaturePopup.js
+import { useState, useRef } from "react";
+import { useRecoilState } from "recoil";
 import SignatureCanvas from "react-signature-canvas";
 import { useRecoilState } from "recoil";
 import { signingState } from "../../recoil/atom/signingState";
-import { BigButton } from "../BigButton"; // 기존 버튼 스타일 적용
+import { BigButton } from "../BigButton";
 
 const SignaturePopup = ({ field, fieldIndex, onClose }) => {
   const [signing, setSigning] = useRecoilState(signingState);
   const sigCanvas = useRef(null);
 
-  // 서명 저장 (캔버스에서 이미지로 변환)
+  // 서명 저장 (캔버스에서 이미지로 변환, 배경을 투명하게 처리)
   const handleSave = () => {
     if (sigCanvas.current) {
-      const signatureData = sigCanvas.current.toDataURL("image/png");
+      const canvas = sigCanvas.current.getCanvas();
+      const signatureData = createTransparentSignature(canvas);
 
       setSigning((prevState) => ({
         ...prevState,
@@ -21,6 +24,37 @@ const SignaturePopup = ({ field, fieldIndex, onClose }) => {
       }));
     }
     onClose();
+  };
+
+  // 서명의 배경을 투명하게 만드는 함수
+  const createTransparentSignature = (canvas) => {
+    // 원본 캔버스의 크기를 가져옴
+    const { width, height } = canvas;
+    
+    // 새 캔버스 생성
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = width;
+    tempCanvas.height = height;
+    const ctx = tempCanvas.getContext('2d');
+    
+    // 원본 캔버스의 이미지 데이터 가져오기
+    const imageData = canvas.getContext('2d').getImageData(0, 0, width, height);
+    const data = imageData.data;
+    
+    // 배경 색상을 투명하게 설정
+    for (let i = 0; i < data.length; i += 4) {
+      // 하얀색 배경인 경우 (R,G,B 모두 255 또는 매우 높은 값)
+      if (data[i] > 240 && data[i+1] > 240 && data[i+2] > 240) {
+        // 완전히 투명하게 설정
+        data[i+3] = 0;
+      }
+    }
+    
+    // 수정된 이미지 데이터를 새 캔버스에 그리기
+    ctx.putImageData(imageData, 0, 0);
+    
+    // 투명 배경으로 된 PNG 이미지로 변환
+    return tempCanvas.toDataURL('image/png');
   };
 
   // 서명 초기화
@@ -42,7 +76,7 @@ const SignaturePopup = ({ field, fieldIndex, onClose }) => {
           width: 400,
           height: 200,
           className: "signatureCanvas",
-          style: signatureCanvasStyle, // 스타일 적용
+          style: signatureCanvasStyle,
         }}
       />
 
