@@ -33,6 +33,7 @@ function SignaturePage() {
         setIsValid(false);
         const errorMessage = err.response?.data?.message || "서명 요청 검증에 실패했습니다.";
         setError(errorMessage);
+        alert(errorMessage);
       });
 
     console.log("전역 변수 signing:", signing);
@@ -80,13 +81,15 @@ function SignaturePage() {
       .catch((err) => {
         console.error("서명 요청 검증 실패:", err);
         const errorMessage = err.response?.data?.message || "이메일 인증에 실패했습니다. 다시 시도해주세요.";
-        setModalError(errorMessage); // 모달 내부 에러 메시지만 설정
+        setModalError(errorMessage); // 모달 내부 에러 메시지 설정
+        alert(errorMessage);
+        // 실패시 모달을 닫지 않음
       });
   };
 
   const handleSubmitSignature = async () => {
     if (!signing.documentId || signing.signatureFields.length === 0) {
-      setError("서명할 필드가 없습니다.");
+      alert("서명할 필드가 없습니다.");
       return;
     }
   
@@ -106,17 +109,17 @@ function SignaturePage() {
   
     try {
       const response = await ApiService.saveSignatures(signing.documentId, signerData);
-      setError("서명이 성공적으로 저장되었습니다!");
+      alert("서명이 성공적으로 저장되었습니다!");
     } catch (error) {
       console.error("서명 저장 실패:", error);
-      setError("서명 저장 중 오류가 발생했습니다.");
+      alert("서명 저장 중 오류 발생");
     }
   };
 
   return (
     <div>
-      {error && <ErrorMessage>{error}</ErrorMessage>}
-      {isValid === null && <LoadingMessage>로딩 중...</LoadingMessage>}
+      {error && <p style={{ color: "red" }}>{error}</p>}
+      {isValid === null && <p>로딩 중...</p>}
 
       {/* ✅ 이메일 모달 - isValid가 true이고 documentId가 없을 때 표시 */}
       {isValid && !signing.documentId && (
@@ -132,6 +135,7 @@ function SignaturePage() {
         <DocumentContainer>
           <PDFViewer pdfUrl={signing.fileUrl} />
           <SignatureOverlay signatureFields={signing.signatureFields} />
+          
         </DocumentContainer>
       )}
 
@@ -171,18 +175,4 @@ const ButtonBase = styled.button`
 
 const CompleteButton = styled(ButtonBase)`
   background-color: ${({ disabled }) => (disabled ? "#ccc" : "#03A3FF")};
-`;
-
-const ErrorMessage = styled.p`
-  color: #dc3545;
-  text-align: center;
-  margin: 10px 0;
-  padding: 10px;
-`;
-
-const LoadingMessage = styled.p`
-  text-align: center;
-  margin: 10px 0;
-  padding: 10px;
-  color: #666;
 `;

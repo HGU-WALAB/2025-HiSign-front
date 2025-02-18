@@ -52,6 +52,8 @@ function EmailInputModal({ open, onSubmit, onClose }) {
           <strong>서명 요청을 수신한 본인의 이메일 주소</strong>를 입력하여 주세요.
         </Typography>
 
+          <br>
+          </br>
         <div style={{ width: "100%", display: "flex", justifyContent: "center", gap: "10px" }}>
           <input
             type="email"

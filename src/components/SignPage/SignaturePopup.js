@@ -1,62 +1,57 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRecoilState } from "recoil";
+import SignatureCanvas from "react-signature-canvas";
 import { signingState } from "../../recoil/atom/signingState";
+import { BigButton } from "../BigButton"; // 기존 버튼 스타일 적용
 
 const SignaturePopup = ({ field, fieldIndex, onClose }) => {
   const [signing, setSigning] = useRecoilState(signingState);
-  const [text, setText] = useState(field.text || ""); // 기존 텍스트 유지
+  const sigCanvas = useRef(null);
 
-  // 서명 이미지 업데이트
-  const handleImageUpload = (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
+  // 서명 저장 (캔버스에서 이미지로 변환)
+  const handleSave = () => {
+    if (sigCanvas.current) {
+      const signatureData = sigCanvas.current.toDataURL("image/png");
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
       setSigning((prevState) => ({
         ...prevState,
-        image: reader.result, // ✅ 하나의 서명 이미지를 공유
+        signatureFields: prevState.signatureFields.map((f, idx) =>
+          idx === fieldIndex ? { ...f, image: signatureData } : f
+        ),
       }));
-    };
-    reader.readAsDataURL(file);
-  };
-
-  // 서명 텍스트 업데이트
-  const handleTextChange = (e) => {
-    setText(e.target.value);
-  };
-
-  // 서명 저장
-  const handleSave = () => {
-    setSigning((prevState) => ({
-      ...prevState,
-      signatureFields: prevState.signatureFields.map((f, idx) =>
-        idx === fieldIndex ? { ...f, text: text } : f
-      ),
-    }));
+    }
     onClose();
+  };
+
+  // 서명 초기화
+  const handleClear = () => {
+    if (sigCanvas.current) {
+      sigCanvas.current.clear();
+    }
   };
 
   return (
     <div style={popupStyle}>
       <h3>서명 입력</h3>
 
-      {field.type === 0 && (
-        <div>
-          <p>서명 이미지 업로드:</p>
-          <input type="file" accept="image/*" onChange={handleImageUpload} />
-        </div>
-      )}
+      {/* 서명 캔버스 */}
+      <SignatureCanvas
+        ref={sigCanvas}
+        penColor="black"
+        canvasProps={{
+          width: 400,
+          height: 200,
+          className: "signatureCanvas",
+          style: signatureCanvasStyle, // 스타일 적용
+        }}
+      />
 
-      {field.type === 1 && (
-        <div>
-          <p>텍스트 서명 입력:</p>
-          <input type="text" value={text} onChange={handleTextChange} />
-        </div>
-      )}
-
-      <button onClick={handleSave}>저장</button>
-      <button onClick={onClose}>취소</button>
+      {/* 버튼 그룹 */}
+      <div style={{ marginTop: 10, display: "flex", justifyContent: "center" }}>
+        <BigButton marginRight={8} title="초기화" onClick={handleClear} />
+        <BigButton marginRight={8} title="저장" onClick={handleSave} />
+        <BigButton inverted={true} title="취소" onClick={onClose} />
+      </div>
     </div>
   );
 };
@@ -69,8 +64,18 @@ const popupStyle = {
   transform: "translate(-50%, -50%)",
   backgroundColor: "white",
   padding: "20px",
-  border: "1px solid black",
+  border: "1px solid #000",
   zIndex: 1000,
+  boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
+  borderRadius: "8px",
+};
+
+// 서명 캔버스 스타일
+const signatureCanvasStyle = {
+  border: "1px solid #000",
+  borderRadius: "8px",
+  boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.1)",
+  marginTop: "8px",
 };
 
 export default SignaturePopup;
