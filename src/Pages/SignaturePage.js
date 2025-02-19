@@ -92,7 +92,7 @@ function SignaturePage() {
       alert("서명할 필드가 없습니다.");
       return;
     }
-    console.log("서명 저장 상태태:", signing);
+    console.log("서명 저장 상태:", signing);
     const signerData = {
       email: signing.signerEmail,
       name: signing.signerName,

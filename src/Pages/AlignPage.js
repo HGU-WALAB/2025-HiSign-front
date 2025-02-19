@@ -61,7 +61,17 @@ const AlignPage = () => {
             <List>
               {signers.map((signer) => (
                 <ListItem button key={signer.email} onClick={(e) => handleMenuClick(e, signer)}>
-                  <ListItemText primary={signer.name} secondary={signer.email} />
+                  <ListItemText 
+                    primary={
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span>{signer.name}</span>
+                        <SignatureCount>
+                          서명 {signer.signatureFields.length}개 할당
+                        </SignatureCount>
+                      </div>
+                    }
+                    secondary={signer.email} 
+                  />
                 </ListItem>
               ))}
             </List>
@@ -170,7 +180,7 @@ const MainContainer = styled.div`
 
 const ContentWrapper = styled.div`
   flex: 1;
-  margin-top: 80px; // 헤더바 높이만큼 마진 추가
+  margin-top: 80px;
 `;
 
 const Container = styled.div`
@@ -242,8 +252,8 @@ const StyledDrawer = styled(Drawer)`
     
     .MuiDrawer-paper {
       width: 250px;
-      top: 80px; // 헤더바 높이만큼 top 값 설정
-      height: calc(100% - 80px); // 전체 높이에서 헤더바 높이만큼 뺌
+      top: 80px;
+      height: calc(100% - 80px);
       background-color: white;
       border-right: 1px solid #e0e0e0;
     }
@@ -265,6 +275,14 @@ const ButtonContainer = styled.div`
   text-align: center;
   margin: 20px 0;
   padding: 20px;
+`;
+
+const SignatureCount = styled.span`
+  font-size: 0.8rem;
+  color: #666;
+  background-color: #f5f5f5;
+  padding: 2px 8px;
+  border-radius: 12px;
 `;
 
 export default AlignPage;
