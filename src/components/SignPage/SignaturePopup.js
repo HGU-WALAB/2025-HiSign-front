@@ -1,6 +1,5 @@
 // SignaturePopup.js
-import { useState, useRef } from "react";
-import { useRecoilState } from "recoil";
+import { useRef } from "react";
 import SignatureCanvas from "react-signature-canvas";
 import { useRecoilState } from "recoil";
 import { signingState } from "../../recoil/atom/signingState";
@@ -16,10 +15,12 @@ const SignaturePopup = ({ field, fieldIndex, onClose }) => {
       const canvas = sigCanvas.current.getCanvas();
       const signatureData = createTransparentSignature(canvas);
 
-      setSigning((prevState) => ({
-        ...prevState,
-        signatureFields: prevState.signatureFields.map((f, idx) =>
-          idx === fieldIndex ? { ...f, image: signatureData } : f
+      setSigning((prev) => ({
+        ...prev,
+        signatureFields: prev.signatureFields.map((field) => 
+          field.type === 0 // ✅ 서명(type 0) 필드에만 서명 이미지 업데이트
+            ? { ...field, image: signatureData }
+            : field
         ),
       }));
     }

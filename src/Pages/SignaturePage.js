@@ -16,6 +16,7 @@ function SignaturePage() {
   const [error, setError] = useState(null);
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [signing, setSigning] = useRecoilState(signingState);
+  const [currentPage, setCurrentPage] = useState(1); // 현재 표시 중인 페이지
 
   // ✅ 1. 토큰 유효성 검사
   useEffect(() => {
@@ -92,29 +93,54 @@ function SignaturePage() {
       alert("서명할 필드가 없습니다.");
       return;
     }
-    console.log("서명 저장 상태태:", signing);
-    const signerData = {
-      email: signing.signerEmail,
-      name: signing.signerName,
-      signatureFields: signing.signatureFields.map(field => ({
-        signerEmail: signing.signerEmail,
-        type: field.type,
-        width: field.width,
-        height: field.height,
-        position: field.position,
-        imageName: field.imageName || null,
-        textData: field.textData || null
-      }))
-    };
-    console.log("서명 데이터:", signerData);
+  
+    console.log("🔹 서명 저장 시작, 현재 상태:", signing);
+  
     try {
-      const response = await ApiService.saveSignatures(signing.documentId, signerData);
+      let fileName = null;
+  
+      // ✅ 1. 서명 이미지 업로드 (서명 필드 중 첫 번째 이미지 필드를 업로드)
+      const imageField = signing.signatureFields.find(field => field.type === 0 && field.image);
+      if (imageField) {
+        console.log("🔹 서명 이미지 업로드 시작...");
+        
+        // ✅ Base64 → Blob 변환
+        const blob = await fetch(imageField.image).then(res => res.blob());
+  
+        // ✅ 서버에 업로드 요청 (절차적 단계 보장)
+        fileName = await ApiService.uploadSignatureFile(blob, signing.signerEmail);
+        
+        console.log("✅ 서명 이미지 업로드 완료, fileName:", fileName);
+      }
+  
+      // ✅ 2. 서명 데이터 생성 (업로드된 이미지 파일명 적용)
+      const signerData = {
+        email: signing.signerEmail,
+        name: signing.signerName,
+        signatureFields: signing.signatureFields.map(field => ({
+          signerEmail: signing.signerEmail,
+          type: field.type,
+          width: field.width,
+          height: field.height,
+          position: field.position,
+          imageName: field.type === 0 ? fileName : null, // ✅ 업로드된 파일명 적용
+          textData: field.textData || null
+        }))
+      };
+  
+      console.log("🔹 최종 서명 데이터 생성 완료:", signerData);
+  
+      // ✅ 3. 서명 정보 저장 (절차적으로 업로드 완료 후 실행)
+      console.log("🔹 서명 데이터 저장 시작...");
+      await ApiService.saveSignatures(signing.documentId, signerData);
+      console.log("✅ 서명 저장 완료!");
       alert("서명이 성공적으로 저장되었습니다!");
     } catch (error) {
-      console.error("서명 저장 실패:", error);
+      console.error("❌ 서명 저장 실패:", error);
       alert("서명 저장 중 오류 발생");
     }
   };
+  
 
   return (
     <div>
@@ -133,15 +159,18 @@ function SignaturePage() {
       {/* ✅ PDF 및 서명 영역 표시 */}
       {signing.documentId && signing.fileUrl && (
         <DocumentContainer>
-          <PDFViewer pdfUrl={signing.fileUrl} />
-          <SignatureOverlay signatureFields={signing.signatureFields} />
+          <PDFViewer
+          pdfUrl={signing.fileUrl}
+          setCurrentPage={setCurrentPage}
+          />
+          <SignatureOverlay currentPage={currentPage} />
           
         </DocumentContainer>
       )}
 
       {signing.documentId && signing.fileUrl && (
         <ButtonContainer>
-          <CompleteButton onClick={handleSubmitSignature}> 완료 </CompleteButton> 
+          <CompleteButton onClick={handleSubmitSignature}> 완료 </CompleteButton>
         </ButtonContainer>
       )}
     </div>
