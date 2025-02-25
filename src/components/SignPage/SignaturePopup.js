@@ -1,5 +1,7 @@
 // SignaturePopup.js
+
 import { useRef } from "react";
+
 import SignatureCanvas from "react-signature-canvas";
 import { useRecoilState } from "recoil";
 import { signingState } from "../../recoil/atom/signingState";
