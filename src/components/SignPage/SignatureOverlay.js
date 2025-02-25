@@ -23,18 +23,6 @@ const SignatureOverlay = ({currentPage}) => {
     setSelectedField(null);
   };
 
-  // 서명을 저장하고 Recoil 상태 업데이트
-  const handleSignatureConfirm = (url, position) => {
-    setSignatureURL(url);
-    setSigning((prev) => ({
-      ...prev,
-      signatureFields: [
-        ...prev.signatureFields,
-        { type: 0, position, width: 100, height: 50, image: url },
-      ],
-    }));
-  };
-
   // 서명 삭제하기 (서명 위치는 유지)
   const handleDeleteSignature = (index) => {
     setSigning((prev) => ({
@@ -49,7 +37,7 @@ const SignatureOverlay = ({currentPage}) => {
     <div>
       {signing.signatureFields
         .filter((field) => field.position.pageNumber === currentPage) // ✅ 현재 페이지에 해당하는 서명 필드만 표시
-        .map((field, index) => (
+        .map((field, index) =>(
         <div
           key={index}
           style={{
@@ -70,11 +58,11 @@ const SignatureOverlay = ({currentPage}) => {
           onMouseLeave={() => setHoveredField(null)}
         >
           {field.type === 0 && field.image && (
-            <img
-              src={field.image}
-              alt="서명"
-              style={{
-                width: "100%",
+            <img 
+              src={field.image} 
+              alt="서명" 
+              style={{ 
+                width: "100%", 
                 height: "100%",
                 objectFit: "contain",
                 border: "2px solid black",
