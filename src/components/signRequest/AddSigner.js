@@ -6,15 +6,17 @@ import { useNavigate } from 'react-router-dom';
 const AddSigner = () => {
     const [signers, setSigners] = useRecoilState(signerState);
     const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
+    const [emailPrefix, setEmailPrefix] = useState('');
+    const [emailDomain, setEmailDomain] = useState('@handong.ac.kr');
     const navigate = useNavigate();
 
     const handleAddSigner = () => {
-        if (name && email) {
+        if (name && emailPrefix) {
+            const email = emailPrefix + emailDomain;
             const newSigner = { name, email };
             setSigners([...signers, newSigner]);
             setName('');
-            setEmail('');
+            setEmailPrefix('');
         } else {
             alert('Please enter both name and email.');
         }
@@ -44,13 +46,31 @@ const AddSigner = () => {
                     onChange={(e) => setName(e.target.value)}
                     style={{ marginRight: '10px', padding: '12px', width: '45%', fontSize: '16px' }}
                 />
-                <input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    style={{ padding: '12px', width: '45%', fontSize: '16px' }}
-                />
+                <div style={{ display: 'inline-flex', width: '45%' }}>
+                    <input
+                        type="text"
+                        placeholder="Email"
+                        value={emailPrefix}
+                        onChange={(e) => setEmailPrefix(e.target.value)}
+                        style={{ padding: '12px', width: '65%', fontSize: '16px', borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
+                    />
+                    <select
+                        value={emailDomain}
+                        onChange={(e) => setEmailDomain(e.target.value)}
+                        style={{
+                            padding: '12px',
+                            width: '35%',
+                            fontSize: '16px',
+                            border: '1px solid #ccc',
+                            borderLeft: 'none',
+                            backgroundColor: '#f9f9f9',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        <option value="@handong.ac.kr">@handong.ac.kr</option>
+                        <option value="@handong.edu">@handong.edu</option>
+                    </select>
+                </div>
             </div>
             <button onClick={handleAddSigner} style={{ padding: '12px 24px', backgroundColor: '#87CEEB', color: 'white', fontSize: '16px', border: 'none' }}>
                 추가하기
@@ -108,4 +128,3 @@ const AddSigner = () => {
 };
 
 export default AddSigner;
-
