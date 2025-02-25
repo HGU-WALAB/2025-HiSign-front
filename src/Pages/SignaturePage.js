@@ -151,7 +151,9 @@ function SignaturePage() {
       });
   
     console.log("✅ 서명 데이터 저장 및 상태 업데이트 완료!");
+
     alert("서명이 성공적으로 완료되었습니다!");
+
     navigate("/sign-complete");
     } catch (error) {
       console.error("❌ 서명 처리 실패:", error);
