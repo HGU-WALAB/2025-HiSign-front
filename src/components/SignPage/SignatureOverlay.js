@@ -1,17 +1,15 @@
 // SignatureOverlay.js
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRecoilState } from "recoil";
 import { signingState } from "../../recoil/atom/signingState";
-import DraggableSignature from "../DraggableSignature";
 import SignaturePopup from "./SignaturePopup";
+import DraggableSignature from "../DraggableSignature";
 
-const SignatureOverlay = ({currentPage}) => {
+const SignatureOverlay = () => {
   const [signing, setSigning] = useRecoilState(signingState);
   const [selectedField, setSelectedField] = useState(null);
   const [signatureURL, setSignatureURL] = useState(null);
   const [hoveredField, setHoveredField] = useState(null);
-
-  useEffect(() => {console.log(currentPage);console.log(signing);}, [currentPage,signing]);
 
   // 서명 입력 팝업 열기
   const openPopup = (fieldIndex) => {
@@ -47,9 +45,7 @@ const SignatureOverlay = ({currentPage}) => {
 
   return (
     <div>
-      {signing.signatureFields
-        .filter((field) => field.position.pageNumber === currentPage) // ✅ 현재 페이지에 해당하는 서명 필드만 표시
-        .map((field, index) => (
+      {signing.signatureFields.map((field, index) => (
         <div
           key={index}
           style={{
@@ -70,14 +66,13 @@ const SignatureOverlay = ({currentPage}) => {
           onMouseLeave={() => setHoveredField(null)}
         >
           {field.type === 0 && field.image && (
-            <img
-              src={field.image}
-              alt="서명"
-              style={{
-                width: "100%",
+            <img 
+              src={field.image} 
+              alt="서명" 
+              style={{ 
+                width: "100%", 
                 height: "100%",
                 objectFit: "contain",
-                border: "2px solid black",
               }} 
             />
           )}
@@ -114,6 +109,7 @@ const SignatureOverlay = ({currentPage}) => {
         <DraggableSignature
           url={signatureURL}
           onCancel={() => setSignatureURL(null)}
+          onSet={(position) => handleSignatureConfirm(signatureURL, position)}
         />
       )}
 
