@@ -61,7 +61,7 @@ function HeaderBar() {
                 </div>
             </header>
 
-            <div className="w-100" style={{ marginTop: "100px" }}>
+            <div className="w-100" style={{ marginTop: "50px" }}>
                 <Outlet/>
             </div>
         </div>

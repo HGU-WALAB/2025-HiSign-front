@@ -4,6 +4,11 @@ import { RecoilRoot } from 'recoil';
 import MyRoutes from "./Routes";
 import GlobalStyle from './styles/GlobalStyle';
 import 'bootstrap/dist/css/bootstrap.min.css';
+// styles
+import"./asset/css/paper-kit.css"
+// import "bootstrap/scss/bootstrap.scss";
+// import "assets/scss/paper-kit.scss?v=1.3.0";
+// import "assets/demo/demo.css?v=1.3.0";
 
 
 function App() {
