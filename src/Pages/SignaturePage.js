@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import EmailInputModal from "../components/SignPage/EmailInputModal";
@@ -17,14 +17,14 @@ function SignaturePage() {
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [signing, setSigning] = useRecoilState(signingState);
   const [currentPage, setCurrentPage] = useState(1); // 현재 표시 중인 페이지
-
+  const navigate = useNavigate();
   // ✅ 1. 토큰 유효성 검사
   useEffect(() => {
     if (!token) {
-      setError("유효하지 않은 접근입니다.");
+      setError("❌ 유효하지 않은 접근입니다.");
       return;
     }
-
+  
     ApiService.checkSignatureToken(token)
       .then(() => {
         setIsValid(true);
@@ -32,13 +32,14 @@ function SignaturePage() {
       })
       .catch((err) => {
         setIsValid(false);
-        const errorMessage = err.response?.data?.message || "서명 요청 검증에 실패했습니다.";
+        const errorMessage = err.message || "⚠️ 서명 요청 검증에 실패했습니다.";
         setError(errorMessage);
-        alert(errorMessage);
+        alert(errorMessage); // ✅ 사용자에게 알림
       });
-
+  
     console.log("전역 변수 signing:", signing);
   }, [token]);
+  
 
   // ✅ 2. 이메일 인증 후 문서 + 서명 위치 불러오기
   const handleEmailSubmit = (inputEmail, setModalError) => {
@@ -94,27 +95,22 @@ function SignaturePage() {
       return;
     }
   
-    console.log("🔹 서명 저장 시작, 현재 상태:", signing);
+    console.log("🔹 서명 저장 시작:", signing);
+    
+    let fileName = null;
   
     try {
-      let fileName = null;
-  
-      // ✅ 1. 서명 이미지 업로드 (서명 필드 중 첫 번째 이미지 필드를 업로드)
+      // ✅ 1. 서명 이미지 업로드
       const imageField = signing.signatureFields.find(field => field.type === 0 && field.image);
       if (imageField) {
         console.log("🔹 서명 이미지 업로드 시작...");
-        
-        // ✅ Base64 → Blob 변환
         const blob = await fetch(imageField.image).then(res => res.blob());
-  
-        // ✅ 서버에 업로드 요청 (절차적 단계 보장)
         fileName = await ApiService.uploadSignatureFile(blob, signing.signerEmail);
-        
         console.log("✅ 서명 이미지 업로드 완료, fileName:", fileName);
       }
   
-      // ✅ 2. 서명 데이터 생성 (업로드된 이미지 파일명 적용)
-      const signerData = {
+      // ✅ 2. 서명 데이터 저장
+      await ApiService.saveSignatures(signing.documentId, {
         email: signing.signerEmail,
         name: signing.signerName,
         signatureFields: signing.signatureFields.map(field => ({
@@ -123,28 +119,24 @@ function SignaturePage() {
           width: field.width,
           height: field.height,
           position: field.position,
-          imageName: field.type === 0 ? fileName : null, // ✅ 업로드된 파일명 적용
+          imageName: field.type === 0 ? fileName : null,
           textData: field.textData || null
         }))
-      };
+      });
   
-      console.log("🔹 최종 서명 데이터 생성 완료:", signerData);
-  
-      // ✅ 3. 서명 정보 저장 (절차적으로 업로드 완료 후 실행)
-      console.log("🔹 서명 데이터 저장 시작...");
-      await ApiService.saveSignatures(signing.documentId, signerData);
-      console.log("✅ 서명 저장 완료!");
-      alert("서명이 성공적으로 저장되었습니다!");
+    console.log("✅ 서명 데이터 저장 및 상태 업데이트 완료!");
+    alert("서명이 성공적으로 완료료되었습니다!");
+    navigate("/signature-complete");
     } catch (error) {
-      console.error("❌ 서명 저장 실패:", error);
-      alert("서명 저장 중 오류 발생");
+      console.error("❌ 서명 처리 실패:", error);
+      alert(`서명 처리 중 오류가 발생했습니다: ${error.message}`);
     }
   };
   
 
   return (
     <div>
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && <ErrorMessage>{error}</ErrorMessage>}
       {isValid === null && <p>로딩 중...</p>}
 
       {/* ✅ 이메일 모달 - isValid가 true이고 documentId가 없을 때 표시 */}
@@ -157,7 +149,7 @@ function SignaturePage() {
       )}
 
       {/* ✅ PDF 및 서명 영역 표시 */}
-      {signing.documentId && signing.fileUrl && (
+      {isValid &&signing.documentId && signing.fileUrl && (
         <DocumentContainer>
           <PDFViewer
           pdfUrl={signing.fileUrl}
@@ -168,7 +160,7 @@ function SignaturePage() {
         </DocumentContainer>
       )}
 
-      {signing.documentId && signing.fileUrl && (
+      {isValid && signing.documentId && signing.fileUrl && (
         <ButtonContainer>
           <CompleteButton onClick={handleSubmitSignature}> 완료 </CompleteButton>
         </ButtonContainer>
@@ -204,4 +196,19 @@ const ButtonBase = styled.button`
 
 const CompleteButton = styled(ButtonBase)`
   background-color: ${({ disabled }) => (disabled ? "#ccc" : "#03A3FF")};
+`;
+
+const ErrorMessage = styled.p`
+  color: #ff4d4f; /* 빨간색 (경고 색상) */
+  font-size: 16px; /* 글씨 크기 */
+  font-weight: bold; /* 굵은 글씨 */
+  background-color: #fff3f3; /* 연한 빨간색 배경 */
+  border: 1px solid #ff4d4f; /* 빨간색 테두리 */
+  padding: 10px 15px; /* 안쪽 여백 */
+  border-radius: 5px; /* 모서리 둥글게 */
+  text-align: center; /* 중앙 정렬 */
+  margin: 10px auto; /* 위아래 여백 */
+  width: 80%; /* 가로 크기 */
+  max-width: 500px; /* 최대 크기 */
+  box-shadow: 0px 2px 8px rgba(255, 77, 79, 0.2); /* 연한 그림자 */
 `;

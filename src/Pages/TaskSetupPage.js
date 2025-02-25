@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { Document, Page, pdfjs } from "react-pdf";
+import "react-pdf/dist/esm/entry.webpack";
 import { useNavigate } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
 import styled from "styled-components";
@@ -6,12 +8,16 @@ import Drop from "../components/Drop";
 import { documentState } from "../recoil/atom/documentState";
 import { memberState } from "../recoil/atom/memberState";
 
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
+
 const TaskSetupPage = () => {
   const [document, setDocumentState] = useRecoilState(documentState);
   const member = useRecoilValue(memberState);
   const [requestName, setRequestName] = useState("");
   const [description, setDescription] = useState("");
   const [isRejectable, setIsRejectable] = useState(0); // ✅ 기본값: 거절 불가능 (0)
+  const [previewUrl, setPreviewUrl] = useState(null); // ✅ 파일 미리보기 상태 추가
+  const [numPages, setNumPages] = useState(null);
   const navigate = useNavigate();
 
   const handlePostFiles = (file) => {
@@ -19,9 +25,10 @@ const TaskSetupPage = () => {
       alert("파일을 선택해주세요.");
       return;
     }
-
+  
     const blobUrl = URL.createObjectURL(file);
-
+    setPreviewUrl(blobUrl); // ✅ PDF URL 저장
+  
     setDocumentState((previousDocument) => ({
       ...previousDocument,
       ownerId: member.unique_id,
@@ -133,7 +140,16 @@ const TaskSetupPage = () => {
                 />
               ) : (
                 <SelectedFileBox>
-                  <SelectedFileText>{document.fileName} 문서가 선택되었습니다.</SelectedFileText>
+                    {/* ✅ PDF 미리보기 추가 */}
+                    {previewUrl && (
+                      <Document
+                        file={previewUrl}
+                        onLoadSuccess={({ numPages }) => setNumPages(numPages)}
+                      >
+                        <Page pageNumber={1} width={250} /> {/* 첫 페이지 미리보기 */}
+                      </Document>
+                    )}
+                  <SelectedFileText>{document.fileName}</SelectedFileText>
                   <ButtonContainer>
                     <ChangeFileButton
                       onClick={() =>
@@ -170,7 +186,7 @@ export default TaskSetupPage;
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100%;
   background-color: #e5e5e5;
   position: relative;
 `;
@@ -281,6 +297,7 @@ const SelectedFileBox = styled.div`
 `;
 
 const SelectedFileText = styled.span`
+  padding-top: 10px;
   font-weight: bold;
 `;
 
@@ -327,4 +344,11 @@ const NextButton = styled.button`
   border: none;
   border-radius: 25px;
   cursor: pointer;
+`;
+
+const FileInfoContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
 `;

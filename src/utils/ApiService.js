@@ -47,9 +47,6 @@ apiInstance.interceptors.response.use(
 
 const ApiService = {
   // 서명 이미지 업로드
-  //const signatureBlob = FileService.base64ToBlob(base64Image); // Base64 → Blob 변환
-  //const filePath = await ApiService.uploadSignatureFile(signatureBlob); // API로 업로드
-  //이런식으로 fileService.js에서 base64ToBlob 함수를 가져와서 Apiservice.uploadSignatureFile 함수를 사용할 수 있습니다.
   uploadSignatureFile: async (blob,memberEmail) => { // -> unniqueID 이 아니라 이메일로 바꾸어야함 
     if (!blob) throw new Error('업로드할 서명 이미지가 없습니다.');
   
@@ -97,9 +94,6 @@ const ApiService = {
     }
   },
 
-
-
-
   // 특정 문서 가져오기 (PDF 다운로드)
   fetchDocument: async (documentId) => {
     return apiInstance.get(`/documents/${documentId}`, { responseType: 'arraybuffer' });
@@ -124,9 +118,6 @@ const ApiService = {
 
     return apiInstance.put(`/signature-requests/reject/${documentId}`, { reason });
   },
-
-
-
 
   // 서명 요청 전송
   sendSignatureRequest: async (documentId, memberName, signers) => {
@@ -172,16 +163,56 @@ const ApiService = {
 
   // 서명 요청 토큰 유효성 확인
   checkSignatureToken: async (token) => {
-    if (!token) throw new Error('토큰이 없습니다.');
-  
+    if (!token) throw new Error("토큰이 없습니다.");
+
     try {
       const response = await PublicaApiInstance.get(`/signature-requests/check?token=${token}`);
-      return response.data;
+      return response.data; // ✅ 정상 응답 반환 (200 OK)
     } catch (error) {
-      console.error('서명 요청 토큰 검증 실패:', error);
-      throw new Error(error.response?.data || '토큰이 유효하지 않습니다.');
+      console.error("서명 요청 토큰 검증 실패:", error);
+
+      if (error.response) {
+        const { status, data } = error.response;
+
+        if (status === 404) {
+          throw new Error("❌ 잘못된 서명 요청입니다. 다시 확인해주세요."); // 404: 토큰이 존재하지 않음
+        } else if (status === 401) {
+          throw new Error("⚠️ 서명 요청이 만료되었습니다. 새로운 요청을 받아 진행하세요."); // 401: 만료된 요청
+        } else if (status === 403) {
+          // 403: 진행할 수 없는 상태 (이미 처리된 요청 등)
+          if (typeof data === "object" && data.status !== undefined) {
+            let errorMessage;
+            switch (data.status) {
+              case 1:
+                errorMessage = "✅ 이미 완료된 서명 요청입니다. 추가 서명이 필요하지 않습니다.";
+                break;
+              case 2:
+                errorMessage = "❌ 서명 요청이 거절되었습니다. 요청자에게 문의하세요.";
+                break;
+              case 3:
+                errorMessage = "⚠️ 서명 요청이 취소되었습니다. 새로운 요청을 받아 진행하세요.";
+                break;
+              case 4:
+                errorMessage = "⚠️ 서명 요청이 만료되었습니다. 다시 요청을 확인하세요.";
+                break;
+              case 5:
+                errorMessage = "❌ 서명 요청이 삭제되었습니다. 진행할 수 없습니다.";
+                break;
+              default:
+                errorMessage = "⚠️ 서명 요청을 진행할 수 없는 상태입니다.";
+            }
+            throw new Error(errorMessage);
+          } else {
+            throw new Error("⚠️ 서명 요청을 진행할 수 없는 상태입니다.");
+          }
+        }
+      }
+
+      throw new Error(error.response?.data || "⚠️ 서명 요청 검증 중 오류가 발생했습니다.");
     }
   },
+  
+
   // 서명 요청 검증 (이메일 입력 후)
   validateSignatureRequest: async (token, email) => {
     if (!token || !email) throw new Error('토큰과 이메일이 필요합니다.');

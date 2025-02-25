@@ -10,6 +10,7 @@ import MakePage from "./Pages/MakePage";
 import ReceivedDocuments from "./Pages/ReceiveListPage"; // 요청받은 문서 리스트 페이지
 import RequestedDocuments from "./Pages/RequestListPage"; // 요청한 문서 리스트 페이지
 import RequestPage from "./Pages/RequestPage";
+import SignatureCompletePage from "./Pages/SignatureCompletePage";
 import SignaturePage from './Pages/SignaturePage';
 import TaskSetupPage from "./Pages/TaskSetupPage";
 
@@ -26,6 +27,7 @@ function MyRoutes() {
                 <Route path="/request-document" element={<RequestedDocuments />} /> {/* 요청한 문서 리스트 */}
                 <Route path="/receive-document" element={<ReceivedDocuments />} /> {/* 요청받은 문서 리스트 */}
                 <Route path="/sign" element={<SignaturePage />} />
+                <Route path="/sign-complete" element={<SignatureCompletePage/>} />
                 <Route path="/contact" element={<ContactPage />} />
                 <Route path="/make" element={<MakePage />} />
             </Route>
