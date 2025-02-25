@@ -151,8 +151,8 @@ function SignaturePage() {
       });
   
     console.log("✅ 서명 데이터 저장 및 상태 업데이트 완료!");
-    alert("서명이 성공적으로 완료료되었습니다!");
-    navigate("/signature-complete");
+    alert("서명이 성공적으로 완료되었습니다!");
+    navigate("/sign-complete");
     } catch (error) {
       console.error("❌ 서명 처리 실패:", error);
       alert(`서명 처리 중 오류가 발생했습니다: ${error.message}`);
@@ -176,7 +176,7 @@ function SignaturePage() {
       <ContentWrapper>
         <Container>
           {/* 사이드바 부분 */}
-          {signing.documentId && (
+          {isValid && signing.documentId && (
             <StyledDrawer variant="permanent" anchor="left">
               <DrawerHeader>
                 <StyledTitle variant="h6">서명 정보</StyledTitle>
@@ -240,7 +240,7 @@ function SignaturePage() {
           )}
 
           {/* PDF 및 서명 영역 표시 */}
-          {signing.documentId && signing.fileUrl && (
+          {isValid &&signing.documentId && signing.fileUrl && (
             <DocumentSection>
               <DocumentContainer>
                 <PDFViewer
