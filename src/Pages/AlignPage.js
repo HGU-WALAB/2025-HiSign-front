@@ -1,5 +1,5 @@
 import { Drawer, List, ListItem, ListItemText, Menu, MenuItem, Typography } from '@mui/material';
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import { Rnd } from "react-rnd";
 import { useRecoilState, useRecoilValue } from "recoil";
@@ -13,26 +13,12 @@ import SignatureService from "../utils/SignatureService";
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
 const AlignPage = () => {
-  const [pdf, setPdf] = useState(null);
-  const [pageNum, setPageNum] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
   const document = useRecoilValue(documentState);
   const [signers, setSigners] = useRecoilState(signerState);
-  const documentRef = useRef(null);
   const [menuAnchor, setMenuAnchor] = useState(null);
   const [selectedSigner, setSelectedSigner] = useState(null);
-
-  useEffect(() => {
-    if (document.fileUrl) {
-      setPdf(document.fileUrl);
-    }
-  }, [document.fileUrl]);
-
-  const addSignatureBox = () => {
-    if (!selectedSigner) return;
-    SignatureService.addSignatureBox(signers, setSigners, selectedSigner.email, pageNum);
-    handleMenuClose();
-  };
+  const [pageNum, setPageNum] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
 
   const handleMenuClick = (event, signer) => {
     setMenuAnchor(event.currentTarget);
@@ -43,9 +29,12 @@ const AlignPage = () => {
     setMenuAnchor(null);
   };
 
-  useEffect(() => {
-    console.log("Updated signers state:", signers);
-  }, [signers]);
+  const addSignatureBox = () => {
+    if (selectedSigner) {
+      SignatureService.addSignatureBox(signers, setSigners, selectedSigner.email, pageNum);
+      handleMenuClose();
+    }
+  };
 
   return (
     <MainContainer>
@@ -55,7 +44,7 @@ const AlignPage = () => {
             <DrawerHeader>
               <StyledTitle variant="h6">서명 인원</StyledTitle>
               <Divider />
-              <StyledServTitle variant="h7">대상을 선택후 위치를 지정하세요</StyledServTitle>
+              <StyledServTitle variant="h7">대상을 선택 후 위치를 지정하세요</StyledServTitle>
               <Divider />
             </DrawerHeader>
             <List>
@@ -65,9 +54,7 @@ const AlignPage = () => {
                     primary={
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <span>{signer.name}</span>
-                        <SignatureCount>
-                          서명 {signer.signatureFields.length}개 할당
-                        </SignatureCount>
+                        <SignatureCount>서명 {signer.signatureFields.length}개 할당</SignatureCount>
                       </div>
                     }
                     secondary={signer.email} 
@@ -82,78 +69,38 @@ const AlignPage = () => {
           </Menu>
 
           <DocumentSection>
-            {pdf ? (
-              <DocumentContainer ref={documentRef}>
-                <Document file={pdf} onLoadSuccess={(data) => setTotalPages(data.numPages)}>
-                  <Page pageNumber={pageNum} width={800} />
+            {document.fileUrl ? (
+              <DocumentContainer>
+                <Document file={document.fileUrl} onLoadSuccess={(data) => setTotalPages(data.numPages)}>
+                  <Page pageNumber={pageNum} width={800} onRenderSuccess={(page) => { console.log("렌더링된 페이지 높이: ", page.height);}} />
                 </Document>
 
-                {signers.length > 0 &&
-                  signers.map((signer) =>
-                    signer.signatureFields
-                      .map((box, originalIndex) => ({ ...box, originalIndex }))
-                      .filter((box) => box.position.pageNumber === pageNum)
-                      .map(({ width, height, position, originalIndex }) => (
-                        <Rnd
-                          key={`${signer.email}-${originalIndex}`}
-                          bounds="parent"
-                          size={{ width, height }}
-                          position={{ x: position.x, y: position.y }}
-                          onDragStop={(e, d) => {
-                            SignatureService.updateSignaturePosition(
-                              signers,
-                              setSigners,
-                              signer.email,
-                              originalIndex,
-                              { x: d.x, y: d.y }
-                            );
-                            setTimeout(() => {
-                              const updatedSigner = signers.find((s) => s.email === signer.email);
-                              const updatedBox = updatedSigner?.signatureFields[originalIndex];
-                              console.log("Updated position to:", {
-                                name: updatedSigner?.name,
-                                page: updatedBox?.position.pageNumber,
-                                x: updatedBox?.position.x,
-                                y: updatedBox?.position.y
-                              });
-                            }, 0);
-                          }}
-                          onResizeStop={(e, direction, ref, delta, pos) => {
-                            SignatureService.updateSignatureSize(
-                              signers,
-                              setSigners,
-                              signer.email,
-                              originalIndex,
-                              ref.offsetWidth,
-                              ref.offsetHeight,
-                              pos
-                            );
-                            setTimeout(() => {
-                              const updatedSigner = signers.find((s) => s.email === signer.email);
-                              const updatedBox = updatedSigner?.signatureFields[originalIndex];
-                              console.log("Updated size to:", {
-                                name: updatedSigner?.name,
-                                page: updatedBox?.position.pageNumber,
-                                width: updatedBox?.width,
-                                height: updatedBox?.height
-                              });
-                            }, 0);
-                          }}
-                        >
-                          <SignatureBoxContainer>
-                            {signer.name}의 서명
-                            <DeleteButton
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                SignatureService.removeSignatureBox(signers, setSigners, signer.email, originalIndex);
-                              }}
-                            >
-                              삭제
-                            </DeleteButton>
-                          </SignatureBoxContainer>
-                        </Rnd>
-                      ))
-                  )}
+                {signers.map((signer) =>
+                  signer.signatureFields
+                    .filter((box) => box.position.pageNumber === pageNum)
+                    .map((box, index) => (
+                      <Rnd
+                        key={`${signer.email}-${index}`}
+                        bounds="parent"
+                        size={{ width: box.width, height: box.height }}
+                        position={{ x: box.position.x, y: box.position.y }}
+                        onDragStop={(e, d) => {
+                          SignatureService.updateSignaturePosition(signers, setSigners, signer.email, index, { x: d.x, y: d.y });
+                        }}
+                        onResizeStop={(e, direction, ref, delta, pos) => {
+                          SignatureService.updateSignatureSize(signers, setSigners, signer.email, index, ref.offsetWidth, ref.offsetHeight, pos);
+                        }}
+                      >
+                        <SignatureBoxContainer>
+                          {signer.name}의 서명
+                          <DeleteButton onClick={(e) => {
+                            e.stopPropagation();
+                            SignatureService.removeSignatureBox(signers, setSigners, signer.email, index);
+                          }}>삭제</DeleteButton>
+                        </SignatureBoxContainer>
+                      </Rnd>
+                    ))
+                )}
               </DocumentContainer>
             ) : (
               <LoadingMessage>문서를 불러오는 중입니다...</LoadingMessage>
@@ -171,6 +118,7 @@ const AlignPage = () => {
   );
 };
 
+// ✅ ESLint 오류가 발생했던 스타일 컴포넌트 추가
 const MainContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -194,6 +142,15 @@ const DocumentSection = styled.div`
   padding: 20px;
 `;
 
+const DocumentContainer = styled.div`
+  max-width: 800px;
+  margin: 20px auto;
+  border: 1px solid #999;
+  position: relative;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+`;
+
 const DrawerHeader = styled.div`
   padding: 16px;
 `;
@@ -202,22 +159,6 @@ const Divider = styled.hr`
   margin: 10px 0;
   border: none;
   border-top: 1px solid #e0e0e0;
-  width: 100%;
-`;
-
-const LoadingMessage = styled.p`
-  text-align: center;
-  padding: 20px;
-  color: #666;
-`;
-
-const DocumentContainer = styled.div`
-  max-width: 800px;
-  margin: 20px auto;
-  border: 1px solid #999;
-  position: relative;
-  background-color: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 `;
 
 const SignatureBoxContainer = styled.div`
@@ -271,18 +212,24 @@ const StyledServTitle = styled(Typography)`
   margin: 8px 0;
 `;
 
-const ButtonContainer = styled.div`
-  text-align: center;
-  margin: 20px 0;
-  padding: 20px;
-`;
-
 const SignatureCount = styled.span`
   font-size: 0.8rem;
   color: #666;
   background-color: #f5f5f5;
   padding: 2px 8px;
   border-radius: 12px;
+`;
+
+const LoadingMessage = styled.p`
+  text-align: center;
+  padding: 20px;
+  color: #666;
+`;
+
+const ButtonContainer = styled.div`
+  text-align: center;
+  margin: 20px 0;
+  padding: 20px;
 `;
 
 export default AlignPage;
