@@ -1,3 +1,5 @@
+
+
 import React, { useEffect, useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/esm/entry.webpack";
@@ -7,6 +9,8 @@ import styled from "styled-components";
 import Drop from "../components/Drop";
 import { documentState } from "../recoil/atom/documentState";
 import { memberState } from "../recoil/atom/memberState";
+import DatePicker from "react-datepicker"; // 👈 DatePicker import
+import "react-datepicker/dist/react-datepicker.css"; // 👈 스타일 추가
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
@@ -15,9 +19,10 @@ const TaskSetupPage = () => {
   const member = useRecoilValue(memberState);
   const [requestName, setRequestName] = useState("");
   const [description, setDescription] = useState("");
-  const [isRejectable, setIsRejectable] = useState(0); // ✅ 기본값: 거절 불가능 (0)
-  const [previewUrl, setPreviewUrl] = useState(null); // ✅ 파일 미리보기 상태 추가
+  const [isRejectable, setIsRejectable] = useState(0);
+  const [previewUrl, setPreviewUrl] = useState(null);
   const [numPages, setNumPages] = useState(null);
+  const [deadline, setDeadline] = useState(null); // 👈 마감일 상태 추가
   const navigate = useNavigate();
 
   const handlePostFiles = (file) => {
@@ -25,10 +30,10 @@ const TaskSetupPage = () => {
       alert("파일을 선택해주세요.");
       return;
     }
-  
+
     const blobUrl = URL.createObjectURL(file);
-    setPreviewUrl(blobUrl); // ✅ PDF URL 저장
-  
+    setPreviewUrl(blobUrl);
+
     setDocumentState((previousDocument) => ({
       ...previousDocument,
       ownerId: member.unique_id,
@@ -50,12 +55,17 @@ const TaskSetupPage = () => {
       alert("문서를 선택해 주세요.");
       return;
     }
+    if (!deadline) {
+      alert("마감일을 설정해 주세요."); // 👈 마감일 체크
+      return;
+    }
 
     setDocumentState((previousDocument) => ({
       ...previousDocument,
       requestName: requestName,
       description: description,
-      isRejectable: isRejectable, // ✅ 라디오 버튼 값 전달
+      isRejectable: isRejectable,
+      deadline: deadline, // 👈 마감일 전달
     }));
 
     navigate(`/request`);
@@ -73,7 +83,7 @@ const TaskSetupPage = () => {
 
           {/* 요청 이름 입력 */}
           <InputRow>
-          <RequiredNotice>* 항목은 필수 입력란입니다.</RequiredNotice>
+            <RequiredNotice>* 항목은 필수 입력란입니다.</RequiredNotice>
             <Label>
               작업명 <RequiredMark>*</RequiredMark>
             </Label>
@@ -98,7 +108,7 @@ const TaskSetupPage = () => {
 
           {/* 작업 설정 (라디오 버튼) */}
           <InputRow>
-            <Label>작업 설정</Label>
+            <Label>작업 설정 <RequiredMark>*</RequiredMark> </Label> 
             <RadioContainer>
               <RadioLabel>
                 <RadioInput
@@ -120,7 +130,24 @@ const TaskSetupPage = () => {
                 />
                 거절 가능
               </RadioLabel>
+              
             </RadioContainer>
+            
+          </InputRow>
+
+          {/* 마감일자 선택 */}
+          <InputRow>
+            <Label>
+              마감일자 <RequiredMark>*</RequiredMark>
+  
+            </Label>
+            <DatePicker
+              selected={deadline}
+              onChange={(date) => setDeadline(date)} // 👈 날짜 변경 시 상태 업데이트
+              dateFormat="yyyy/MM/dd"
+              placeholderText="현재 날짜 이후로만 선택해주세요. "
+              minDate={new Date()} // 오늘 날짜부터 선택 가능
+            />
           </InputRow>
 
           {/* 문서 선택 (파일 업로드) */}
@@ -140,15 +167,14 @@ const TaskSetupPage = () => {
                 />
               ) : (
                 <SelectedFileBox>
-                    {/* ✅ PDF 미리보기 추가 */}
-                    {previewUrl && (
-                      <Document
-                        file={previewUrl}
-                        onLoadSuccess={({ numPages }) => setNumPages(numPages)}
-                      >
-                        <Page pageNumber={1} width={250} /> {/* 첫 페이지 미리보기 */}
-                      </Document>
-                    )}
+                  {previewUrl && (
+                    <Document
+                      file={previewUrl}
+                      onLoadSuccess={({ numPages }) => setNumPages(numPages)}
+                    >
+                      <Page pageNumber={1} width={250} />
+                    </Document>
+                  )}
                   <SelectedFileText>{document.fileName}</SelectedFileText>
                   <ButtonContainer>
                     <ChangeFileButton
@@ -167,20 +193,24 @@ const TaskSetupPage = () => {
               )}
             </UploadSection>
           </InputRow>
+
+          
         </MainArea>
       </StyledBody>
 
       {/* 하단 이동 버튼 */}
       <FloatingButtonContainer>
         <GrayButton onClick={() => navigate(`/request-document`)}>나가기</GrayButton>
-        <NextButton onClick={handleNextStep}>
-          서명자 추가
-        </NextButton>
+        <NextButton onClick={handleNextStep}>서명자 추가</NextButton>
       </FloatingButtonContainer>
     </Container>
   );
 };
 export default TaskSetupPage;
+
+// 스타일 수정 부분
+// 추가 스타일을 작성하겠습니다.
+
 
 // ✅ 스타일 수정
 const Container = styled.div`
@@ -352,3 +382,5 @@ const FileInfoContainer = styled.div`
   align-items: center;
   gap: 8px;
 `;
+
+

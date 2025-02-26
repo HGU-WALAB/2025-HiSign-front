@@ -53,6 +53,7 @@ function HeaderBar() {
                         <Link to="/contact" className="nav-link text-dark">
                             문의 페이지
                         </Link>
+                        
                     </div>
                 )}
 

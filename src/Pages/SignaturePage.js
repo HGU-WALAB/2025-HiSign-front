@@ -115,6 +115,80 @@ function SignaturePage() {
     setCurrentPage(pageNumber);
   };
 
+
+const [savedSignatures, setSavedSignatures] = useState([]);
+const [openSavedSignatures, setOpenSavedSignatures] = useState(false);
+const [selectedSavedSignature, setSelectedSavedSignature] = useState(null);
+
+// 컴포넌트 마운트시 로컬 스토리지에서 선택된 서명 확인
+useEffect(() => {
+  const selectedSignature = localStorage.getItem('selectedSignature');
+  if (selectedSignature) {
+    try {
+      const parsedSignature = JSON.parse(selectedSignature);
+      setSelectedSavedSignature(parsedSignature);
+      // 선택된 서명이 있으면 자동으로 적용
+      if (signing.signatureFields && signing.signatureFields.length > 0) {
+        const imageSignatureField = signing.signatureFields.find(field => field.type === 0);
+        if (imageSignatureField) {
+          // 서명 필드에 이미지 적용
+          setSigning(prevState => ({
+            ...prevState,
+            signatureFields: prevState.signatureFields.map(field => 
+              field.type === 0 ? { ...field, image: parsedSignature.imageUrl } : field
+            )
+          }));
+        }
+      }
+      // 사용 후 로컬 스토리지 클리어
+      localStorage.removeItem('selectedSignature');
+    } catch (error) {
+      console.error('저장된 서명 파싱 오류:', error);
+    }
+  }
+}, [signing.signatureFields]);
+
+// 사용자 서명 목록 불러오기
+const loadUserSignatures = async () => {
+  if (signing.signerEmail) {
+    try {
+      const response = await ApiService.getUserSignatures(signing.signerEmail);
+      setSavedSignatures(response.data);
+      setOpenSavedSignatures(true);
+    } catch (error) {
+      console.error('서명 목록 불러오기 실패:', error);
+      alert('저장된 서명을 불러오는 데 실패했습니다.');
+    }
+  } else {
+    alert('먼저 이메일 인증을 완료해주세요.');
+  }
+};
+
+// 저장된 서명 선택 및 적용
+const applySavedSignature = (signature) => {
+  setSelectedSavedSignature(signature);
+  
+  // 서명 필드에 이미지 적용
+  setSigning(prevState => ({
+    ...prevState,
+    signatureFields: prevState.signatureFields.map(field => 
+      field.type === 0 ? { ...field, image: signature.imageUrl } : field
+    )
+  }));
+  
+  // 서명 사용 내역 업데이트
+  ApiService.updateSignatureUsage(signature.id, {
+    documentId: signing.documentId,
+    documentName: signing.documentName,
+    date: new Date().toISOString()
+  }).catch(error => {
+    console.error('서명 사용 내역 업데이트 실패:', error);
+  });
+  
+  setOpenSavedSignatures(false);
+};
+
+
   const handleSubmitSignature = async () => {
     if (!signing.documentId || signing.signatureFields.length === 0) {
       alert("서명할 필드가 없습니다.");

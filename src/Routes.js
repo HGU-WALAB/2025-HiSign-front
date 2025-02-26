@@ -14,6 +14,7 @@ import SignatureCompletePage from "./Pages/SignatureCompletePage";
 import SignaturePage from './Pages/SignaturePage';
 import TaskSetupPage from "./Pages/TaskSetupPage";
 
+
 function MyRoutes() {
     return (
         <Routes>
@@ -30,6 +31,8 @@ function MyRoutes() {
                 <Route path="/sign-complete" element={<SignatureCompletePage/>} />
                 <Route path="/contact" element={<ContactPage />} />
                 <Route path="/make" element={<MakePage />} />
+                
+                
             </Route>
             
         </Routes>
