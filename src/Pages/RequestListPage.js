@@ -5,6 +5,12 @@ import { PageContainer } from "../components/PageContainer";
 import CancelModal from "../components/ListPage/CancelModal";
 import ApiService from "../utils/ApiService";
 
+import CloseIcon from '@mui/icons-material/Close';
+import DeleteIcon from '@mui/icons-material/Delete';
+import DownloadIcon from '@mui/icons-material/Download';
+
+
+
 const RequestedDocuments = () => {
     const [documents, setDocuments] = useState([]);
     const [error, setError] = useState(null);
@@ -52,7 +58,6 @@ const RequestedDocuments = () => {
                 );
             })
             .catch((error) => {
-                console.error("요청 취소 중 오류 발생:", error);
                 alert("요청 취소에 실패했습니다.");
             });
     };
@@ -65,7 +70,7 @@ const RequestedDocuments = () => {
             3: "label label-warning",
             4: "label label-default",
         };
-        return statusClasses[status] || "label label-default";
+        return statusClasses[status] || "badge bg-secondary";
     };
 
     const getStatusLabel = (status) => {
@@ -81,78 +86,89 @@ const RequestedDocuments = () => {
 
     return (
         <PageContainer>
-            <h1 style={{ textAlign: "center", marginBottom: "20px", fontSize: "24px", fontWeight: "bold" }}>
+            <h1 style={{ textAlign: "center", marginBottom: "20px", fontSize: "24px", fontWeight: "bold", paddingTop: "1rem" }}>
                 요청한 작업
             </h1>
             {error && <p style={{ color: "red", textAlign: "center" }}>{error}</p>}
 
-            <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: "Arial, sans-serif" }}>
-                <thead>
-                <tr style={{
-                    backgroundColor: "#86CFFA",
-                    color: "white",
-                    height: "45px",
-                    textAlign: "center",
-                    fontSize: "16px",
-                    fontWeight: "bold"
+            <div style={{ maxWidth: "85%", margin: "auto" }}>
+                <table style={{
+                    width: "100%",
+                    borderCollapse: "separate",
+                    borderSpacing: "0",
+                    fontFamily: "Arial, sans-serif",
+                    border: "1px solid #ddd",
+                    borderRadius: "8px",
+                    overflow: "hidden"
                 }}>
-                    <th style={{ padding: "10px" }}>상태</th>
-                    <th style={{ padding: "10px" }}>작업명</th>
-                    <th style={{ padding: "10px" }}>파일명</th>
-                    <th style={{ padding: "10px" }}>요청 생성일</th>
-                    <th style={{ padding: "10px" }}>Action</th>
-                </tr>
-                </thead>
-                <tbody>
-                {documents.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((doc) => (
-                    <tr key={doc.id}>
-                        <td style={{ padding: "10px", textAlign: "center", borderBottom: "1px solid #ddd" }}>
-                                <span className={getStatusClass(doc.status)}>
-                                    {getStatusLabel(doc.status)}
-                                </span>
-                        </td>
-                        <td style={{ padding: "10px", textAlign: "center", borderBottom: "1px solid #ddd" }}>
-                            {doc.requestName}
-                        </td>
-                        <td style={{ padding: "10px", textAlign: "center", borderBottom: "1px solid #ddd" }}>
-                            <Link to={`/detail/${doc.id}`} style={{ textDecoration: "none", color: "#2196F3" }}>
-                                {doc.fileName}
-                            </Link>
-                        </td>
-                        <td style={{ padding: "10px", textAlign: "center", borderBottom: "1px solid #ddd" }}>
-                            {doc.createdAt}
-                        </td>
-                        <td style={{ padding: "10px", textAlign: "center", borderBottom: "1px solid #ddd" }}>
-                            <Dropdown>
-                                <Dropdown.Toggle
-                                    variant="secondary"
-                                    style={{
-                                        padding: "5px 10px",
-                                        borderRadius: "5px",
-                                        fontWeight: "bold",
-                                        border: "none",
-                                    }}
-                                >
-                                    옵션
-                                </Dropdown.Toggle>
-
-                                <Dropdown.Menu>
-                                    <Dropdown.Item disabled>다운로드</Dropdown.Item>
-                                    <Dropdown.Item
-                                        onClick={() => handleCancelClick(doc)}
-                                        className="text-muted"
-                                        disabled={doc.status !== 0}
-                                    >
-                                        요청 취소
-                                    </Dropdown.Item>
-                                    <Dropdown.Item disabled>삭제</Dropdown.Item>
-                                </Dropdown.Menu>
-                            </Dropdown>
-                        </td>
+                    <thead>
+                    <tr style={{
+                        backgroundColor: "#FFFFFF",
+                        color: "#333",
+                        height: "45px",
+                        textAlign: "center",
+                        fontSize: "16px",
+                        fontWeight: "bold",
+                        borderBottom: "1px solid #ddd"
+                    }}>
+                        <th style={{ padding: "12px" }}>상태</th>
+                        <th style={{ padding: "12px" }}>작업명</th>
+                        <th style={{ padding: "12px" }}>파일명</th>
+                        <th style={{ padding: "12px" }}>요청 생성일</th>
+                        <th style={{ padding: "12px" }}>추가메뉴</th>
                     </tr>
-                ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                    {documents.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((doc, index) => (
+                        <tr key={doc.id} style={{
+                            borderBottom: "1px solid #ddd",
+                            height: "50px",
+                            backgroundColor: "white"
+                        }}>
+                            <td style={{ textAlign: "center" }}>
+                                    <span className={getStatusClass(doc.status)}>
+                                        {getStatusLabel(doc.status)}
+                                    </span>
+                            </td>
+                            <td style={{ textAlign: "center" }}>{doc.requestName}</td>
+                            <td style={{ textAlign: "center" }}>
+                                <Link to={`/detail/${doc.id}`} style={{ textDecoration: "none", color: "#007BFF" }}>
+                                    {doc.fileName}
+                                </Link>
+                            </td>
+                            <td style={{ textAlign: "center" }}>{doc.createdAt}</td>
+                            <td style={{ textAlign: "center" }}>
+                                <Dropdown>
+                                    <Dropdown.Toggle
+                                        variant="light"
+                                        style={{
+                                            padding: "5px 10px",
+                                            borderRadius: "5px",
+                                            fontWeight: "bold",
+                                            border: "none",
+                                        }}
+                                    >
+                                        ⋮
+                                    </Dropdown.Toggle>
+
+                                    <Dropdown.Menu>
+                                        <Dropdown.Item disabled> <DownloadIcon/> 다운로드</Dropdown.Item>
+                                        <Dropdown.Item
+                                            onClick={() => handleCancelClick(doc)}
+                                            className="text-muted"
+                                            disabled={doc.status !== 0}
+                                        >
+                                            <CloseIcon/> 요청 취소
+                                        </Dropdown.Item>
+                                        <Dropdown.Item disabled> <DeleteIcon/> 삭제</Dropdown.Item>
+                                    </Dropdown.Menu>
+                                </Dropdown>
+                            </td>
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
+            </div>
 
             <CancelModal
                 isVisible={showModal}

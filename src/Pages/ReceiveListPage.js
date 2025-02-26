@@ -4,6 +4,11 @@ import { Dropdown } from "react-bootstrap";
 import { PageContainer } from "../components/PageContainer";
 import RejectModal from "../components/ListPage/RejectModal";
 import ApiService from "../utils/ApiService";
+import moment from 'moment';
+
+import DoDisturbIcon from '@mui/icons-material/DoDisturb';
+import DeleteIcon from '@mui/icons-material/Delete';
+import DownloadIcon from '@mui/icons-material/Download';
 
 const ReceivedDocuments = () => {
     const [documents, setDocuments] = useState([]);
@@ -21,7 +26,6 @@ const ReceivedDocuments = () => {
                 const sortedDocuments = filteredDocuments.sort((a, b) =>
                     new Date(b.createdAt) - new Date(a.createdAt)
                 );
-
                 setDocuments(sortedDocuments);
             })
             .catch((error) => {
@@ -66,7 +70,7 @@ const ReceivedDocuments = () => {
             3: "label label-warning",
             4: "label label-default",
         };
-        return statusClasses[status] || "label label-default";
+        return statusClasses[status] || "badge bg-secondary";
     };
 
     const getStatusLabel = (status) => {
@@ -82,90 +86,71 @@ const ReceivedDocuments = () => {
 
     return (
         <PageContainer>
-            <h1 style={{ textAlign: "center", marginBottom: "20px", fontSize: "24px", fontWeight: "bold" }}>
+            <h1 style={{ textAlign: "center", marginBottom: "20px", fontSize: "24px", fontWeight: "bold", paddingTop: "1rem" }}>
                 요청받은 작업
             </h1>
             {error && <p style={{ color: "red", textAlign: "center" }}>{error}</p>}
 
-            <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: "Arial, sans-serif" }}>
-                <thead>
-                <tr style={{
-                    backgroundColor: "#86CFFA",
-                    color: "white",
-                    height: "45px",
-                    textAlign: "center",
-                    fontSize: "16px",
-                    fontWeight: "bold"
+            <div style={{ maxWidth: "85%", margin: "auto" }}>
+                <table style={{
+                    width: "100%",
+                    borderCollapse: "separate",
+                    borderSpacing: "0",
+                    fontFamily: "Arial, sans-serif",
+                    border: "1px solid #ddd",
+                    borderRadius: "8px",
+                    overflow: "hidden"
                 }}>
-                    <th style={{ padding: "10px" }}>상태</th>
-                    <th style={{ padding: "10px" }}>작업명</th>
-                    <th style={{ padding: "10px" }}>파일명</th>
-                    <th style={{ padding: "10px" }}>요청 생성일</th>
-                    <th style={{ padding: "10px" }}>요청자</th>
-                    <th style={{ padding: "10px" }}>Action</th>
-                </tr>
-                </thead>
-                <tbody>
-                {documents.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((doc) => (
-                    <tr key={doc.id}>
-                        <td style={{ padding: "10px", textAlign: "center", borderBottom: "1px solid #ddd" }}>
-                                <span className={getStatusClass(doc.status)}>
-                                    {getStatusLabel(doc.status)}
-                                </span>
-                        </td>
-                        <td style={{ padding: "10px", textAlign: "center", borderBottom: "1px solid #ddd" }}>
-                            {doc.requestName}
-                        </td>
-                        <td style={{ padding: "10px", textAlign: "center", borderBottom: "1px solid #ddd" }}>
-                            <Link to={`/detail/${doc.id}`} style={{ textDecoration: "none", color: "#2196F3" }}>
-                                {doc.fileName}
-                            </Link>
-                        </td>
-                        <td style={{ padding: "10px", textAlign: "center", borderBottom: "1px solid #ddd" }}>
-                            {doc.createdAt}
-                        </td>
-                        <td style={{ padding: "10px", textAlign: "center", borderBottom: "1px solid #ddd" }}>
-                            {doc.requesterName || "알 수 없음"}
-                        </td>
-                        <td style={{ padding: "10px", textAlign: "center", borderBottom: "1px solid #ddd" }}>
-                            <Dropdown>
-                                <Dropdown.Toggle
-                                    variant="secondary"
-                                    style={{
-                                        padding: "5px 10px",
-                                        borderRadius: "5px",
-                                        fontWeight: "bold",
-                                        border: "none",
-                                    }}
-                                >
-                                    옵션
-                                </Dropdown.Toggle>
-
-                                <Dropdown.Menu>
-                                    <Dropdown.Item disabled>다운로드</Dropdown.Item>
-                                    <Dropdown.Item
-                                        onClick={() => handleRejectClick(doc)}
-                                        className = "text-muted"
-                                        disabled={doc.status !== 0}
-                                    >
-                                        요청 거절
-                                    </Dropdown.Item>
-                                    <Dropdown.Item disabled>삭제</Dropdown.Item>
-                                </Dropdown.Menu>
-                            </Dropdown>
-                        </td>
+                    <thead>
+                    <tr style={{
+                        backgroundColor: "#FFFFFF",
+                        color: "#333",
+                        height: "45px",
+                        textAlign: "center",
+                        fontSize: "16px",
+                        fontWeight: "bold",
+                        borderBottom: "1px solid #ddd"
+                    }}>
+                        <th style={{ padding: "12px" }}>상태</th>
+                        <th style={{ padding: "12px" }}>작업명</th>
+                        <th style={{ padding: "12px" }}>파일명</th>
+                        <th style={{ padding: "12px" }}>요청 생성일</th>
+                        <th style={{ padding: "12px" }}>요청자</th>
+                        <th style={{ padding: "12px" }}>추가메뉴</th>
                     </tr>
-                ))}
-                </tbody>
-            </table>
-
-            <RejectModal
-                isVisible={showModal}
-                onClose={() => setShowModal(false)}
-                onConfirm={handleConfirmReject}
-                rejectReason={rejectReason}
-                setRejectReason={setRejectReason}
-            />
+                    </thead>
+                    <tbody>
+                    {documents.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((doc) => (
+                        <tr key={doc.id} style={{ borderBottom: "1px solid #ddd", height: "50px", backgroundColor: "white" }}>
+                            <td style={{ textAlign: "center" }}>
+                                    <span className={getStatusClass(doc.status)}>
+                                        {getStatusLabel(doc.status)}
+                                    </span>
+                            </td>
+                            <td style={{ textAlign: "center" }}>{doc.requestName}</td>
+                            <td style={{ textAlign: "center" }}>
+                                <Link to={`/detail/${doc.id}`} style={{ textDecoration: "none", color: "#007BFF" }}>
+                                    {doc.fileName}
+                                </Link>
+                            </td>
+                            <td style={{ textAlign: "center" }}>{moment(doc.createdAt).format('YYYY.MM.DD HH:mm')}</td>
+                            <td style={{ textAlign: "center" }}>{doc.requesterName || "알 수 없음"}</td>
+                            <td style={{ textAlign: "center" }}>
+                                <Dropdown>
+                                    <Dropdown.Toggle variant="light" style={{ padding: "5px 10px", borderRadius: "5px", fontWeight: "bold", border: "none" }}>⋮</Dropdown.Toggle>
+                                    <Dropdown.Menu>
+                                        <Dropdown.Item disabled><DownloadIcon /> 다운로드</Dropdown.Item>
+                                        <Dropdown.Item onClick={() => handleRejectClick(doc)} disabled={doc.status !== 0}><DoDisturbIcon /> 요청 거절</Dropdown.Item>
+                                        <Dropdown.Item disabled><DeleteIcon /> 삭제</Dropdown.Item>
+                                    </Dropdown.Menu>
+                                </Dropdown>
+                            </td>
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
+            </div>
+            <RejectModal isVisible={showModal} onClose={() => setShowModal(false)} onConfirm={handleConfirmReject} rejectReason={rejectReason} setRejectReason={setRejectReason} />
         </PageContainer>
     );
 };

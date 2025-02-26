@@ -66,118 +66,118 @@ const TaskSetupPage = () => {
   }, [document]);
 
   return (
-    <Container>
-      <StyledBody>
-        <MainArea>
-          <Title>작업 정보 입력</Title>
+      <Container style={{paddingTop: "2.5rem"}}>
+        <StyledBody>
+          <MainArea>
+            <Title>작업 정보 입력</Title>
 
-          {/* 요청 이름 입력 */}
-          <InputRow>
-          <RequiredNotice>* 항목은 필수 입력란입니다.</RequiredNotice>
-            <Label>
-              작업명 <RequiredMark>*</RequiredMark>
-            </Label>
-            <InputField
-              placeholder="예: 2024년 1분기 계약서 서명 요청"
-              value={requestName}
-              onChange={(e) => setRequestName(e.target.value)}
-            />
-          </InputRow>
+            {/* 요청 이름 입력 */}
+            <InputRow>
+              <RequiredNotice>* 항목은 필수 입력란입니다.</RequiredNotice>
+              <Label>
+                작업명 <RequiredMark>*</RequiredMark>
+              </Label>
+              <InputField
+                  placeholder="예: 2024년 1분기 계약서 서명 요청"
+                  value={requestName}
+                  onChange={(e) => setRequestName(e.target.value)}
+              />
+            </InputRow>
 
-          {/* 문서 설명 입력 */}
-          <InputRow>
-            <Label>
-              작업 요청 설명 <RequiredMark>*</RequiredMark>
-            </Label>
-            <Textarea
-              placeholder="예: 최대한 빠르게 서명을 완료해주세요."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </InputRow>
+            {/* 문서 설명 입력 */}
+            <InputRow>
+              <Label>
+                작업 요청 설명 <RequiredMark>*</RequiredMark>
+              </Label>
+              <Textarea
+                  placeholder="예: 최대한 빠르게 서명을 완료해주세요."
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+              />
+            </InputRow>
 
-          {/* 작업 설정 (라디오 버튼) */}
-          <InputRow>
-            <Label>작업 설정</Label>
-            <RadioContainer>
-              <RadioLabel>
-                <RadioInput
-                  type="radio"
-                  name="rejectable"
-                  value={0}
-                  checked={isRejectable === 0}
-                  onChange={() => setIsRejectable(0)}
-                />
-                거절 불가능
-              </RadioLabel>
-              <RadioLabel>
-                <RadioInput
-                  type="radio"
-                  name="rejectable"
-                  value={1}
-                  checked={isRejectable === 1}
-                  onChange={() => setIsRejectable(1)}
-                />
-                거절 가능
-              </RadioLabel>
-            </RadioContainer>
-          </InputRow>
+            {/* 작업 설정 (라디오 버튼) */}
+            <InputRow>
+              <Label>작업 설정</Label>
+              <RadioContainer>
+                <RadioLabel>
+                  <RadioInput
+                      type="radio"
+                      name="rejectable"
+                      value={0}
+                      checked={isRejectable === 0}
+                      onChange={() => setIsRejectable(0)}
+                  />
+                  거절 불가능
+                </RadioLabel>
+                <RadioLabel>
+                  <RadioInput
+                      type="radio"
+                      name="rejectable"
+                      value={1}
+                      checked={isRejectable === 1}
+                      onChange={() => setIsRejectable(1)}
+                  />
+                  거절 가능
+                </RadioLabel>
+              </RadioContainer>
+            </InputRow>
 
-          {/* 문서 선택 (파일 업로드) */}
-          <InputRow>
-            <Label>
-              문서 선택 <RequiredMark>*</RequiredMark>
-            </Label>
-            <UploadSection>
-              {!document.fileUrl ? (
-                <Drop
-                  onLoaded={(files) => {
-                    const file = files[0];
-                    if (file) {
-                      handlePostFiles(file);
-                    }
-                  }}
-                />
-              ) : (
-                <SelectedFileBox>
-                    {/* ✅ PDF 미리보기 추가 */}
-                    {previewUrl && (
-                      <Document
-                        file={previewUrl}
-                        onLoadSuccess={({ numPages }) => setNumPages(numPages)}
-                      >
-                        <Page pageNumber={1} width={250} /> {/* 첫 페이지 미리보기 */}
-                      </Document>
-                    )}
-                  <SelectedFileText>{document.fileName}</SelectedFileText>
-                  <ButtonContainer>
-                    <ChangeFileButton
-                      onClick={() =>
-                        setDocumentState((previousDocument) => ({
-                          ...previousDocument,
-                          fileName: "",
-                          fileUrl: null,
-                        }))
-                      }
-                    >
-                      다른 문서 선택
-                    </ChangeFileButton>
-                  </ButtonContainer>
-                </SelectedFileBox>
-              )}
-            </UploadSection>
-          </InputRow>
-        </MainArea>
-      </StyledBody>
+            {/* 문서 선택 (파일 업로드) */}
+            <InputRow>
+              <Label>
+                문서 선택 <RequiredMark>*</RequiredMark>
+              </Label>
+              <UploadSection>
+                {!document.fileUrl ? (
+                    <Drop
+                        onLoaded={(files) => {
+                          const file = files[0];
+                          if (file) {
+                            handlePostFiles(file);
+                          }
+                        }}
+                    />
+                ) : (
+                    <SelectedFileBox>
+                      {/* ✅ PDF 미리보기 추가 */}
+                      {previewUrl && (
+                          <Document
+                              file={previewUrl}
+                              onLoadSuccess={({numPages}) => setNumPages(numPages)}
+                          >
+                            <Page pageNumber={1} width={250}/> {/* 첫 페이지 미리보기 */}
+                          </Document>
+                      )}
+                      <SelectedFileText>{document.fileName}</SelectedFileText>
+                      <ButtonContainer>
+                        <ChangeFileButton
+                            onClick={() =>
+                                setDocumentState((previousDocument) => ({
+                                  ...previousDocument,
+                                  fileName: "",
+                                  fileUrl: null,
+                                }))
+                            }
+                        >
+                          다른 문서 선택
+                        </ChangeFileButton>
+                      </ButtonContainer>
+                    </SelectedFileBox>
+                )}
+              </UploadSection>
+            </InputRow>
+          </MainArea>
+        </StyledBody>
 
-      {/* 하단 이동 버튼 */}
-      <FloatingButtonContainer>
-        <GrayButton onClick={() => navigate(`/request-document`)}>나가기</GrayButton>
-        <NextButton onClick={handleNextStep}>
-          서명자 추가
-        </NextButton>
-      </FloatingButtonContainer>
-    </Container>
+        {/* 하단 이동 버튼 */}
+        <FloatingButtonContainer>
+          <GrayButton onClick={() => navigate(`/request-document`)}>나가기</GrayButton>
+          <NextButton onClick={handleNextStep}>
+            서명자 추가
+          </NextButton>
+        </FloatingButtonContainer>
+      </Container>
   );
 };
 export default TaskSetupPage;
