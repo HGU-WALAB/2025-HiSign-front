@@ -186,7 +186,7 @@ export default TaskSetupPage;
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  height: 100%;
+  min-height: 100vh;
   background-color: #e5e5e5;
   position: relative;
 `;

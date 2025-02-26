@@ -120,7 +120,13 @@ function SignaturePage() {
       alert("서명할 필드가 없습니다.");
       return;
     }
-  
+
+    // ✅ 서명이 없는 필드가 있는지 검사
+    const isAllSigned = signing.signatureFields.every(field => field.image || field.textData);
+    if (!isAllSigned) {
+        alert("모든 서명을 완료해 주세요.");
+        return;
+    }
     console.log("🔹 서명 저장 시작:", signing);
     
     let fileName = null;
@@ -168,9 +174,9 @@ function SignaturePage() {
 
       {/* ✅ 이메일 모달 - isValid가 true이고 documentId가 없을 때 표시 */}
       {isValid && !signing.documentId && (
-        <EmailInputModal 
-          open={true} 
-          onSubmit={handleEmailSubmit} 
+        <EmailInputModal
+          open={true}
+          onSubmit={handleEmailSubmit}
           onClose={() => {}} // 닫기 버튼 비활성화
         />
       )}
