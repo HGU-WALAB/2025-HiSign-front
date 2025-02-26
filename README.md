@@ -24,7 +24,7 @@
 
 ## 2025년
 
-| [<img src="https://avatars.githubusercontent.com/u/49269218?v=4" width="100">](https://github.com/HongKing896) | [<img src="https://avatars.githubusercontent.com/u/89755770?v=4" width="100">](https://github.com/thisissolmi) | [<img src="https://avatars.githubusercontent.com/u/45687157?v=4" width="100">](https://github.com/chanmi12) |
+| [<img src="https://avatars.githubusercontent.com/u/49269218?v=5" width="100">](https://github.com/HongKing896) | [<img src="https://avatars.githubusercontent.com/u/89755770?v=5" width="100">](https://github.com/thisissolmi) | [<img src="https://avatars.githubusercontent.com/u/45687157?v=5" width="100">](https://github.com/chanmi12) |
 |:---------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------: |
 |                                                   김홍찬                                                    |                                                    김솔미                                                    |                                                   류찬미                                                    |
 
