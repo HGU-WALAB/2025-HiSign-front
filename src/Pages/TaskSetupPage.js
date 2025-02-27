@@ -1,5 +1,3 @@
-
-
 import React, { useEffect, useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/esm/entry.webpack";
@@ -9,8 +7,6 @@ import styled from "styled-components";
 import Drop from "../components/Drop";
 import { documentState } from "../recoil/atom/documentState";
 import { memberState } from "../recoil/atom/memberState";
-import DatePicker from "react-datepicker"; // 👈 DatePicker import
-import "react-datepicker/dist/react-datepicker.css"; // 👈 스타일 추가
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
@@ -19,21 +15,25 @@ const TaskSetupPage = () => {
   const member = useRecoilValue(memberState);
   const [requestName, setRequestName] = useState("");
   const [description, setDescription] = useState("");
-  const [isRejectable, setIsRejectable] = useState(0);
-  const [previewUrl, setPreviewUrl] = useState(null);
+  const [isRejectable, setIsRejectable] = useState(0); // ✅ 기본값: 거절 불가능 (0)
+  const [expirationDate, setExpirationDate] = useState(""); // ✅ 서명 만료 날짜 상태
+  const [expirationTime, setExpirationTime] = useState("23:59"); // ✅ 서명 만료 시간 상태 추가
+  const [previewUrl, setPreviewUrl] = useState(null); // ✅ 파일 미리보기 상태 추가
   const [numPages, setNumPages] = useState(null);
-  const [deadline, setDeadline] = useState(null); // 👈 마감일 상태 추가
   const navigate = useNavigate();
+
+  // ✅ 오늘 날짜를 기본 최소값으로 설정
+  const today = new Date().toISOString().split('T')[0];
 
   const handlePostFiles = (file) => {
     if (!file) {
       alert("파일을 선택해주세요.");
       return;
     }
-
+  
     const blobUrl = URL.createObjectURL(file);
-    setPreviewUrl(blobUrl);
-
+    setPreviewUrl(blobUrl); // ✅ PDF URL 저장
+  
     setDocumentState((previousDocument) => ({
       ...previousDocument,
       ownerId: member.unique_id,
@@ -55,17 +55,30 @@ const TaskSetupPage = () => {
       alert("문서를 선택해 주세요.");
       return;
     }
-    if (!deadline) {
-      alert("마감일을 설정해 주세요."); // 👈 마감일 체크
-      return;
+    
+    // ✅ 거절 가능한 경우 만료일 검증 추가
+    if (isRejectable === 1) {
+      if (!expirationDate) {
+        alert("서명 만료일을 선택해 주세요.");
+        return;
+      }
+      if (!expirationTime) {
+        alert("서명 만료 시간을 선택해 주세요.");
+        return;
+      }
     }
+
+    // ✅ 날짜와 시간을 합쳐서 저장
+    const formattedExpiration = isRejectable === 1 
+      ? `${expirationDate}T${expirationTime}:00` // ISO 형식으로 변환 (YYYY-MM-DDTHH:MM:00)
+      : null;
 
     setDocumentState((previousDocument) => ({
       ...previousDocument,
       requestName: requestName,
       description: description,
       isRejectable: isRejectable,
-      deadline: deadline, // 👈 마감일 전달
+      expirationDateTime: formattedExpiration, // ✅ 날짜와 시간이 합쳐진 값으로 저장
     }));
 
     navigate(`/request`);
@@ -76,147 +89,163 @@ const TaskSetupPage = () => {
   }, [document]);
 
   return (
-    <Container>
-      <StyledBody>
-        <MainArea>
-          <Title>작업 정보 입력</Title>
+      <Container style={{paddingTop: "2.5rem"}}>
+        <StyledBody>
+          <MainArea>
+            <Title>작업 정보 입력</Title>
 
-          {/* 요청 이름 입력 */}
-          <InputRow>
-            <RequiredNotice>* 항목은 필수 입력란입니다.</RequiredNotice>
-            <Label>
-              작업명 <RequiredMark>*</RequiredMark>
-            </Label>
-            <InputField
-              placeholder="예: 2024년 1분기 계약서 서명 요청"
-              value={requestName}
-              onChange={(e) => setRequestName(e.target.value)}
-            />
-          </InputRow>
+            {/* 요청 이름 입력 */}
+            <InputRow>
+              <RequiredNotice>* 항목은 필수 입력란입니다.</RequiredNotice>
+              <Label>
+                작업명 <RequiredMark>*</RequiredMark>
+              </Label>
+              <InputField
+                  placeholder="예: 2024년 1분기 계약서 서명 요청"
+                  value={requestName}
+                  onChange={(e) => setRequestName(e.target.value)}
+              />
+            </InputRow>
 
-          {/* 문서 설명 입력 */}
-          <InputRow>
-            <Label>
-              작업 요청 설명 <RequiredMark>*</RequiredMark>
-            </Label>
-            <Textarea
-              placeholder="예: 최대한 빠르게 서명을 완료해주세요."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </InputRow>
+            {/* 문서 설명 입력 */}
+            <InputRow>
+              <Label>
+                작업 요청 설명 <RequiredMark>*</RequiredMark>
+              </Label>
+              <Textarea
+                  placeholder="예: 최대한 빠르게 서명을 완료해주세요."
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+              />
+            </InputRow>
 
-          {/* 작업 설정 (라디오 버튼) */}
-          <InputRow>
-            <Label>작업 설정 <RequiredMark>*</RequiredMark> </Label> 
-            <RadioContainer>
-              <RadioLabel>
-                <RadioInput
-                  type="radio"
-                  name="rejectable"
-                  value={0}
-                  checked={isRejectable === 0}
-                  onChange={() => setIsRejectable(0)}
-                />
-                거절 불가능
-              </RadioLabel>
-              <RadioLabel>
-                <RadioInput
-                  type="radio"
-                  name="rejectable"
-                  value={1}
-                  checked={isRejectable === 1}
-                  onChange={() => setIsRejectable(1)}
-                />
-                거절 가능
-              </RadioLabel>
+            {/* 작업 설정 (라디오 버튼) */}
+            <InputRow>
+              <Label>작업 설정</Label>
+              <RadioContainer>
+                <RadioLabel>
+                  <RadioInput
+                      type="radio"
+                      name="rejectable"
+                      value={0}
+                      checked={isRejectable === 0}
+                      onChange={() => setIsRejectable(0)}
+                  />
+                  거절 불가능
+                </RadioLabel>
+                <RadioLabel>
+                  <RadioInput
+                      type="radio"
+                      name="rejectable"
+                      value={1}
+                      checked={isRejectable === 1}
+                      onChange={() => setIsRejectable(1)}
+                  />
+                  거절 가능
+                </RadioLabel>
+              </RadioContainer>
               
-            </RadioContainer>
+              {/* ✅ 만료일 및 시간 선택  */}
             
-          </InputRow>
+                <DatePickerContainer>
+                  <DateTimePickerTitle>서명 만료 설정</DateTimePickerTitle>
+                  
+                  <DateTimePickerRow>
+                    <DateTimePickerColumn>
+                      <DatePickerLabel>
+                        만료일 <RequiredMark>*</RequiredMark>
+                      </DatePickerLabel>
+                      <DatePickerInput
+                        type="date"
+                        min={today}
+                        value={expirationDate}
+                        onChange={(e) => setExpirationDate(e.target.value)}
+                      />
+                    </DateTimePickerColumn>
+                    
+                    <DateTimePickerColumn>
+                      <DatePickerLabel>
+                        만료 시간 <RequiredMark>*</RequiredMark>
+                      </DatePickerLabel>
+                      <DatePickerInput
+                        type="time"
+                        value={expirationTime}
+                        onChange={(e) => setExpirationTime(e.target.value)}
+                      />
+                    </DateTimePickerColumn>
+                  </DateTimePickerRow>
+                  
+                  <DatePickerHint>
+                    서명 요청이 만료되는 날짜와 시간을 선택하세요. 만료 시점 이후에는 서명이 불가합니다.
+                  </DatePickerHint>
+                </DatePickerContainer>
+              
+            </InputRow>
+            
+            {/* 문서 선택 (파일 업로드) */}
+            <InputRow>
+              <Label>
+                문서 선택 <RequiredMark>*</RequiredMark>
+              </Label>
+              <UploadSection>
+                {!document.fileUrl ? (
+                    <Drop
+                        onLoaded={(files) => {
+                          const file = files[0];
+                          if (file) {
+                            handlePostFiles(file);
+                          }
+                        }}
+                    />
+                ) : (
+                    <SelectedFileBox>
+                      {/* ✅ PDF 미리보기 추가 */}
+                      {previewUrl && (
+                          <Document
+                              file={previewUrl}
+                              onLoadSuccess={({numPages}) => setNumPages(numPages)}
+                          >
+                            <Page pageNumber={1} width={250}/> {/* 첫 페이지 미리보기 */}
+                          </Document>
+                      )}
+                      <SelectedFileText>{document.fileName}</SelectedFileText>
+                      <ButtonContainer>
+                        <ChangeFileButton
+                            onClick={() =>
+                                setDocumentState((previousDocument) => ({
+                                  ...previousDocument,
+                                  fileName: "",
+                                  fileUrl: null,
+                                }))
+                            }
+                        >
+                          다른 문서 선택
+                        </ChangeFileButton>
+                      </ButtonContainer>
+                    </SelectedFileBox>
+                )}
+              </UploadSection>
+            </InputRow>
+          </MainArea>
+        </StyledBody>
 
-          {/* 마감일자 선택 */}
-          <InputRow>
-            <Label>
-              마감일자 <RequiredMark>*</RequiredMark>
-  
-            </Label>
-            <DatePicker
-              selected={deadline}
-              onChange={(date) => setDeadline(date)} // 👈 날짜 변경 시 상태 업데이트
-              dateFormat="yyyy/MM/dd"
-              placeholderText="현재 날짜 이후로만 선택해주세요. "
-              minDate={new Date()} // 오늘 날짜부터 선택 가능
-            />
-          </InputRow>
-
-          {/* 문서 선택 (파일 업로드) */}
-          <InputRow>
-            <Label>
-              문서 선택 <RequiredMark>*</RequiredMark>
-            </Label>
-            <UploadSection>
-              {!document.fileUrl ? (
-                <Drop
-                  onLoaded={(files) => {
-                    const file = files[0];
-                    if (file) {
-                      handlePostFiles(file);
-                    }
-                  }}
-                />
-              ) : (
-                <SelectedFileBox>
-                  {previewUrl && (
-                    <Document
-                      file={previewUrl}
-                      onLoadSuccess={({ numPages }) => setNumPages(numPages)}
-                    >
-                      <Page pageNumber={1} width={250} />
-                    </Document>
-                  )}
-                  <SelectedFileText>{document.fileName}</SelectedFileText>
-                  <ButtonContainer>
-                    <ChangeFileButton
-                      onClick={() =>
-                        setDocumentState((previousDocument) => ({
-                          ...previousDocument,
-                          fileName: "",
-                          fileUrl: null,
-                        }))
-                      }
-                    >
-                      다른 문서 선택
-                    </ChangeFileButton>
-                  </ButtonContainer>
-                </SelectedFileBox>
-              )}
-            </UploadSection>
-          </InputRow>
-
-          
-        </MainArea>
-      </StyledBody>
-
-      {/* 하단 이동 버튼 */}
-      <FloatingButtonContainer>
-        <GrayButton onClick={() => navigate(`/request-document`)}>나가기</GrayButton>
-        <NextButton onClick={handleNextStep}>서명자 추가</NextButton>
-      </FloatingButtonContainer>
-    </Container>
+        {/* 하단 이동 버튼 */}
+        <FloatingButtonContainer>
+          <GrayButton onClick={() => navigate(`/request-document`)}>나가기</GrayButton>
+          <NextButton onClick={handleNextStep}>
+            서명자 추가
+          </NextButton>
+        </FloatingButtonContainer>
+      </Container>
   );
 };
 export default TaskSetupPage;
 
-// 스타일 수정 부분
-// 추가 스타일을 작성하겠습니다.
-
-
-// ✅ 스타일 수정
+// 스타일 컴포넌트
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  height: 100%;
+  min-height: 100vh;
   background-color: #e5e5e5;
   position: relative;
 `;
@@ -301,6 +330,60 @@ const RadioInput = styled.input`
   cursor: pointer;
 `;
 
+// ✅ 날짜 및 시간 선택 관련 스타일 추가/수정
+const DatePickerContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 15px;
+  padding: 15px;
+  background-color: #f5f8ff;
+  border-radius: 5px;
+  border-left: 3px solid #007bff;
+`;
+
+const DateTimePickerTitle = styled.h4`
+  font-size: 15px;
+  font-weight: bold;
+  color: #007bff;
+  margin: 0 0 5px 0;
+`;
+
+const DateTimePickerRow = styled.div`
+  display: flex;
+  gap: 15px;
+`;
+
+const DateTimePickerColumn = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+`;
+
+const DatePickerLabel = styled.label`
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+`;
+
+const DatePickerInput = styled.input`
+  width: 100%;
+  height: 40px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+  font-size: 14px;
+  outline: none;
+  cursor: pointer;
+`;
+
+const DatePickerHint = styled.p`
+  font-size: 12px;
+  color: #666;
+  margin-top: 5px;
+`;
+
 const RequiredNotice = styled.p`
   font-size: 12px;
   color: #ff4d4f;
@@ -382,5 +465,3 @@ const FileInfoContainer = styled.div`
   align-items: center;
   gap: 8px;
 `;
-
-
