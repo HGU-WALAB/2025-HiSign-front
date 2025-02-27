@@ -5,6 +5,7 @@ import { PageContainer } from "../components/PageContainer";
 import RejectModal from "../components/ListPage/RejectModal";
 import ApiService from "../utils/ApiService";
 import moment from 'moment';
+import { Pagination } from "@mui/material";
 
 import DoDisturbIcon from '@mui/icons-material/DoDisturb';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -34,6 +35,28 @@ const ReceivedDocuments = () => {
             });
     }, []);
 
+    const getStatusClass = (status) => {
+        const statusClasses = {
+            0: "label label-info",
+            1: "label label-success",
+            2: "label label-danger",
+            3: "label label-warning",
+            4: "label label-default",
+        };
+        return statusClasses[status] || "badge bg-secondary";
+    };
+
+    const getStatusLabel = (status) => {
+        const statusLabels = {
+            0: "서명 진행 중",
+            1: "완료",
+            2: "거절됨",
+            3: "취소됨",
+            4: "만료됨",
+        };
+        return statusLabels[status] || "알 수 없음";
+    };
+
     const handleRejectClick = (doc) => {
         setSelectedDocument(doc);
         setRejectReason("");
@@ -62,26 +85,8 @@ const ReceivedDocuments = () => {
             });
     };
 
-    const getStatusClass = (status) => {
-        const statusClasses = {
-            0: "label label-info",
-            1: "label label-success",
-            2: "label label-danger",
-            3: "label label-warning",
-            4: "label label-default",
-        };
-        return statusClasses[status] || "badge bg-secondary";
-    };
-
-    const getStatusLabel = (status) => {
-        const statusLabels = {
-            0: "서명 진행 중",
-            1: "완료",
-            2: "거절됨",
-            3: "취소됨",
-            4: "만료됨",
-        };
-        return statusLabels[status] || "알 수 없음";
+    const handlePageChange = (event, value) => {
+        setCurrentPage(value);
     };
 
     return (
@@ -91,7 +96,14 @@ const ReceivedDocuments = () => {
             </h1>
             {error && <p style={{ color: "red", textAlign: "center" }}>{error}</p>}
 
-            <div style={{ maxWidth: "85%", margin: "auto" }}>
+            <div style={{
+                maxWidth: "85%",
+                margin: "auto",
+                boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                borderRadius: "8px",
+                overflow: "hidden",
+                backgroundColor: "#fff"
+            }}>
                 <table style={{
                     width: "100%",
                     borderCollapse: "separate",
@@ -99,7 +111,7 @@ const ReceivedDocuments = () => {
                     fontFamily: "Arial, sans-serif",
                     border: "1px solid #ddd",
                     borderRadius: "8px",
-                    overflow: "hidden"
+                    overflow: "hidden",
                 }}>
                     <thead>
                     <tr style={{
@@ -121,7 +133,13 @@ const ReceivedDocuments = () => {
                     </thead>
                     <tbody>
                     {documents.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((doc) => (
-                        <tr key={doc.id} style={{ borderBottom: "1px solid #ddd", height: "50px", backgroundColor: "white" }}>
+                        <tr key={doc.id} style={{
+                            borderBottom: "1px solid #ddd",
+                            height: "50px",
+                            backgroundColor: "white",
+                            transition: "all 0.2s ease-in-out",
+                            boxShadow: "0 2px 5px rgba(0, 0, 0, 0.05)", // 행에도 그림자 추가
+                        }}>
                             <td style={{ textAlign: "center" }}>
                                     <span className={getStatusClass(doc.status)}>
                                         {getStatusLabel(doc.status)}
@@ -150,6 +168,11 @@ const ReceivedDocuments = () => {
                     </tbody>
                 </table>
             </div>
+
+            <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
+                <Pagination count={Math.ceil(documents.length / itemsPerPage)} color="default" page={currentPage} onChange={handlePageChange} />
+            </div>
+
             <RejectModal isVisible={showModal} onClose={() => setShowModal(false)} onConfirm={handleConfirmReject} rejectReason={rejectReason} setRejectReason={setRejectReason} />
         </PageContainer>
     );
