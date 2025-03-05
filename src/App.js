@@ -5,8 +5,6 @@ import MyRoutes from "./Routes";
 import GlobalStyle from './styles/GlobalStyle';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-import SvgIcon from "@mui/material/SvgIcon";
-import { SvgIconComponent } from "@mui/icons-material";
 // styles
 import"./asset/css/paper-kit.css"
 // import "bootstrap/scss/bootstrap.scss";
