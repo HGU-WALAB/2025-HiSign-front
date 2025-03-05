@@ -11,7 +11,7 @@ import { taskState } from "../recoil/atom/taskState";
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
 const SetupTaskPage = () => {
-  const [document, settaskState] = useRecoilState(taskState);
+  const [document, setTaskState] = useRecoilState(taskState);
   const member = useRecoilValue(loginMemberState);
   const [requestName, setRequestName] = useState("");
   const [description, setDescription] = useState("");
@@ -34,7 +34,7 @@ const SetupTaskPage = () => {
     const blobUrl = URL.createObjectURL(file);
     setPreviewUrl(blobUrl); // ✅ PDF URL 저장
   
-    settaskState((previousDocument) => ({
+    setTaskState((previousDocument) => ({
       ...previousDocument,
       ownerId: member.unique_id,
       fileName: file.name,
@@ -73,7 +73,7 @@ const SetupTaskPage = () => {
       ? `${expirationDate}T${expirationTime}:00` // ISO 형식으로 변환 (YYYY-MM-DDTHH:MM:00)
       : null;
 
-    settaskState((previousDocument) => ({
+    setTaskState((previousDocument) => ({
       ...previousDocument,
       requestName: requestName,
       description: description,
@@ -212,7 +212,7 @@ const SetupTaskPage = () => {
                       <ButtonContainer>
                         <ChangeFileButton
                             onClick={() =>
-                                settaskState((previousDocument) => ({
+                                setTaskState((previousDocument) => ({
                                   ...previousDocument,
                                   fileName: "",
                                   fileUrl: null,
