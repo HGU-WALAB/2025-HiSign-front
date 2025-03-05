@@ -4,14 +4,14 @@ import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useSetRecoilState } from 'recoil';
 import { authState } from '../recoil/atom/authState';
-import { memberState } from '../recoil/atom/memberState';
+import { loginMemberState } from '../recoil/atom/loginMemberState';
 import ApiService from '../utils/ApiService';
 
 const LoginCallback = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const setAuthState = useSetRecoilState(authState);
-  const setMemberState = useSetRecoilState(memberState);
+  const setloginMemberState = useSetRecoilState(loginMemberState);
 
   // URL에서 토큰 추출
   const getTokenFromUrl = (search) => {
@@ -39,7 +39,7 @@ const LoginCallback = () => {
           console.log('payload:', payload);
 
           // 사용자 정보 상태 변경
-          setMemberState({
+          setloginMemberState({
             unique_id: payload.uniqueId,
             name: payload.name,
             email: payload.email,
@@ -56,7 +56,7 @@ const LoginCallback = () => {
     };
   
     handleToken();
-  }, [location.search, navigate, setAuthState, setMemberState]);
+  }, [location.search, navigate, setAuthState, setloginMemberState]);
 };
 
 export default LoginCallback;

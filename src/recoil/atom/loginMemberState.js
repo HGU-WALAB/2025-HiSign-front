@@ -16,8 +16,8 @@ const decodeJWT = (token) => {
 const token = sessionStorage.getItem('token');
 const decodedToken = token ? decodeJWT(token) : null;
 
-export const memberState = atom({
-  key: 'memberState',
+export const loginMemberState = atom({
+  key: 'loginMemberState',
   default: decodedToken
     ? {
         unique_id: decodedToken.unique_id || null,

@@ -2,17 +2,17 @@ import { Button } from '@mui/material';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { documentState } from '../../recoil/atom/documentState';
-import { memberState } from '../../recoil/atom/memberState';
+import { loginMemberState } from '../../recoil/atom/loginMemberState';
 import { signerState } from '../../recoil/atom/signerState';
+import { taskState } from '../../recoil/atom/taskState';
 import ApiService from '../../utils/ApiService';
 import CompleteModal from './CompleteModal';
 
 const CompleteButton = () => {
-  const [document, setDocument] = useRecoilState(documentState);
+  const [document, setDocument] = useRecoilState(taskState);
   const [signers, setSigners] = useRecoilState(signerState);
   const [open, setOpen] = useState(false);
-  const member = useRecoilValue(memberState);
+  const member = useRecoilValue(loginMemberState);
   const navigate = useNavigate();
 
   // 모달 열기

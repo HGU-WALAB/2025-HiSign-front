@@ -3,12 +3,12 @@ import { IoClose } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
 import styled from "styled-components";
-import { documentState } from "../recoil/atom/documentState";
 import { signerState } from "../recoil/atom/signerState";
+import { taskState } from "../recoil/atom/taskState";
 
-const RequestPage = () => {
+const AddSignerPage = () => {
   const navigate = useNavigate();
-  const document = useRecoilValue(documentState);
+  const document = useRecoilValue(taskState);
   const [signers, setSigners] = useRecoilState(signerState);
 
   const [newName, setNewName] = useState("");
@@ -101,7 +101,7 @@ const RequestPage = () => {
       </Container>
   );
 };
-
+export default AddSignerPage;
 // 📌 **Styled Components 적용**
 const Container = styled.div`
   display: flex;
@@ -251,4 +251,3 @@ const NextButton = styled(ButtonBase)`
   background-color: ${({ disabled }) => (disabled ? "#ccc" : "#03A3FF")};
 `;
 
-export default RequestPage;

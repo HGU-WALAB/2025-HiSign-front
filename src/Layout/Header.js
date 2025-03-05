@@ -47,9 +47,6 @@ function HeaderBar() {
                         <Link to="/align" className="nav-link text-dark">
                             서명 할당하기
                         </Link>
-                        <Link to="/make" className="nav-link text-dark">
-                            예제 페이지
-                        </Link>
                         <Link to="/contact" className="nav-link text-dark">
                             문의 페이지
                         </Link>

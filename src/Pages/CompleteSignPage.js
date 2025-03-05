@@ -4,7 +4,7 @@ import { useSetRecoilState } from "recoil";
 import styled from "styled-components";
 import { signingState } from "../recoil/atom/signingState";
 
-const SignatureCompletePage = () => {
+const CompleteSignPage = () => {
   const navigate = useNavigate();
   const resetSigningState = useSetRecoilState(signingState);
 
@@ -35,7 +35,7 @@ const SignatureCompletePage = () => {
   );
 };
 
-export default SignatureCompletePage;
+export default CompleteSignPage;
 
 // ✅ 스타일링
 const Container = styled.div`

@@ -9,7 +9,7 @@ import SignatureOverlay from "../components/SignPage/SignatureOverlay";
 import { signingState } from "../recoil/atom/signingState";
 import ApiService from "../utils/ApiService";
 
-function SignaturePage() {
+function SignPage() {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
 
@@ -548,5 +548,5 @@ const StyledServTitle = styled(Typography)`
   margin: 8px 0;
 `;
 
-export default SignaturePage;
+export default SignPage;
 

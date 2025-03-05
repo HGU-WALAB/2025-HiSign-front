@@ -1,11 +1,11 @@
 import { useNavigate } from 'react-router-dom';
 import { useSetRecoilState } from 'recoil';
 import { authState } from '../recoil/atom/authState';
-import { memberState } from '../recoil/atom/memberState';
+import { loginMemberState } from '../recoil/atom/loginMemberState';
 
 const HisnetLogoutButton = () => {
   const setAuth = useSetRecoilState(authState);
-  const setMember = useSetRecoilState(memberState);
+  const setMember = useSetRecoilState(loginMemberState);
   const navigate = useNavigate();
 
   const handleLogout = () => {

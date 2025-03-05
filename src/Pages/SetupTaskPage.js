@@ -5,14 +5,14 @@ import { useNavigate } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
 import styled from "styled-components";
 import Drop from "../components/Drop";
-import { documentState } from "../recoil/atom/documentState";
-import { memberState } from "../recoil/atom/memberState";
+import { loginMemberState } from "../recoil/atom/loginMemberState";
+import { taskState } from "../recoil/atom/taskState";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
-const TaskSetupPage = () => {
-  const [document, setDocumentState] = useRecoilState(documentState);
-  const member = useRecoilValue(memberState);
+const SetupTaskPage = () => {
+  const [document, settaskState] = useRecoilState(taskState);
+  const member = useRecoilValue(loginMemberState);
   const [requestName, setRequestName] = useState("");
   const [description, setDescription] = useState("");
   const [isRejectable, setIsRejectable] = useState(0); // ✅ 기본값: 거절 불가능 (0)
@@ -34,7 +34,7 @@ const TaskSetupPage = () => {
     const blobUrl = URL.createObjectURL(file);
     setPreviewUrl(blobUrl); // ✅ PDF URL 저장
   
-    setDocumentState((previousDocument) => ({
+    settaskState((previousDocument) => ({
       ...previousDocument,
       ownerId: member.unique_id,
       fileName: file.name,
@@ -73,7 +73,7 @@ const TaskSetupPage = () => {
       ? `${expirationDate}T${expirationTime}:00` // ISO 형식으로 변환 (YYYY-MM-DDTHH:MM:00)
       : null;
 
-    setDocumentState((previousDocument) => ({
+    settaskState((previousDocument) => ({
       ...previousDocument,
       requestName: requestName,
       description: description,
@@ -212,7 +212,7 @@ const TaskSetupPage = () => {
                       <ButtonContainer>
                         <ChangeFileButton
                             onClick={() =>
-                                setDocumentState((previousDocument) => ({
+                                settaskState((previousDocument) => ({
                                   ...previousDocument,
                                   fileName: "",
                                   fileUrl: null,
@@ -239,7 +239,7 @@ const TaskSetupPage = () => {
       </Container>
   );
 };
-export default TaskSetupPage;
+export default SetupTaskPage;
 
 // 스타일 컴포넌트
 const Container = styled.div`
