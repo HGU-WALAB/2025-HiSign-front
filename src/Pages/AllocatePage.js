@@ -4,16 +4,16 @@ import { Document, Page, pdfjs } from "react-pdf";
 import { Rnd } from "react-rnd";
 import { useRecoilState, useRecoilValue } from "recoil";
 import styled from 'styled-components';
-import CompleteButton from '../components/AlignPage/CompleteButton';
+import CompleteButton from '../components/AllocatePage/CompleteButton';
 import PagingControl from "../components/PagingControl";
-import { documentState } from "../recoil/atom/documentState";
 import { signerState } from "../recoil/atom/signerState";
+import { taskState } from "../recoil/atom/taskState";
 import SignatureService from "../utils/SignatureService";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
-const AlignPage = () => {
-  const document = useRecoilValue(documentState);
+const AllocatePage = () => {
+  const document = useRecoilValue(taskState);
   const [signers, setSigners] = useRecoilState(signerState);
   const [menuAnchor, setMenuAnchor] = useState(null);
   const [selectedSigner, setSelectedSigner] = useState(null);
@@ -232,4 +232,4 @@ const ButtonContainer = styled.div`
   padding: 20px;
 `;
 
-export default AlignPage;
+export default AllocatePage;

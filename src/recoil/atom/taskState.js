@@ -1,7 +1,7 @@
 import { atom } from 'recoil';
 
-export const documentState = atom({
-  key: 'documentState',
+export const taskState = atom({
+  key: 'taskState',
   default: {
     requestName: '',       // 작업 이름
     description: '',       // 작업 설명
