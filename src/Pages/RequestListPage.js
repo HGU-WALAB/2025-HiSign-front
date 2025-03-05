@@ -4,18 +4,17 @@ import { Dropdown } from "react-bootstrap";
 import { PageContainer } from "../components/PageContainer";
 import CancelModal from "../components/ListPage/CancelModal";
 import ApiService from "../utils/ApiService";
+import { Pagination } from "@mui/material";
 
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DownloadIcon from '@mui/icons-material/Download';
 
-
-
 const RequestedDocuments = () => {
     const [documents, setDocuments] = useState([]);
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(10);
+    const itemsPerPage = 10;
     const [showModal, setShowModal] = useState(false);
     const [selectedDocument, setSelectedDocument] = useState(null);
     const [cancelReason, setCancelReason] = useState("");
@@ -27,7 +26,6 @@ const RequestedDocuments = () => {
                 const sortedDocuments = filteredDocuments.sort((a, b) =>
                     new Date(b.createdAt) - new Date(a.createdAt)
                 );
-
                 setDocuments(sortedDocuments);
             })
             .catch((error) => {
@@ -57,7 +55,7 @@ const RequestedDocuments = () => {
                     )
                 );
             })
-            .catch((error) => {
+            .catch(() => {
                 alert("요청 취소에 실패했습니다.");
             });
     };
@@ -84,6 +82,10 @@ const RequestedDocuments = () => {
         return statusLabels[status] || "알 수 없음";
     };
 
+    const handlePageChange = (event, value) => {
+        setCurrentPage(value);
+    };
+
     return (
         <PageContainer>
             <h1 style={{ textAlign: "center", marginBottom: "20px", fontSize: "24px", fontWeight: "bold", paddingTop: "1rem" }}>
@@ -91,7 +93,14 @@ const RequestedDocuments = () => {
             </h1>
             {error && <p style={{ color: "red", textAlign: "center" }}>{error}</p>}
 
-            <div style={{ maxWidth: "85%", margin: "auto" }}>
+            <div style={{
+                maxWidth: "85%",
+                margin: "auto",
+                boxShadow: "0px 6px 15px rgba(0, 0, 0, 0.1)",
+                borderRadius: "8px",
+                overflow: "hidden",
+                backgroundColor: "#fff"
+            }}>
                 <table style={{
                     width: "100%",
                     borderCollapse: "separate",
@@ -99,7 +108,7 @@ const RequestedDocuments = () => {
                     fontFamily: "Arial, sans-serif",
                     border: "1px solid #ddd",
                     borderRadius: "8px",
-                    overflow: "hidden"
+                    overflow: "hidden",
                 }}>
                     <thead>
                     <tr style={{
@@ -119,11 +128,13 @@ const RequestedDocuments = () => {
                     </tr>
                     </thead>
                     <tbody>
-                    {documents.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((doc, index) => (
+                    {documents.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((doc) => (
                         <tr key={doc.id} style={{
                             borderBottom: "1px solid #ddd",
                             height: "50px",
-                            backgroundColor: "white"
+                            backgroundColor: "white",
+                            transition: "all 0.2s ease-in-out",
+                            boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)", // 행에도 그림자 추가
                         }}>
                             <td style={{ textAlign: "center" }}>
                                     <span className={getStatusClass(doc.status)}>
@@ -139,25 +150,12 @@ const RequestedDocuments = () => {
                             <td style={{ textAlign: "center" }}>{doc.createdAt}</td>
                             <td style={{ textAlign: "center" }}>
                                 <Dropdown>
-                                    <Dropdown.Toggle
-                                        variant="light"
-                                        style={{
-                                            padding: "5px 10px",
-                                            borderRadius: "5px",
-                                            fontWeight: "bold",
-                                            border: "none",
-                                        }}
-                                    >
+                                    <Dropdown.Toggle variant="light" style={{ padding: "5px 10px", borderRadius: "5px", fontWeight: "bold", border: "none" }}>
                                         ⋮
                                     </Dropdown.Toggle>
-
                                     <Dropdown.Menu>
                                         <Dropdown.Item disabled> <DownloadIcon/> 다운로드</Dropdown.Item>
-                                        <Dropdown.Item
-                                            onClick={() => handleCancelClick(doc)}
-                                            className="text-muted"
-                                            disabled={doc.status !== 0}
-                                        >
+                                        <Dropdown.Item onClick={() => handleCancelClick(doc)} className="text-muted" disabled={doc.status !== 0}>
                                             <CloseIcon/> 요청 취소
                                         </Dropdown.Item>
                                         <Dropdown.Item disabled> <DeleteIcon/> 삭제</Dropdown.Item>
@@ -170,13 +168,11 @@ const RequestedDocuments = () => {
                 </table>
             </div>
 
-            <CancelModal
-                isVisible={showModal}
-                onClose={() => setShowModal(false)}
-                onConfirm={handleConfirmCancel}
-                cancelReason={cancelReason}
-                setCancelReason={setCancelReason}
-            />
+            <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
+                <Pagination count={Math.ceil(documents.length / itemsPerPage)} color="default" page={currentPage} onChange={handlePageChange} />
+            </div>
+
+            <CancelModal isVisible={showModal} onClose={() => setShowModal(false)} onConfirm={handleConfirmCancel} cancelReason={cancelReason} setCancelReason={setCancelReason} />
         </PageContainer>
     );
 };
