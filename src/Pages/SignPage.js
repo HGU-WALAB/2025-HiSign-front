@@ -15,7 +15,7 @@ function SignPage() {
 
   const [isValid, setIsValid] = useState(null);
   const [error, setError] = useState(null);
-  const [showEmailModal, setShowEmailModal] = useState(false);
+  // const [showEmailModal, setShowEmailModal] = useState(false);
   const [signing, setSigning] = useRecoilState(signingState);
   const [currentPage, setCurrentPage] = useState(1); // 현재 표시 중인 페이지
   
@@ -116,9 +116,9 @@ function SignPage() {
   };
 
 
-const [savedSignatures, setSavedSignatures] = useState([]);
-const [openSavedSignatures, setOpenSavedSignatures] = useState(false);
-const [selectedSavedSignature, setSelectedSavedSignature] = useState(null);
+// const [savedSignatures, setSavedSignatures] = useState([]);
+// const [openSavedSignatures, setOpenSavedSignatures] = useState(false);
+// const [selectedSavedSignature, setSelectedSavedSignature] = useState(null);
 
 // 컴포넌트 마운트시 로컬 스토리지에서 선택된 서명 확인
 useEffect(() => {

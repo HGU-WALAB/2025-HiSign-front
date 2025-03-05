@@ -8,7 +8,7 @@ import { signingState } from "../../recoil/atom/signingState";
 import { BigButton } from "../BigButton";
 
 const SignaturePopup = ({ field, fieldIndex, onClose }) => {
-  const [signing, setSigning] = useRecoilState(signingState);
+  // const [signing, setSigning] = useRecoilState(signingState);
   const sigCanvas = useRef(null);
 
   // 서명 저장 (캔버스에서 이미지로 변환, 배경을 투명하게 처리)
