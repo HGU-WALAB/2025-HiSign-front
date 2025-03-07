@@ -28,8 +28,9 @@ const CompleteSignPage = () => {
   }, [navigate, resetSigningState]);
 
   return (
-    <Container>
-      <h2>서명이 완료되었습니다! ✅</h2>
+    <Container> 
+      <h2>서명이 완료되었습니다! </h2>
+      <h2>✅ </h2>
       {/* <p>곧 메인 페이지로 이동합니다...</p> */}
     </Container>
   );
