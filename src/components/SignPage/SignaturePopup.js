@@ -3,12 +3,12 @@
 import { useRef } from "react";
 
 import SignatureCanvas from "react-signature-canvas";
-import { useRecoilState } from "recoil";
+import { useSetRecoilState } from "recoil";
 import { signingState } from "../../recoil/atom/signingState";
 import { BigButton } from "../BigButton";
 
 const SignaturePopup = ({ field, fieldIndex, onClose }) => {
-  // const [signing, setSigning] = useRecoilState(signingState);
+  const setSigning = useSetRecoilState(signingState);
   const sigCanvas = useRef(null);
 
   // 서명 저장 (캔버스에서 이미지로 변환, 배경을 투명하게 처리)
