@@ -31,7 +31,7 @@ const AllocatePage = () => {
 
   const addSignatureBox = () => {
     if (selectedSigner) {
-      SignatureService.addSignatureBox(signers, setSigners, selectedSigner.email, pageNum);
+      SignatureService.addSignatureBox(setSigners, selectedSigner.email, pageNum);
       handleMenuClose();
     }
   };
@@ -80,22 +80,24 @@ const AllocatePage = () => {
                     .filter((box) => box.position.pageNumber === pageNum)
                     .map((box, index) => (
                       <Rnd
-                        key={`${signer.email}-${index}`}
+                        key={box.id}
                         bounds="parent"
                         size={{ width: box.width, height: box.height }}
                         position={{ x: box.position.x, y: box.position.y }}
                         onDragStop={(e, d) => {
-                          SignatureService.updateSignaturePosition(signers, setSigners, signer.email, index, { x: d.x, y: d.y });
+                          console.log("선택된 박스 : ", signer, box.id);
+                          SignatureService.updateSignaturePosition(setSigners, signer.email, box.id, { x: d.x, y: d.y });
                         }}
                         onResizeStop={(e, direction, ref, delta, pos) => {
-                          SignatureService.updateSignatureSize(signers, setSigners, signer.email, index, ref.offsetWidth, ref.offsetHeight, pos);
+                          console.log("선택된 박스 : ", signer, box.id);
+                          SignatureService.updateSignatureSize(setSigners, signer.email, box.id, ref.offsetWidth, ref.offsetHeight, pos);
                         }}
                       >
                         <SignatureBoxContainer>
                           {signer.name}의 서명
                           <DeleteButton onClick={(e) => {
                             e.stopPropagation();
-                            SignatureService.removeSignatureBox(signers, setSigners, signer.email, index);
+                            SignatureService.removeSignatureBox(setSigners, signer.email, box.id);
                           }}>삭제</DeleteButton>
                         </SignatureBoxContainer>
                       </Rnd>

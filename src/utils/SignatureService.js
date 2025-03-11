@@ -1,8 +1,10 @@
+import { v4 as uuidv4 } from "uuid"; // UUID 라이브러리
+
 const SignatureService = {
   /**
    * 서명 박스를 추가하는 함수
    */
-  addSignatureBox: (signers, setSigners, email, pageNum) => {
+  addSignatureBox: (setSigners, email, pageNum) => {
     setSigners((prevSigners) =>
       prevSigners.map((signer) =>
         signer.email === email
@@ -11,6 +13,7 @@ const SignatureService = {
               signatureFields: [
                 ...signer.signatureFields,
                 {
+                  id: uuidv4(),
                   type: 0,
                   position: {
                     pageNumber: pageNum,
@@ -30,20 +33,20 @@ const SignatureService = {
   /**
    * 서명 박스의 위치를 업데이트하는 함수
    */
-  updateSignaturePosition: (signers, setSigners, email, index, position) => {
+  updateSignaturePosition: (setSigners, email, id, position) => {
     setSigners((prevSigners) =>
       prevSigners.map((signer) =>
         signer.email === email
           ? {
               ...signer,
-              signatureFields: signer.signatureFields.map((field, idx) =>
-                idx === index
+              signatureFields: signer.signatureFields.map((field) =>
+                field.id === id
                   ? {
                       ...field,
-                      position: { 
+                      position: {
                         ...field.position,
-                        x: position.x, 
-                        y: position.y 
+                        x: position.x,
+                        y: position.y
                       },
                     }
                   : field
@@ -57,14 +60,14 @@ const SignatureService = {
   /**
    * 서명 박스의 크기를 업데이트하는 함수
    */
-  updateSignatureSize: (signers, setSigners, email, index, width, height, position) => {
+  updateSignatureSize: (setSigners, email, id, width, height, position) => {
     setSigners((prevSigners) =>
       prevSigners.map((signer) =>
         signer.email === email
           ? {
               ...signer,
               signatureFields: signer.signatureFields.map((field, idx) =>
-                idx === index
+                field.id === id
                   ? {
                       ...field,
                       width: width,
@@ -86,13 +89,13 @@ const SignatureService = {
   /**
    * 서명 박스를 삭제하는 함수
    */
-  removeSignatureBox: (signers, setSigners, email, index) => {
+  removeSignatureBox: (setSigners, email, id) => {
     setSigners((prevSigners) =>
       prevSigners.map((signer) =>
         signer.email === email
           ? {
               ...signer,
-              signatureFields: signer.signatureFields.filter((_, idx) => idx !== index),
+              signatureFields: signer.signatureFields.filter((field) => field.id !== id),
             }
           : signer
       )
