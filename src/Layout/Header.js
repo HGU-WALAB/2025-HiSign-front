@@ -23,13 +23,13 @@ function HeaderBar() {
                     zIndex: 1000
                 }}
             >
-                <Link to="/" className="text-decoration-none text-dark fs-4 ms-3">
-    <img
-        src={`${process.env.PUBLIC_URL}/hi-sign-logo.png`}
-        alt="HI-Sign 로고"
-        style={{ height: "80px" }}
-    />
-</Link>
+               <Link to="/" className="text-decoration-none text-dark fs-4 ms-3">
+                  <img
+                      src={`${process.env.PUBLIC_URL}/hi-sign-logo.png`}
+                      alt="HI-Sign 로고"
+                      style={{ height: "80px" }}
+                  />
+              </Link>
                 {auth.isAuthenticated && (
                     <div className="d-flex gap-3">
                         <Link to="/request-document" className="nav-link text-dark">
