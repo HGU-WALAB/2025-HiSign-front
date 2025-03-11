@@ -24,9 +24,18 @@ const ReceivedDocuments = () => {
         ApiService.fetchDocuments("received-with-requester")
             .then((response) => {
                 const filteredDocuments = response.data.filter(doc => doc.status !== 5);
-                const sortedDocuments = filteredDocuments.sort((a, b) =>
-                    new Date(b.createdAt) - new Date(a.createdAt)
-                );
+
+                const sortedDocuments = filteredDocuments.sort((a, b) => {
+                    if (a.status === 0 && b.status !== 0) return -1;
+                    if (a.status !== 0 && b.status === 0) return 1;
+
+                    if (a.status === 0 && b.status === 0) {
+                        return new Date(a.expiredAt) - new Date(b.expiredAt);
+                    }
+
+                    return new Date(b.createdAt) - new Date(a.createdAt);
+                });
+
                 setDocuments(sortedDocuments);
             })
             .catch((error) => {
@@ -34,6 +43,7 @@ const ReceivedDocuments = () => {
                 setError("문서를 불러오는 중 문제가 발생했습니다: " + error.message);
             });
     }, []);
+
 
     const getStatusClass = (status) => {
         const statusClasses = {
