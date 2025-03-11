@@ -25,7 +25,7 @@ function HeaderBar() {
             >
                <Link to="/" className="text-decoration-none text-dark fs-4 ms-3">
   <img 
-    src="/hi-sign-logo.png" 
+    src="/home/hisign/upload/img/hi-sign-logo.png"
     alt="HI-Sign 로고" 
     style={{ height: "80px" }} 
   />

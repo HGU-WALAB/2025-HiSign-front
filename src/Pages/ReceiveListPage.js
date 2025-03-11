@@ -108,10 +108,10 @@ const ReceivedDocuments = () => {
                     width: "100%",
                     borderCollapse: "separate",
                     borderSpacing: "0",
-                    fontFamily: "Arial, sans-serif",
                     border: "1px solid #ddd",
                     borderRadius: "8px",
                     overflow: "hidden",
+
                 }}>
                     <thead>
                     <tr style={{
@@ -123,12 +123,13 @@ const ReceivedDocuments = () => {
                         fontWeight: "bold",
                         borderBottom: "1px solid #ddd"
                     }}>
-                        <th style={{ padding: "12px" }}>상태</th>
-                        <th style={{ padding: "12px" }}>작업명</th>
-                        <th style={{ padding: "12px" }}>파일명</th>
-                        <th style={{ padding: "12px" }}>요청 생성일</th>
-                        <th style={{ padding: "12px" }}>요청자</th>
-                        <th style={{ padding: "12px" }}>추가메뉴</th>
+                        <th style={{padding: "12px"}}>상태</th>
+                        <th style={{padding: "12px"}}>작업명</th>
+                        <th style={{padding: "12px"}}>파일명</th>
+                        <th style={{padding: "12px"}}>요청 생성일</th>
+                        <th style={{padding: "12px"}}>요청 만료일</th>
+                        <th style={{padding: "12px"}}>요청자</th>
+                        <th style={{padding: "12px"}}>추가메뉴</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -138,28 +139,35 @@ const ReceivedDocuments = () => {
                             height: "50px",
                             backgroundColor: "white",
                             transition: "all 0.2s ease-in-out",
-                            boxShadow: "0 2px 5px rgba(0, 0, 0, 0.05)", // 행에도 그림자 추가
                         }}>
-                            <td style={{ textAlign: "center" }}>
+                            <td style={{textAlign: "center"}}>
                                     <span className={getStatusClass(doc.status)}>
                                         {getStatusLabel(doc.status)}
                                     </span>
                             </td>
-                            <td style={{ textAlign: "center" }}>{doc.requestName}</td>
-                            <td style={{ textAlign: "center" }}>
-                                <Link to={`/detail/${doc.id}`} style={{ textDecoration: "none", color: "#007BFF" }}>
+                            <td style={{textAlign: "center"}}>{doc.requestName}</td>
+                            <td style={{textAlign: "center"}}>
+                                <Link to={`/detail/${doc.id}`} style={{textDecoration: "none", color: "#007BFF"}}>
                                     {doc.fileName}
                                 </Link>
                             </td>
-                            <td style={{ textAlign: "center" }}>{moment(doc.createdAt).format('YYYY.MM.DD HH:mm')}</td>
-                            <td style={{ textAlign: "center" }}>{doc.requesterName || "알 수 없음"}</td>
-                            <td style={{ textAlign: "center" }}>
+                            <td style={{textAlign: "center"}}>{moment(doc.createdAt).format('YY년 MM월 DD일')}</td>
+                            <td style={{textAlign: "center"}}>{moment(doc.expiredAt).format('YY년 MM월 DD일 HH:mm')}</td>
+                            <td style={{textAlign: "center"}}>{doc.requesterName || "알 수 없음"}</td>
+                            <td style={{textAlign: "center"}}>
                                 <Dropdown>
-                                    <Dropdown.Toggle variant="light" style={{ padding: "5px 10px", borderRadius: "5px", fontWeight: "bold", border: "none" }}>⋮</Dropdown.Toggle>
+                                    <Dropdown.Toggle variant="light" style={{
+                                        padding: "5px 10px",
+                                        borderRadius: "5px",
+                                        fontWeight: "bold",
+                                        border: "none"
+                                    }}>⋮</Dropdown.Toggle>
                                     <Dropdown.Menu>
-                                        <Dropdown.Item disabled><DownloadIcon /> 다운로드</Dropdown.Item>
-                                        <Dropdown.Item onClick={() => handleRejectClick(doc)} disabled={doc.status !== 0}><DoDisturbIcon /> 요청 거절</Dropdown.Item>
-                                        <Dropdown.Item disabled><DeleteIcon /> 삭제</Dropdown.Item>
+                                        <Dropdown.Item disabled><DownloadIcon/> 다운로드</Dropdown.Item>
+                                        <Dropdown.Item onClick={() => handleRejectClick(doc)}
+                                                       disabled={doc.status !== 0}><DoDisturbIcon/> 요청
+                                            거절</Dropdown.Item>
+                                        <Dropdown.Item disabled><DeleteIcon/> 삭제</Dropdown.Item>
                                     </Dropdown.Menu>
                                 </Dropdown>
                             </td>
