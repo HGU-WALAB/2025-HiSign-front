@@ -20,7 +20,7 @@ function SideBar() {
             {/* <HamburgerButton onClick={toggleSidebar} aria-label="사이드바 열기">
                 ☰
             </HamburgerButton> */}
-
+ 
             {/* 사이드바 */}
             {/* <SidebarContainer isOpen={isSidebarOpen}>
                 <img src="/assets/Csee.png" alt="CSEE 로고" />
@@ -34,7 +34,7 @@ function SideBar() {
             </SidebarContainer> */}
              {/* 중앙 링크 컨테이너 */}
             <CenterContainer>
-            <img src="/assets/frame.png" alt="CSEE 로고" />
+            <img src={`${process.env.PUBLIC_URL}/assets/frame.png`} alt="CSEE 로고" />
                 {auth.isAuthenticated ? (
                     <CenterLink to="/tasksetup">서명 요청 시작하기</CenterLink>
                 ) : (
