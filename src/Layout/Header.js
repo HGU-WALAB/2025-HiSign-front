@@ -33,20 +33,13 @@ function HeaderBar() {
                 {auth.isAuthenticated && (
                     <div className="d-flex gap-3">
                         <Link to="/request-document" className="nav-link text-dark">
-                            요청한 문서
+                            요청한 작업
                         </Link>
                         <Link to="/receive-document" className="nav-link text-dark">
-                            요청받은 문서
+                            요청받은 작업
                         </Link>
-                        <Link to="/tasksetup" className="nav-link text-dark">
-                            문서 업로드하기
-                        </Link>
-                        <Link to="/request" className="nav-link text-dark">
-                            서명자 등록하기
-                        </Link>
-                        <Link to="/align" className="nav-link text-dark">
-                            서명 할당하기
-                        </Link>
+                       
+                     
                         <Link to="/contact" className="nav-link text-dark">
                             문의 페이지
                         </Link>
