@@ -159,7 +159,12 @@ const RequestedDocuments = () => {
                                 </Link>
                             </td>
                             <td style={{textAlign: "center"}}>{moment(doc.createdAt).format('YY년 MM월 DD일')}</td>
-                            <td style={{textAlign: "center"}}>{moment(doc.expiredAt).format('YY년 MM월 DD일 HH:mm')}</td>
+                            <td style={{
+                                textAlign: "center",
+                                color: moment(doc.expiredAt).isSame(moment(), 'day') ? "red" : "black"
+                            }}>
+                                {moment(doc.expiredAt).format('YY년 MM월 DD일 HH:mm')}
+                            </td>
                             <td style={{textAlign: "center"}}>
                                 <Dropdown>
                                     <Dropdown.Toggle variant="light" style={{
@@ -187,7 +192,8 @@ const RequestedDocuments = () => {
             </div>
 
             <div style={{display: "flex", justifyContent: "center", marginTop: "20px"}}>
-                <Pagination count={Math.ceil(documents.length / itemsPerPage)} color="default" page={currentPage} onChange={handlePageChange} />
+                <Pagination count={Math.ceil(documents.length / itemsPerPage)} color="default" page={currentPage}
+                            onChange={handlePageChange}/>
             </div>
 
             <CancelModal isVisible={showModal} onClose={() => setShowModal(false)} onConfirm={handleConfirmCancel} cancelReason={cancelReason} setCancelReason={setCancelReason} />

@@ -162,7 +162,12 @@ const ReceivedDocuments = () => {
                                 </Link>
                             </td>
                             <td style={{textAlign: "center"}}>{moment(doc.createdAt).format('YY년 MM월 DD일')}</td>
-                            <td style={{textAlign: "center"}}>{moment(doc.expiredAt).format('YY년 MM월 DD일 HH:mm')}</td>
+                            <td style={{
+                                textAlign: "center",
+                                color: moment(doc.expiredAt).isSame(moment(), 'day') ? "red" : "black"
+                            }}>
+                                {moment(doc.expiredAt).format('YY년 MM월 DD일 HH:mm')}
+                            </td>
                             <td style={{textAlign: "center"}}>{doc.requesterName || "알 수 없음"}</td>
                             <td style={{textAlign: "center"}}>
                                 <Dropdown>
