@@ -23,6 +23,10 @@ const CheckEmailPage = () => {
     ApiService.checkSignatureToken(token)
       .then(() => {
         setIsValid(true);
+        setSigning((prevState) => ({
+          ...prevState,
+          token: token,
+        }));
       })
       .catch((err) => {
         setIsValid(false);
@@ -52,6 +56,8 @@ const CheckEmailPage = () => {
           signerName: response.signerName,
           requesterName: response.requesterName,
           requestName: response.requestName,
+          description: response.description,
+          isRejectable: response.isRejectable === 1,
         }));
 
         // ✅ PDF 문서 불러오기
@@ -104,6 +110,7 @@ const MainContainer = styled.div`
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  padding-top: 80px;
   background-color: #f5f5f5;
 `;
 

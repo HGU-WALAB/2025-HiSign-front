@@ -19,6 +19,7 @@ const AllocatePage = () => {
   const [selectedSigner, setSelectedSigner] = useState(null);
   const [pageNum, setPageNum] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
+  const [hoveredField, setHoveredField] = useState(null);
 
   const handleMenuClick = (event, signer) => {
     setMenuAnchor(event.currentTarget);
@@ -57,7 +58,7 @@ const AllocatePage = () => {
                         <SignatureCount>서명 {signer.signatureFields.length}개 할당</SignatureCount>
                       </div>
                     }
-                    secondary={signer.email} 
+                    secondary={signer.email}
                   />
                 </ListItem>
               ))}
@@ -84,22 +85,31 @@ const AllocatePage = () => {
                         bounds="parent"
                         size={{ width: box.width, height: box.height }}
                         position={{ x: box.position.x, y: box.position.y }}
+                        lockAspectRatio={2 / 1}
                         onDragStop={(e, d) => {
                           console.log("선택된 박스 : ", signer, box.id);
                           SignatureService.updateSignaturePosition(setSigners, signer.email, box.id, { x: d.x, y: d.y });
                         }}
                         onResizeStop={(e, direction, ref, delta, pos) => {
+                          const adjustedWidth = ref.offsetWidth;
+                          const adjustedHeight = adjustedWidth / 2; // ✅ 2:1 비율 유지
                           console.log("선택된 박스 : ", signer, box.id);
-                          SignatureService.updateSignatureSize(setSigners, signer.email, box.id, ref.offsetWidth, ref.offsetHeight, pos);
+                          SignatureService.updateSignatureSize(setSigners, signer.email, box.id, adjustedWidth, adjustedHeight, pos);
                         }}
+                        onMouseEnter={() => setHoveredField(box.id)}
+                        onMouseLeave={() => setHoveredField(null)}
                       >
+                        
                         <SignatureBoxContainer>
                           {signer.name}의 서명
-                          <DeleteButton onClick={(e) => {
-                            e.stopPropagation();
-                            SignatureService.removeSignatureBox(setSigners, signer.email, box.id);
-                          }}>삭제</DeleteButton>
+                          {hoveredField === box.id && (
+                            <DeleteButton onClick={(e) => {
+                              e.stopPropagation();
+                              SignatureService.removeSignatureBox(setSigners, signer.email, box.id);
+                            }}>삭제</DeleteButton>
+                          )}
                         </SignatureBoxContainer>
+                        
                       </Rnd>
                     ))
                 )}
@@ -109,12 +119,11 @@ const AllocatePage = () => {
             )}
 
             <PagingControl pageNum={pageNum} setPageNum={setPageNum} totalPages={totalPages} />
-          </DocumentSection>
-        </Container>
-
-        <ButtonContainer>
+            <ButtonContainer>
           <CompleteButton />
         </ButtonContainer>
+          </DocumentSection>
+        </Container>
       </ContentWrapper>
     </MainContainer>
   );
@@ -145,7 +154,7 @@ const DocumentSection = styled.div`
 `;
 
 const DocumentContainer = styled.div`
-  max-width: 800px;
+  max-width: 802px;
   margin: 20px auto;
   border: 1px solid #999;
   position: relative;

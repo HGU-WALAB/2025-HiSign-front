@@ -1,6 +1,6 @@
 import React from "react";
-import { primary45 } from "../utils/colors";
 import useHover from "../hooks/useHover";
+import { primary45 } from "../utils/colors";
 
 export function BigButton({
   title,
@@ -21,7 +21,7 @@ export function BigButton({
   let fillColor = customFillColor || primary45;
   const whiteColor = customWhiteColor || "#FFF";
 
-  let initialBg = null;
+  let initialBg = "#FFF";
   let hoverBg = fillColor;
 
   let initialColor = fillColor;

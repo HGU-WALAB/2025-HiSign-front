@@ -3,6 +3,7 @@ import { IoClose } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
 import styled from "styled-components";
+import ButtonBase from "../components/ButtonBase";
 import { signerState } from "../recoil/atom/signerState";
 import { taskState } from "../recoil/atom/taskState";
 
@@ -233,21 +234,23 @@ const FloatingButtonContainer = styled.div`
   z-index: 1000;
 `;
 
-const ButtonBase = styled.button`
-  padding: 12px 24px;
-  color: white;
-  border: none;
-  border-radius: 25px;
-  cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  transition: transform 0.2s, box-shadow 0.2s;
-`;
+// const ButtonBase = styled.button`
+//   padding: 12px 24px;
+//   color: white;
+//   border: none;
+//   border-radius: 25px;
+//   cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
+//   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+//   transition: transform 0.2s, box-shadow 0.2s;
+// `;
 
 const GrayButton = styled(ButtonBase)`
-  background-color: #ccc;
+  background-color: #b5b5b5;
+  color: white;
 `;
 
 const NextButton = styled(ButtonBase)`
   background-color: ${({ disabled }) => (disabled ? "#ccc" : "#03A3FF")};
+  color: white;
 `;
 

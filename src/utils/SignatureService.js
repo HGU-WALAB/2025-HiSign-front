@@ -20,7 +20,7 @@ const SignatureService = {
                     x: 100,
                     y: 150,
                   },
-                  width: 150,
+                  width: 100,
                   height: 50,
                 },
               ],
@@ -72,10 +72,10 @@ const SignatureService = {
                       ...field,
                       width: width,
                       height: height,
-                      position: { 
+                      position: {
                         ...field.position, // 기존 position 값 유지
-                        x: position.x, 
-                        y: position.y 
+                        x: position.x,
+                        y: position.y
                       },
                     }
                   : field

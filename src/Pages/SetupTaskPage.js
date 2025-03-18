@@ -4,6 +4,7 @@ import "react-pdf/dist/esm/entry.webpack";
 import { useNavigate } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
 import styled from "styled-components";
+import ButtonBase from "../components/ButtonBase";
 import Drop from "../components/Drop";
 import { loginMemberState } from "../recoil/atom/loginMemberState";
 import { taskState } from "../recoil/atom/taskState";
@@ -88,7 +89,7 @@ const SetupTaskPage = () => {
   }, [document]);
 
   return (
-      <Container style={{paddingTop: "2.5rem"}}>
+      <Container>
         <StyledBody>
           <MainArea>
             <Title>작업 정보 입력</Title>
@@ -207,7 +208,7 @@ const SetupTaskPage = () => {
                           </Document>
                       )}
                       <SelectedFileText>{document.fileName}</SelectedFileText>
-                      <ButtonContainer>
+                      <FileButtonContainer>
                         <ChangeFileButton
                             onClick={() =>
                                 setTaskState((previousDocument) => ({
@@ -219,7 +220,7 @@ const SetupTaskPage = () => {
                         >
                           다른 문서 선택
                         </ChangeFileButton>
-                      </ButtonContainer>
+                      </FileButtonContainer>
                     </SelectedFileBox>
                 )}
               </UploadSection>
@@ -228,12 +229,12 @@ const SetupTaskPage = () => {
         </StyledBody>
 
         {/* 하단 이동 버튼 */}
-        <FloatingButtonContainer>
+        <ButtonContainer>
           <GrayButton onClick={() => navigate(`/request-document`)}>나가기</GrayButton>
           <NextButton onClick={handleNextStep}>
             다음 단계
           </NextButton>
-        </FloatingButtonContainer>
+        </ButtonContainer>
       </Container>
   );
 };
@@ -246,6 +247,7 @@ const Container = styled.div`
   min-height: 100vh;
   background-color: #e5e5e5;
   position: relative;
+  padding-top: 80px;
 `;
 
 const StyledBody = styled.main`
@@ -412,7 +414,7 @@ const SelectedFileText = styled.span`
   font-weight: bold;
 `;
 
-const ButtonContainer = styled.div`
+const FileButtonContainer = styled.div`
   margin-top: 10px;
 `;
 
@@ -429,32 +431,23 @@ const ChangeFileButton = styled.button`
   }
 `;
 
-const FloatingButtonContainer = styled.div`
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 20px;
-  z-index: 1000;
+const ButtonContainer = styled.div`
+  display: flex; /* 버튼들을 가로로 배치 */
+  justify-content: center; /* 중앙 정렬 */
+  align-items: center;
+  gap: 10px; /* ✅ 버튼 간 간격 조정 */
+  margin: 20px 0;
+  padding: 20px;
 `;
 
-const GrayButton = styled.button`
+const GrayButton = styled(ButtonBase)`
   background-color: #ccc;
-  padding: 12px 24px;
   color: white;
-  border: none;
-  border-radius: 25px;
-  cursor: pointer;
 `;
 
-const NextButton = styled.button`
+const NextButton = styled(ButtonBase)`
   background-color: ${({ disabled }) => (disabled ? "#ccc" : "#03A3FF")};
-  padding: 12px 24px;
   color: white;
-  border: none;
-  border-radius: 25px;
-  cursor: pointer;
 `;
 
 // const FileInfoContainer = styled.div`

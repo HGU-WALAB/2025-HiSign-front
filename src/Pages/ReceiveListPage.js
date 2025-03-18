@@ -1,15 +1,16 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { Dropdown } from "react-bootstrap";
-import { PageContainer } from "../components/PageContainer";
-import RejectModal from "../components/ListPage/RejectModal";
-import ApiService from "../utils/ApiService";
-import moment from 'moment';
-import { Pagination } from "@mui/material";
-
-import DoDisturbIcon from '@mui/icons-material/DoDisturb';
 import DeleteIcon from '@mui/icons-material/Delete';
+import DoDisturbIcon from '@mui/icons-material/DoDisturb';
 import DownloadIcon from '@mui/icons-material/Download';
+import { Pagination } from "@mui/material";
+import moment from 'moment';
+import React, { useEffect, useState } from "react";
+import { Dropdown } from "react-bootstrap";
+import { Link } from "react-router-dom";
+import { useRecoilState } from "recoil";
+import RejectModal from "../components/ListPage/RejectModal";
+import { PageContainer } from "../components/PageContainer";
+import { loginMemberState } from "../recoil/atom/loginMemberState";
+import ApiService from "../utils/ApiService";
 
 const ReceivedDocuments = () => {
     const [documents, setDocuments] = useState([]);
@@ -19,7 +20,7 @@ const ReceivedDocuments = () => {
     const [showModal, setShowModal] = useState(false);
     const [selectedDocument, setSelectedDocument] = useState(null);
     const [rejectReason, setRejectReason] = useState("");
-
+    const [loginMember, setLoginMember] = useRecoilState(loginMemberState);
     useEffect(() => {
         ApiService.fetchDocuments("received-with-requester")
             .then((response) => {
@@ -61,6 +62,7 @@ const ReceivedDocuments = () => {
         setSelectedDocument(doc);
         setRejectReason("");
         setShowModal(true);
+        console.log("선택된 문서:", doc);
     };
 
     const handleConfirmReject = () => {
@@ -69,7 +71,7 @@ const ReceivedDocuments = () => {
             return;
         }
 
-        ApiService.rejectDocument(selectedDocument.id, rejectReason)
+        ApiService.rejectDocument(selectedDocument.id, rejectReason, selectedDocument.token, loginMember.email)
             .then(() => {
                 alert("요청이 거절되었습니다.");
                 setShowModal(false);
