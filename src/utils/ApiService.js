@@ -39,7 +39,7 @@ apiInstance.interceptors.response.use(
     if (error.response?.status === 401) {
       alert('다시 로그인해 주세요.');
       sessionStorage.removeItem('token');
-      window.location.href = '/';
+      window.location.href = '/hisign';
     }
     return Promise.reject(error);
   }
@@ -112,11 +112,18 @@ const ApiService = {
     }
   },
 
-  rejectDocument: async (documentId, reason) => {
+  // 문서 요청 거절
+  rejectDocument: async (documentId, reason, token, email) => {
     if (!documentId) throw new Error("문서 ID가 필요합니다.");
     if (!reason) throw new Error("거절 사유가 필요합니다.");
+    if (!token) throw new Error("토큰이 필요합니다.");
+    if (!email) throw new Error("이메일이 필요합니다.");
 
-    return apiInstance.put(`/signature-requests/reject/${documentId}`, { reason });
+    return PublicaApiInstance.put(`/signature-requests/reject/${documentId}`, { 
+      reason,
+      token,
+      email
+    });
   },
 
   // 서명 요청 전송
@@ -163,52 +170,47 @@ const ApiService = {
 
   // 서명 요청 토큰 유효성 확인
   checkSignatureToken: async (token) => {
-    if (!token) throw new Error("토큰이 없습니다.");
-
+    if (!token) {
+      return Promise.reject(new Error("❌ 토큰이 없습니다."));
+    }
+  
     try {
       const response = await PublicaApiInstance.get(`/signature-requests/check?token=${token}`);
       return response.data; // ✅ 정상 응답 반환 (200 OK)
     } catch (error) {
-      console.error("서명 요청 토큰 검증 실패:", error);
-
-      if (error.response) {
-        const { status, data } = error.response;
-
-        if (status === 404) {
-          throw new Error("❌ 잘못된 서명 요청입니다. 다시 확인해주세요."); // 404: 토큰이 존재하지 않음
-        } else if (status === 401) {
-          throw new Error("⚠️ 서명 요청이 만료되었습니다. 새로운 요청을 받아 진행하세요."); // 401: 만료된 요청
-        } else if (status === 403) {
-          // 403: 진행할 수 없는 상태 (이미 처리된 요청 등)
-          if (typeof data === "object" && data.status !== undefined) {
-            let errorMessage;
-            switch (data.status) {
-              case 1:
-                errorMessage = "✅ 이미 완료된 서명 요청입니다. 추가 서명이 필요하지 않습니다.";
-                break;
-              case 2:
-                errorMessage = "❌ 서명 요청이 거절되었습니다. 요청자에게 문의하세요.";
-                break;
-              case 3:
-                errorMessage = "⚠️ 서명 요청이 취소되었습니다. 새로운 요청을 받아 진행하세요.";
-                break;
-              case 4:
-                errorMessage = "⚠️ 서명 요청이 만료되었습니다. 다시 요청을 확인하세요.";
-                break;
-              case 5:
-                errorMessage = "❌ 서명 요청이 삭제되었습니다. 진행할 수 없습니다.";
-                break;
-              default:
-                errorMessage = "⚠️ 서명 요청을 진행할 수 없는 상태입니다.";
-            }
-            throw new Error(errorMessage);
-          } else {
-            throw new Error("⚠️ 서명 요청을 진행할 수 없는 상태입니다.");
-          }
-        }
+      console.error("❌ 서명 요청 토큰 검증 실패:", error);
+  
+      if (!error.response) {
+        return Promise.reject(new Error("⚠️ 네트워크 오류 또는 서버에 연결할 수 없습니다."));
       }
-
-      throw new Error(error.response?.data || "⚠️ 서명 요청 검증 중 오류가 발생했습니다.");
+  
+      const { status, data } = error.response;
+  
+      switch (status) {
+        case 400:
+          return Promise.reject(new Error("❌ 잘못된 요청 형식입니다. 다시 확인해주세요."));
+        case 404:
+          return Promise.reject(new Error("❌ 잘못된 서명 요청입니다. 다시 확인해주세요."));
+        case 410:
+          return Promise.reject(new Error("⚠️ 서명 요청이 만료되었습니다. 새로운 요청을 받아 진행하세요."));
+        case 403:
+          // 진행할 수 없는 상태 (이미 처리된 요청 등)
+          if (typeof data === "object" && data.status !== undefined) {
+            const errorMessages = {
+              1: "✅ 이미 완료된 서명 요청입니다. 추가 서명이 필요하지 않습니다.",
+              2: "❌ 서명 요청이 거절되었습니다. 요청자에게 문의하세요.",
+              3: "⚠️ 서명 요청이 취소되었습니다. 새로운 요청을 받아 진행하세요.",
+              4: "⚠️ 서명 요청이 만료되었습니다. 다시 요청을 확인하세요.",
+              5: "❌ 서명 요청이 삭제되었습니다. 진행할 수 없습니다.",
+            };
+            return Promise.reject(new Error(errorMessages[data.status] || "⚠️ 서명 요청을 진행할 수 없는 상태입니다."));
+          }
+          return Promise.reject(new Error("⚠️ 서명 요청을 진행할 수 없는 상태입니다."));
+        case 500:
+          return Promise.reject(new Error("🚨 서버 내부 오류가 발생했습니다. 관리자에게 문의하세요."));
+        default:
+          return Promise.reject(new Error(data?.message || "⚠️ 서명 요청 검증 중 오류가 발생했습니다."));
+      }
     }
   },
   

@@ -16,23 +16,6 @@ function SideBar() {
     return (
 
         <>
-            {/* 햄버거 버튼 */}
-            {/* <HamburgerButton onClick={toggleSidebar} aria-label="사이드바 열기">
-                ☰
-            </HamburgerButton> */}
- 
-            {/* 사이드바 */}
-            {/* <SidebarContainer isOpen={isSidebarOpen}>
-                <img src="/assets/Csee.png" alt="CSEE 로고" />
-                <NavigationLinks>
-                    <StyledLink to="/list">리스트 페이지</StyledLink>
-                    <StyledLink to="/add-file">서명 요청 시작하기</StyledLink>
-                    <StyledLink to="/upload">문서 업로드하기</StyledLink>
-                    <StyledLink to="/request">서명자 등록하기</StyledLink>
-                    <StyledLink to="/align">서명 할당하기</StyledLink>
-                </NavigationLinks>
-            </SidebarContainer> */}
-             {/* 중앙 링크 컨테이너 */}
             <CenterContainer>
              {/* <img src={`${process.env.PUBLIC_URL}/assets/frame.png`} alt="CSEE 로고" /> */}
              {<h2> 쉽고 빠르게 안전한 전자서명 솔루션 </h2>}

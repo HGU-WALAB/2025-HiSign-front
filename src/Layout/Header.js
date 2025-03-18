@@ -64,9 +64,8 @@ function HeaderBar() {
                     {auth.isAuthenticated ? <HisnetLogoutButton /> : <HisnetLoginButton />}
                 </div>
             </header>
-
-            <div className="w-100" style={{ marginTop: "50px" }}>
-                <Outlet />
+            <div className="w-100" >
+                <Outlet/>
             </div>
         </div>
     );

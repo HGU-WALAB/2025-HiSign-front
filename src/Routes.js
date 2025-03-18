@@ -4,10 +4,12 @@ import LoginCallback from "./auth/LoginCallback";
 import Header from "./Layout/Header";
 import AddSignerPage from "./Pages/AddSignerPage";
 import AllocatePage from "./Pages/AllocatePage";
+import CheckEmailPage from './Pages/CheckEmailPage';
 import CompleteSignPage from "./Pages/CompleteSignPage";
 import ContactPage from './Pages/ContactPage';
 import DetailPage from "./Pages/DetailPage";
 import LandingPage from "./Pages/LandingPage";
+import PreviewTaskPage from './Pages/PreviewTaskPage';
 import ReceivedDocuments from "./Pages/ReceiveListPage";
 import RequestedDocuments from "./Pages/RequestListPage";
 import SetupTaskPage from "./Pages/SetupTaskPage";
@@ -25,7 +27,8 @@ function MyRoutes() {
                 <Route path="/align" element={<AllocatePage />} />
                 <Route path="/request-document" element={<RequestedDocuments />} />
                 <Route path="/receive-document" element={<ReceivedDocuments />} />
-                <Route path="/checkEmail" element={<SignPage />} />
+                <Route path="/checkEmail" element={<CheckEmailPage />} />
+                <Route path="/preview" element={<PreviewTaskPage />} />
                 <Route path="/sign" element={<SignPage />} />
                 <Route path="/sign-complete" element={<CompleteSignPage/>} />
                 <Route path="/contact" element={<ContactPage />} />
