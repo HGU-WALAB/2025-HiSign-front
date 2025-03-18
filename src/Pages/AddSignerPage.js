@@ -34,9 +34,7 @@ const AddSignerPage = () => {
       setNewName("");
       setNewEmailPrefix("");
       setNewEmailDomain("@handong.ac.kr"); // 기본값으로 초기화
-    } else if (!validateEmail(newEmail)) {
-      alert("이메일은 @handong.ac.kr 또는 @handong.edu로 끝나야 합니다.");
-    }
+    } 
   };
 
   const handleDeleteSigner = (emailToDelete) => {
