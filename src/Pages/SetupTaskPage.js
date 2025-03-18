@@ -19,6 +19,7 @@ const SetupTaskPage = () => {
   const [expirationDate, setExpirationDate] = useState(""); // ✅ 서명 만료 날짜 상태
   const [expirationTime, setExpirationTime] = useState("23:59"); // ✅ 서명 만료 시간 상태 추가
   const [previewUrl, setPreviewUrl] = useState(null); // ✅ 파일 미리보기 상태 추가
+  const [numPages, setNumPages] = useState(null);
   const navigate = useNavigate();
 
   // ✅ 오늘 날짜를 기본 최소값으로 설정
@@ -202,6 +203,7 @@ const SetupTaskPage = () => {
                       {previewUrl && (
                           <Document
                               file={previewUrl}
+                              onLoadSuccess={({numPages}) => setNumPages(numPages)}
                           >
                             <Page pageNumber={1} width={250}/> {/* 첫 페이지 미리보기 */}
                           </Document>
@@ -231,7 +233,7 @@ const SetupTaskPage = () => {
         <FloatingButtonContainer>
           <GrayButton onClick={() => navigate(`/request-document`)}>나가기</GrayButton>
           <NextButton onClick={handleNextStep}>
-            다음 단계
+            서명자 추가
           </NextButton>
         </FloatingButtonContainer>
       </Container>
@@ -457,9 +459,9 @@ const NextButton = styled.button`
   cursor: pointer;
 `;
 
-// const FileInfoContainer = styled.div`
-//   display: flex;
-//   flex-direction: column;
-//   align-items: center;
-//   gap: 8px;
-// `;
+const FileInfoContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+`;

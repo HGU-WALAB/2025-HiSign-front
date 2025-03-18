@@ -24,16 +24,6 @@ const ContactPage = () => {
         </Description>
         
         <InputGroup>
-          <Label>제목</Label>
-          <Input
-            type="text"
-            value={subject}
-            onChange={(e) => setSubject(e.target.value)}
-            placeholder="문의 제목을 입력해주세요"
-          />
-        </InputGroup>
-
-        <InputGroup>
           <Label>내용</Label>
           <TextArea
             value={content}
