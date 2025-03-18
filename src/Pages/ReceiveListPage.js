@@ -155,20 +155,20 @@ const ReceivedDocuments = () => {
                                         {getStatusLabel(doc.status)}
                                     </span>
                             </td>
-                            <td style={{textAlign: "center"}}>{doc.requestName}</td>
+                            <td style={{textAlign: "center", color:"black"}}>{doc.requestName}</td>
                             <td style={{textAlign: "center"}}>
                                 <Link to={`/detail/${doc.id}`} style={{textDecoration: "none", color: "#007BFF"}}>
                                     {doc.fileName}
                                 </Link>
                             </td>
-                            <td style={{textAlign: "center"}}>{moment(doc.createdAt).format('YY년 MM월 DD일')}</td>
+                            <td style={{textAlign: "center", color:"black"}}>{moment(doc.createdAt).format('YY년 MM월 DD일')}</td>
                             <td style={{
                                 textAlign: "center",
                                 color: moment(doc.expiredAt).isSame(moment(), 'day') ? "red" : "black"
                             }}>
                                 {moment(doc.expiredAt).format('YY년 MM월 DD일 HH:mm')}
                             </td>
-                            <td style={{textAlign: "center"}}>{doc.requesterName || "알 수 없음"}</td>
+                            <td style={{textAlign: "center", color:"black"}}>{doc.requesterName || "알 수 없음"}</td>
                             <td style={{textAlign: "center"}}>
                                 <Dropdown>
                                     <Dropdown.Toggle variant="light" style={{
