@@ -20,10 +20,37 @@ const SetupTaskPage = () => {
   const [expirationTime, setExpirationTime] = useState("23:59"); // ✅ 서명 만료 시간 상태 추가
   const [previewUrl, setPreviewUrl] = useState(null); // ✅ 파일 미리보기 상태 추가
   const [numPages, setNumPages] = useState(null);
+  // ✅ 만료일 선택 옵션 상태 추가
+  const [expirationOption, setExpirationOption] = useState("custom");
   const navigate = useNavigate();
 
   // ✅ 오늘 날짜를 기본 최소값으로 설정
   const today = new Date().toISOString().split('T')[0];
+
+  // ✅ 만료일 옵션 계산 함수
+  const calculateExpirationDate = (option) => {
+    const now = new Date();
+    
+    switch(option) {
+      case "today":
+        return now.toISOString().split('T')[0];
+      case "threeDays":
+        now.setDate(now.getDate() + 3);
+        return now.toISOString().split('T')[0];
+      case "oneWeek":
+        now.setDate(now.getDate() + 7);
+        return now.toISOString().split('T')[0];
+      default:
+        return expirationDate;
+    }
+  };
+
+  // ✅ 만료일 옵션 변경 핸들러
+  const handleExpirationOptionChange = (option) => {
+    setExpirationOption(option);
+    const newDate = calculateExpirationDate(option);
+    setExpirationDate(newDate);
+  };
 
   const handlePostFiles = (file) => {
     if (!file) {
@@ -145,41 +172,86 @@ const SetupTaskPage = () => {
                 </RadioLabel>
               </RadioContainer>
               
-              {/* ✅ 만료일 및 시간 선택  */}
-            
-                <DatePickerContainer>
-                  <DateTimePickerTitle>서명 만료 설정</DateTimePickerTitle>
+              {/* ✅ 만료일 및 시간 선택 */}
+              <DatePickerContainer>
+                <DateTimePickerTitle>서명 만료 설정</DateTimePickerTitle>
+                
+                {/* ✅ 만료일 옵션 라디오 버튼 추가 */}
+                <ExpirationOptionContainer>
+                  <ExpirationOptionLabel>
+                    <RadioInput
+                      type="radio"
+                      name="expirationOption"
+                      value="today"
+                      checked={expirationOption === "today"}
+                      onChange={() => handleExpirationOptionChange("today")}
+                    />
+                    오늘
+                  </ExpirationOptionLabel>
+                  <ExpirationOptionLabel>
+                    <RadioInput
+                      type="radio"
+                      name="expirationOption"
+                      value="threeDays"
+                      checked={expirationOption === "threeDays"}
+                      onChange={() => handleExpirationOptionChange("threeDays")}
+                    />
+                    3일 후
+                  </ExpirationOptionLabel>
+                  <ExpirationOptionLabel>
+                    <RadioInput
+                      type="radio"
+                      name="expirationOption"
+                      value="oneWeek"
+                      checked={expirationOption === "oneWeek"}
+                      onChange={() => handleExpirationOptionChange("oneWeek")}
+                    />
+                    일주일 후
+                  </ExpirationOptionLabel>
+                  <ExpirationOptionLabel>
+                    <RadioInput
+                      type="radio"
+                      name="expirationOption"
+                      value="custom"
+                      checked={expirationOption === "custom"}
+                      onChange={() => setExpirationOption("custom")}
+                    />
+                    직접 선택
+                  </ExpirationOptionLabel>
+                </ExpirationOptionContainer>
+                
+                <DateTimePickerRow>
+                  <DateTimePickerColumn>
+                    <DatePickerLabel>
+                      만료일 <RequiredMark>*</RequiredMark>
+                    </DatePickerLabel>
+                    <DatePickerInput
+                      type="date"
+                      min={today}
+                      value={expirationDate}
+                      onChange={(e) => {
+                        setExpirationDate(e.target.value);
+                        setExpirationOption("custom");
+                      }}
+                    />
+                  </DateTimePickerColumn>
                   
-                  <DateTimePickerRow>
-                    <DateTimePickerColumn>
-                      <DatePickerLabel>
-                        만료일 <RequiredMark>*</RequiredMark>
-                      </DatePickerLabel>
-                      <DatePickerInput
-                        type="date"
-                        min={today}
-                        value={expirationDate}
-                        onChange={(e) => setExpirationDate(e.target.value)}
-                      />
-                    </DateTimePickerColumn>
-                    
-                    <DateTimePickerColumn>
-                      <DatePickerLabel>
-                        만료 시간 <RequiredMark>*</RequiredMark>
-                      </DatePickerLabel>
-                      <DatePickerInput
-                        type="time"
-                        value={expirationTime}
-                        onChange={(e) => setExpirationTime(e.target.value)}
-                      />
-                    </DateTimePickerColumn>
-                  </DateTimePickerRow>
-                  
-                  <DatePickerHint>
-                    서명 요청이 만료되는 날짜와 시간을 선택하세요. 만료 시점 이후에는 서명이 불가합니다.
-                  </DatePickerHint>
-                </DatePickerContainer>
-              
+                  <DateTimePickerColumn>
+                    <DatePickerLabel>
+                      만료 시간 <RequiredMark>*</RequiredMark>
+                    </DatePickerLabel>
+                    <DatePickerInput
+                      type="time"
+                      value={expirationTime}
+                      onChange={(e) => setExpirationTime(e.target.value)}
+                    />
+                  </DateTimePickerColumn>
+                </DateTimePickerRow>
+                
+                <DatePickerHint>
+                  서명 요청이 만료되는 날짜와 시간을 선택하세요. 만료 시점 이후에는 서명이 불가합니다.
+                </DatePickerHint>
+              </DatePickerContainer>
             </InputRow>
             
             {/* 문서 선택 (파일 업로드) */}
@@ -347,6 +419,34 @@ const DateTimePickerTitle = styled.h4`
   font-weight: bold;
   color: #007bff;
   margin: 0 0 5px 0;
+`;
+
+// ✅ 만료일 옵션 라디오 버튼 스타일 추가
+const ExpirationOptionContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 10px;
+  padding: 10px;
+  background-color: #f0f5ff;
+  border-radius: 5px;
+`;
+
+const ExpirationOptionLabel = styled.label`
+  font-size: 14px;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  cursor: pointer;
+  
+  &:hover {
+    background-color: #f0f0f0;
+  }
 `;
 
 const DateTimePickerRow = styled.div`
