@@ -3,20 +3,19 @@ import { IoClose } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
 import styled from "styled-components";
-import ButtonBase from "../components/ButtonBase";
+import { documentState } from "../recoil/atom/documentState";
 import { signerState } from "../recoil/atom/signerState";
-import { taskState } from "../recoil/atom/taskState";
 
-const AddSignerPage = () => {
+const RequestPage = () => {
   const navigate = useNavigate();
-  const document = useRecoilValue(taskState);
+  const document = useRecoilValue(documentState);
   const [signers, setSigners] = useRecoilState(signerState);
 
   const [newName, setNewName] = useState("");
-  const [newEmailPrefix, setNewEmailPrefix] = useState("");
-  const [newEmailDomain, setNewEmailDomain] = useState("@handong.ac.kr");
+  const [newEmail, setNewEmail] = useState("");
+  
 
-  const isAddButtonEnabled = newName && newEmailPrefix;
+  const isAddButtonEnabled = newName && newEmail;
   const isNextButtonEnabled = signers.length > 0;
 
   const validateEmail = (email) => {
@@ -24,7 +23,6 @@ const AddSignerPage = () => {
   };
 
   const handleAddSigner = () => {
-    const newEmail = newEmailPrefix + newEmailDomain;
     if (newName && newEmail && validateEmail(newEmail)) {
       const newSigner = {
         name: newName,
@@ -33,8 +31,7 @@ const AddSignerPage = () => {
       };
       setSigners([...signers, newSigner]);
       setNewName("");
-      setNewEmailPrefix("");
-      setNewEmailDomain("@handong.ac.kr"); // 기본값으로 초기화
+      setNewEmail("");
     } else if (!validateEmail(newEmail)) {
       alert("이메일은 @handong.ac.kr 또는 @handong.edu로 끝나야 합니다.");
     }
@@ -65,18 +62,15 @@ const AddSignerPage = () => {
                     onChange={(e) => setNewName(e.target.value)}
                 />
                 <Input
-                    placeholder="이메일"
-                    value={newEmailPrefix}
-                    onChange={(e) => setNewEmailPrefix(e.target.value)}
+                    placeholder="이메일 (@handong.ac.kr 또는 .edu)"
+                    value={newEmail}
+                    onChange={(e) => setNewEmail(e.target.value)}
+                    onBlur={() => {
+                      if (newEmail && !validateEmail(newEmail)) {
+                        alert("이메일은 @handong.ac.kr 또는 @handong.edu로 끝나야 합니다.");
+                      }
+                    }}
                 />
-                {/*셀렉터*/}
-                <Select
-                    value={newEmailDomain}
-                    onChange={(e) => setNewEmailDomain(e.target.value)}
-                >
-                  <option value="@handong.ac.kr">@handong.ac.kr</option>
-                  <option value="@handong.edu">@handong.edu</option>
-                </Select>
               </RowContainer>
               <AddButton onClick={handleAddSigner} disabled={!isAddButtonEnabled}>
                 추가하기
@@ -101,17 +95,19 @@ const AddSignerPage = () => {
         <FloatingButtonContainer>
           <GrayButton onClick={() => navigate(`/tasksetup`)}>이전으로</GrayButton>
           <GrayButton onClick={() => navigate(`/request-document`)}>나가기</GrayButton>
-          <NextButton onClick={handleNextStep} disabled={!isNextButtonEnabled}>다음단계</NextButton>
+          <NextButton onClick={handleNextStep} disabled={!isNextButtonEnabled}>
+            추가 완료
+          </NextButton>
         </FloatingButtonContainer>
       </Container>
   );
 };
-export default AddSignerPage;
 
+// 📌 **Styled Components 적용**
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100vh;
   background-color: #e5e5e5;
   position: relative;
 `;
@@ -171,14 +167,6 @@ const RowContainer = styled.div`
 `;
 
 const Input = styled.input`
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  padding: 10px;
-  width: 100%;
-  font-size: 14px;
-`;
-
-const Select = styled.select`
   border: 1px solid #ddd;
   border-radius: 5px;
   padding: 10px;
@@ -246,22 +234,22 @@ const FloatingButtonContainer = styled.div`
   z-index: 1000;
 `;
 
-// const ButtonBase = styled.button`
-//   padding: 12px 24px;
-//   color: white;
-//   border: none;
-//   border-radius: 25px;
-//   cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
-//   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-//   transition: transform 0.2s, box-shadow 0.2s;
-// `;
+const ButtonBase = styled.button`
+  padding: 12px 24px;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s, box-shadow 0.2s;
+`;
 
 const GrayButton = styled(ButtonBase)`
-  background-color: #b5b5b5;
-  color: white;
+  background-color: #ccc;
 `;
 
 const NextButton = styled(ButtonBase)`
   background-color: ${({ disabled }) => (disabled ? "#ccc" : "#03A3FF")};
-  color: white;
 `;
+
+export default RequestPage;

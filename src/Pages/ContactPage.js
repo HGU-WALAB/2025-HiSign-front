@@ -24,16 +24,6 @@ const ContactPage = () => {
         </Description>
         
         <InputGroup>
-          <Label>제목</Label>
-          <Input
-            type="text"
-            value={subject}
-            onChange={(e) => setSubject(e.target.value)}
-            placeholder="문의 제목을 입력해주세요"
-          />
-        </InputGroup>
-
-        <InputGroup>
           <Label>내용</Label>
           <TextArea
             value={content}
@@ -43,18 +33,33 @@ const ContactPage = () => {
           />
         </InputGroup>
 
+    
+
         <ButtonContainer>
           <SendButton onClick={handleEmailSend}>
-            이메일 보내기
+             접수하기
           </SendButton>
         </ButtonContainer>
 
-        <ContactInfo>
-          <InfoTitle>담당자 연락처</InfoTitle>
-          <InfoText>Email: hisign0120@gmail.com</InfoText>
-        </ContactInfo>
+
+        <br>
+        </br>
+
+        <Description>
+         카카오톡 상담하기 봇을 사용하여 문의주시면 더 빠른 답변이 가능합니다.
+         
+        </Description>
+
+
+        
       </ContactBox>
+
+      
+
+
     </ContactContainer>
+
+    
   );
 };
 

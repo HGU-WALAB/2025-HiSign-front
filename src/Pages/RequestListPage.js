@@ -9,6 +9,7 @@ import { Pagination } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DownloadIcon from '@mui/icons-material/Download';
+import moment from "moment/moment";
 
 const RequestedDocuments = () => {
     const [documents, setDocuments] = useState([]);
@@ -23,15 +24,26 @@ const RequestedDocuments = () => {
         ApiService.fetchDocuments("requested")
             .then((response) => {
                 const filteredDocuments = response.data.filter(doc => doc.status !== 5);
-                const sortedDocuments = filteredDocuments.sort((a, b) =>
-                    new Date(b.createdAt) - new Date(a.createdAt)
-                );
+
+                const sortedDocuments = filteredDocuments.sort((a, b) => {
+                    if (a.status === 0 && b.status !== 0) {
+                        return -1;
+                    } else if (a.status !== 0 && b.status === 0) {
+                        return 1;
+                    } else if (a.status === 0 && b.status === 0) {
+                        return new Date(a.expiredAt) - new Date(b.expiredAt);
+                    } else {
+                        return new Date(b.createdAt) - new Date(a.createdAt);
+                    }
+                });
+
                 setDocuments(sortedDocuments);
             })
             .catch((error) => {
                 setError("문서를 불러오는 중 문제가 발생했습니다: " + error.message);
             });
     }, []);
+
 
     const handleCancelClick = (doc) => {
         setSelectedDocument(doc);
@@ -105,7 +117,6 @@ const RequestedDocuments = () => {
                     width: "100%",
                     borderCollapse: "separate",
                     borderSpacing: "0",
-                    fontFamily: "Arial, sans-serif",
                     border: "1px solid #ddd",
                     borderRadius: "8px",
                     overflow: "hidden",
@@ -120,11 +131,12 @@ const RequestedDocuments = () => {
                         fontWeight: "bold",
                         borderBottom: "1px solid #ddd"
                     }}>
-                        <th style={{ padding: "12px" }}>상태</th>
-                        <th style={{ padding: "12px" }}>작업명</th>
-                        <th style={{ padding: "12px" }}>파일명</th>
-                        <th style={{ padding: "12px" }}>요청 생성일</th>
-                        <th style={{ padding: "12px" }}>추가메뉴</th>
+                        <th style={{padding: "12px"}}>상태</th>
+                        <th style={{padding: "12px"}}>작업명</th>
+                        <th style={{padding: "12px"}}>파일명</th>
+                        <th style={{padding: "12px"}}>요청 생성일</th>
+                        <th style={{padding: "12px"}}>요청 만료일</th>
+                        <th style={{padding: "12px"}}>추가메뉴</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -134,28 +146,39 @@ const RequestedDocuments = () => {
                             height: "50px",
                             backgroundColor: "white",
                             transition: "all 0.2s ease-in-out",
-                            boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)", // 행에도 그림자 추가
                         }}>
-                            <td style={{ textAlign: "center" }}>
+                            <td style={{textAlign: "center"}}>
                                     <span className={getStatusClass(doc.status)}>
                                         {getStatusLabel(doc.status)}
                                     </span>
                             </td>
-                            <td style={{ textAlign: "center" }}>{doc.requestName}</td>
-                            <td style={{ textAlign: "center" }}>
-                                <Link to={`/detail/${doc.id}`} style={{ textDecoration: "none", color: "#007BFF" }}>
+                            <td style={{textAlign: "center", color:"black"}}>{doc.requestName}</td>
+                            <td style={{textAlign: "center"}}>
+                                <Link to={`/detail/${doc.id}`} style={{textDecoration: "none", color: "#007BFF"}}>
                                     {doc.fileName}
                                 </Link>
                             </td>
-                            <td style={{ textAlign: "center" }}>{doc.createdAt}</td>
-                            <td style={{ textAlign: "center" }}>
+                            <td style={{textAlign: "center", color:"black"}}>{moment(doc.createdAt).format('YY년 MM월 DD일')}</td>
+                            <td style={{
+                                textAlign: "center",
+                                color: moment(doc.expiredAt).isSame(moment(), 'day') ? "red" : "black"
+                            }}>
+                                {moment(doc.expiredAt).format('YY년 MM월 DD일 HH:mm')}
+                            </td>
+                            <td style={{textAlign: "center"}}>
                                 <Dropdown>
-                                    <Dropdown.Toggle variant="light" style={{ padding: "5px 10px", borderRadius: "5px", fontWeight: "bold", border: "none" }}>
+                                    <Dropdown.Toggle variant="light" style={{
+                                        padding: "5px 10px",
+                                        borderRadius: "5px",
+                                        fontWeight: "bold",
+                                        border: "none"
+                                    }}>
                                         ⋮
                                     </Dropdown.Toggle>
                                     <Dropdown.Menu>
                                         <Dropdown.Item disabled> <DownloadIcon/> 다운로드</Dropdown.Item>
-                                        <Dropdown.Item onClick={() => handleCancelClick(doc)} className="text-muted" disabled={doc.status !== 0}>
+                                        <Dropdown.Item onClick={() => handleCancelClick(doc)} className="text-muted"
+                                                       disabled={doc.status !== 0}>
                                             <CloseIcon/> 요청 취소
                                         </Dropdown.Item>
                                         <Dropdown.Item disabled> <DeleteIcon/> 삭제</Dropdown.Item>
@@ -168,8 +191,9 @@ const RequestedDocuments = () => {
                 </table>
             </div>
 
-            <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
-                <Pagination count={Math.ceil(documents.length / itemsPerPage)} color="default" page={currentPage} onChange={handlePageChange} />
+            <div style={{display: "flex", justifyContent: "center", marginTop: "20px"}}>
+                <Pagination count={Math.ceil(documents.length / itemsPerPage)} color="default" page={currentPage}
+                            onChange={handlePageChange}/>
             </div>
 
             <CancelModal isVisible={showModal} onClose={() => setShowModal(false)} onConfirm={handleConfirmCancel} cancelReason={cancelReason} setCancelReason={setCancelReason} />
