@@ -37,6 +37,18 @@ function HeaderBar() {
                         </Link>
                         <Link to="/receive-document" className="nav-link text-dark">
                             요청받은 작업
+<<<<<<< HEAD
+=======
+                        </Link>
+                        <Link to="/tasksetup" className="nav-link text-dark">
+                            문서 업로드하기
+                        </Link>
+                        <Link to="/request" className="nav-link text-dark">
+                            서명자 등록하기
+                        </Link>
+                        <Link to="/align" className="nav-link text-dark">
+                            서명 할당하기
+>>>>>>> 2bdc1dbef6390667069de850473295439f6122bb
                         </Link>
                        
                      
