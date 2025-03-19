@@ -94,6 +94,16 @@ const ApiService = {
     }
   },
 
+  fetchSignersByDocument: async (documentId) => {
+    if (!documentId) throw new Error("문서 ID가 필요합니다.");
+    return apiInstance.get(`/signature-requests/document/${documentId}/signers`)
+        .then(response => response.data)
+        .catch(error => {
+          console.error("서명자 정보 가져오기 실패:", error);
+          throw new Error("서명자 정보를 불러오는 중 오류가 발생했습니다.");
+        });
+  },
+
   // 특정 문서 가져오기 (PDF 다운로드)
   fetchDocument: async (documentId) => {
     return apiInstance.get(`/documents/${documentId}`, { responseType: 'arraybuffer' });
