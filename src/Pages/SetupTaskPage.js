@@ -223,7 +223,7 @@ const SetupTaskPage = () => {
                 
                 <DateTimePickerRow>
                   <DateTimePickerColumn>
-                    <DatePickerLabel>
+                    <DatePickerLabel> 
                       만료일 <RequiredMark>*</RequiredMark>
                     </DatePickerLabel>
                     <DatePickerInput
