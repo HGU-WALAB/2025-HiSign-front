@@ -208,16 +208,6 @@ const SetupTaskPage = () => {
                     />
                     일주일 후
                   </ExpirationOptionLabel>
-                  <ExpirationOptionLabel>
-                    <RadioInput
-                      type="radio"
-                      name="expirationOption"
-                      value="custom"
-                      checked={expirationOption === "custom"}
-                      onChange={() => setExpirationOption("custom")}
-                    />
-                    직접 선택
-                  </ExpirationOptionLabel>
                 </ExpirationOptionContainer>
                 
                 <DateTimePickerRow>
