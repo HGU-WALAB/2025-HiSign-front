@@ -64,11 +64,11 @@ const RequestedDocuments = () => {
 
     const getStatusLabel = (status) => {
         const statusLabels = {
-            0: "서명 진행 중",
+            0: "서명중",
             1: "완료",
-            2: "거절됨",
-            3: "취소됨",
-            4: "만료됨",
+            2: "거절",
+            3: "취소",
+            4: "만료",
         };
         return statusLabels[status] || "알 수 없음";
     };
@@ -151,7 +151,7 @@ const RequestedDocuments = () => {
                     }}>
                         <th style={{padding: "12px"}}>상태</th>
                         <th style={{padding: "12px"}}>작업명</th>
-                        <th style={{padding: "12px"}}>파일명</th>
+                        {/*<th style={{padding: "12px"}}>파일명</th>*/}
                         <th style={{padding: "12px"}}>요청 생성일</th>
                         <th style={{padding: "12px"}}>요청 만료일</th>
                         <th style={{padding: "12px"}}>추가메뉴</th>
@@ -175,20 +175,20 @@ const RequestedDocuments = () => {
                                 <FaSearch style={{marginLeft: "8px", cursor: "pointer", color: "black"}}
                                           onClick={() => handleSearchClick(doc.id)}/>
                             </td>
-                            <td style={{textAlign: "center"}}>
-                                <Link to={`/detail/${doc.id}`} style={{textDecoration: "none", color: "#007BFF"}}>
-                                    {doc.fileName}
-                                </Link>
-                            </td>
+                            {/*<td style={{textAlign: "center"}}>*/}
+                            {/*    <Link to={`/detail/${doc.id}`} style={{textDecoration: "none", color: "#007BFF"}}>*/}
+                            {/*        {doc.fileName}*/}
+                            {/*    </Link>*/}
+                            {/*</td>*/}
                             <td style={{
                                 textAlign: "center",
                                 color: "black"
-                            }}>{moment(doc.createdAt).format('YY년 MM월 DD일')}</td>
+                            }}>{moment(doc.createdAt).format('YYYY/MM/DD')}</td>
                             <td style={{
                                 textAlign: "center",
                                 color: moment(doc.expiredAt).isSame(moment(), 'day') ? "red" : "black"
                             }}>
-                                {moment(doc.expiredAt).format('YY년 MM월 DD일 HH:mm')}
+                                {moment(doc.expiredAt).format('YYYY/MM/DD HH:mm')}
                             </td>
                             <td style={{textAlign: "center"}}>
                                 <Dropdown>
@@ -197,7 +197,7 @@ const RequestedDocuments = () => {
                                         borderRadius: "5px",
                                         fontWeight: "bold",
                                         border: "none"
-                                    }}>⋮</Dropdown.Toggle>
+                                    }}></Dropdown.Toggle>
                                     <Dropdown.Menu>
                                         <Dropdown.Item disabled><DownloadIcon/> 다운로드</Dropdown.Item>
                                         <Dropdown.Item onClick={() => handleCancelClick(doc)}
@@ -231,7 +231,7 @@ const RequestedDocuments = () => {
                     boxShadow: 24,
                     p: 4,
                     width: "90%",
-                    maxWidth: "400px",
+                    maxWidth: "430px",
                     minWidth: "280px",
                     borderRadius: "8px",
                 }}>
