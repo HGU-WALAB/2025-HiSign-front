@@ -1,3 +1,4 @@
+// PreviewPage.js
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRecoilState } from "recoil";
@@ -15,9 +16,8 @@ const PreviewPage = () => {
   const [showModal, setShowModal] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
   const navigate = useNavigate();
-  
+
   useEffect(() => {
-    // 만약 서명 정보가 없으면 다시 이메일 검증 페이지로 이동
     if (!signing.documentId) {
       alert("유효한 문서 정보가 없습니다. 이메일을 먼저 인증해주세요.");
       navigate("/");
@@ -49,75 +49,106 @@ const PreviewPage = () => {
 
   return (
     <MainContainer>
+      <ContentWrapper>
+        <Sidebar>
+          <InfoSection>
+            <InfoItem>
+              <Label>작업 요청자:</Label>
+              <Value>{signing.requesterName || "알 수 없음"}</Value>
+            </InfoItem>
+            <InfoItem>
+              <Label>작업명:</Label>
+              <Value>{signing.requestName || "알 수 없음"}</Value>
+            </InfoItem>
+            <InfoItem>
+              <Label>작업 요청 상세:</Label>
+              <Value>{signing.description || "알 수 없음"}</Value>
+            </InfoItem>
+            <InfoItem>
+              <Label>문서 이름:</Label>
+              <Value>{signing.documentName || "알 수 없음"}</Value>
+            </InfoItem>
+            <InfoItem>
+              <Label>서명자:</Label>
+              <Value>{signing.signerName || "알 수 없음"}</Value>
+            </InfoItem>
+            <InfoItem>
+              <Label>서명 상태:</Label>
+              <Value>{signing.isSigned ? "서명 완료" : "서명 대기중"}</Value>
+            </InfoItem>
+          </InfoSection>
 
-      {/* 요청 정보 표시 */}
-      <InfoSection>
-        <InfoItem>
-          <Label>작업 요청자:</Label>
-          <Value>{signing.requesterName || "알 수 없음"}</Value>
-        </InfoItem>
-        <InfoItem>
-          <Label>작업명:</Label>
-          <Value>{signing.requestName || "알 수 없음"}</Value>
-        </InfoItem>
-        <InfoItem>
-          <Label>작업 요청 상세:</Label>
-          <Value>{signing.description || "알 수 없음"}</Value>
-        </InfoItem>
-        <InfoItem>
-          <Label>문서 이름:</Label>
-          <Value>{signing.documentName || "알 수 없음"}</Value>
-        </InfoItem>
-        <InfoItem>
-          <Label>서명자:</Label>
-          <Value>{signing.signerName || "알 수 없음"}</Value>
-        </InfoItem>
-      </InfoSection>
+          <ButtonContainer>
+            {signing.isRejectable && (<RejectButton onClick={handleReject}>거절하기</RejectButton>)}
+            <NextButton onClick={() => navigate("/sign")}>서명하기</NextButton>
+          </ButtonContainer>
+        </Sidebar>
 
-      {/* PDF 문서와 서명 위치 표시 */}
-      {signing.fileUrl && signing.signatureFields ? (
-        <DocumentContainer>
-          <PDFViewer
-            pdfUrl={signing.fileUrl}
-            setCurrentPage={setCurrentPage}
-          />
-          <SignatureMarker currentPage={currentPage} />
-        </DocumentContainer>
-      ) : (
-        <LoadingMessage>문서 및 서명 정보를 불러오는 중...</LoadingMessage>
-      )}
+        <PDFWrapper>
+          {signing.fileUrl && signing.signatureFields ? (
+            <DocumentContainer>
+              <PDFViewer
+                pdfUrl={signing.fileUrl}
+                setCurrentPage={setCurrentPage}
+              />
+              <SignatureMarker currentPage={currentPage} />
+            </DocumentContainer>
+          ) : (
+            <LoadingMessage>문서 및 서명 정보를 불러오는 중...</LoadingMessage>
+          )}
+        </PDFWrapper>
+      </ContentWrapper>
 
-      {/* 서명 페이지로 이동 버튼 */}
-      <ButtonContainer>
-        {signing.isRejectable && (<RejectButton onClick={handleReject}>거절하기</RejectButton>)}
-        <NextButton onClick={() => navigate("/sign")}>서명하기</NextButton>
-      </ButtonContainer>
-
-      <RejectModal isVisible={showModal} onClose={() => setShowModal(false)} onConfirm={handleConfirmReject} rejectReason={rejectReason} setRejectReason={setRejectReason} />
+      <RejectModal
+        isVisible={showModal}
+        onClose={() => setShowModal(false)}
+        onConfirm={handleConfirmReject}
+        rejectReason={rejectReason}
+        setRejectReason={setRejectReason}
+      />
     </MainContainer>
   );
 };
 
 export default PreviewPage;
 
-// 스타일 정의
 const MainContainer = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: center;
   min-height: 100vh;
-  padding: 80px 0 20px 0;
-  background-color:#f5f5f5;
+  background-color: #f5f5f5;
+  padding-top: 80px;
+`;
+
+const ContentWrapper = styled.div`
+  display: flex;
+  flex: 1;
+  width: 100%;
+`;
+
+const Sidebar = styled.div`
+  width: 300px;
+  padding: 20px;
+  background-color: white;
+  border-right: 1px solid #ddd;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+`;
+
+const PDFWrapper = styled.div`
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
 `;
 
 const InfoSection = styled.div`
-  width: 80%;
-  max-width: 400px;
+  width: 100%;
   background: white;
   padding: 15px;
   border-radius: 8px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  margin: 20px 0 20px 0;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
+  margin-bottom: 20px;
 `;
 
 const InfoItem = styled.div`
@@ -136,9 +167,8 @@ const Value = styled.span`
 
 const DocumentContainer = styled.div`
   max-width: 800px;
-  margin: 20px auto;
-  position: relative;
   background-color: #f5f5f5;
+  position: relative;
 `;
 
 const LoadingMessage = styled.p`
@@ -148,21 +178,21 @@ const LoadingMessage = styled.p`
 
 const ButtonContainer = styled.div`
   margin-top: 20px;
+  text-align: center;
 `;
 
 const NextButton = styled(ButtonBase)`
   background-color: #03A3FF;
   color: white;
-  
+  margin-left: 10px;
   &:hover {
-    background-color:rgba(3, 163, 255, 0.66);
+    background-color: rgba(3, 163, 255, 0.66);
   }
 `;
 
 const RejectButton = styled(ButtonBase)`
   background-color: rgb(255, 0, 0);
   color: white;
-  margin-right: 10px;
   &:hover {
     background-color: rgb(179, 0, 0);
   }
