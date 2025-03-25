@@ -16,25 +16,43 @@ const AddSignerPage = () => {
   const [newName, setNewName] = useState("");
   const [newEmailPrefix, setNewEmailPrefix] = useState("");
   const [newEmailDomain, setNewEmailDomain] = useState("@handong.ac.kr");
-  const [debouncedQuery, setDebouncedQuery] = useState("");
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const [activeList, setActiveList] = useState(false);
+  const [focusTarget, setFocusTarget] = useState("name"); // "name" or "email"
+
   const autocompleteRef = useRef(null);
 
+  // 디바운싱된 쿼리
+  const [debouncedName, setDebouncedName] = useState("");
+  const [debouncedEmail, setDebouncedEmail] = useState("");
+
   useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedQuery(newName);
-    }, 300);
+    const handler = setTimeout(() => setDebouncedName(newName), 300);
     return () => clearTimeout(handler);
   }, [newName]);
 
-  const { data: searchResponse  } = useQuery({
-    queryKey: ["signers", debouncedQuery],
-    queryFn: () => ApiService.searchSigners(debouncedQuery),
-    enabled: !!debouncedQuery,
+  useEffect(() => {
+    const handler = setTimeout(() => setDebouncedEmail(newEmailPrefix), 300);
+    return () => clearTimeout(handler);
+  }, [newEmailPrefix]);
+
+  // 이름 검색용
+  const { data: nameSearchResponse } = useQuery({
+    queryKey: ["signers", "name", debouncedName],
+    queryFn: () => ApiService.searchSignersByName(debouncedName),
+    enabled: focusTarget === "name" && !!debouncedName,
     staleTime: 1000 * 60,
   });
-  const searchResults = searchResponse?.data || [];
+  const nameResults = nameSearchResponse?.data || [];
+
+  // 이메일 검색용
+  const { data: emailSearchResponse } = useQuery({
+    queryKey: ["signers", "email", debouncedEmail],
+    queryFn: () => ApiService.searchSignersByEmail(debouncedEmail),
+    enabled: focusTarget === "email" && !!debouncedEmail,
+    staleTime: 1000 * 60,
+  });
+  const emailResults = emailSearchResponse?.data || [];
 
   const toggleSigner = (signer) => {
     const exists = signers.some((s) => s.email === signer.email);
@@ -46,16 +64,17 @@ const AddSignerPage = () => {
   };
 
   const handleKeyDown = (e) => {
-    if (!searchResults.length) return;
+    const activeResults = focusTarget === "name" ? nameResults : emailResults;
+    if (!activeResults.length) return;
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      setHighlightedIndex((prev) => (prev + 1) % searchResults.length);
+      setHighlightedIndex((prev) => (prev + 1) % activeResults.length);
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      setHighlightedIndex((prev) => (prev - 1 + searchResults.length) % searchResults.length);
+      setHighlightedIndex((prev) => (prev - 1 + activeResults.length) % activeResults.length);
     } else if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
-      const selected = searchResults[highlightedIndex];
+      const selected = activeResults[highlightedIndex];
       if (selected) toggleSigner(selected);
     }
   };
@@ -86,10 +105,7 @@ const AddSignerPage = () => {
 
   const handleNextStep = () => navigate("/align");
 
-  useEffect(() => {
-    console.log("searchResults", searchResults);
-    console.log("activeList", activeList);
-  }, [searchResults, debouncedQuery]);
+  const activeResults = focusTarget === "name" ? nameResults : emailResults;
 
   return (
     <Container>
@@ -100,23 +116,32 @@ const AddSignerPage = () => {
 
           <AddSignerSection>
             <AddSignerTitle>서명자 추가하기</AddSignerTitle>
-            <RowContainer style={{ position: "relative" }} ref={autocompleteRef}>
+            <RowContainer ref={autocompleteRef}>
               <Input
                 placeholder="이름"
                 value={newName}
                 onChange={(e) => {
                   setNewName(e.target.value);
+                  setFocusTarget("name");
                   setActiveList(true);
                 }}
+                onFocus={() => setFocusTarget("name")}
                 onKeyDown={handleKeyDown}
                 autoComplete="off"
               />
               <Input
                 placeholder="이메일"
                 value={newEmailPrefix}
-                onChange={(e) => setNewEmailPrefix(e.target.value)}
+                onChange={(e) => {
+                  setNewEmailPrefix(e.target.value);
+                  setFocusTarget("email");
+                  setActiveList(true);
+                }}
+                onFocus={() => setFocusTarget("email")}
+                onKeyDown={handleKeyDown}
+                autoComplete="off"
               />
-              <span style={{ fontWeight: 'bold', fontSize: '1.2rem', }}>@</span>
+              <span style={{ fontWeight: 'bold', fontSize: '1.2rem' }}>@</span>
               <Select
                 value={newEmailDomain}
                 onChange={(e) => setNewEmailDomain(e.target.value)}
@@ -124,9 +149,10 @@ const AddSignerPage = () => {
                 <option value="@handong.ac.kr">handong.ac.kr</option>
                 <option value="@handong.edu">handong.edu</option>
               </Select>
-              {activeList && searchResults.length > 0 && (
+
+              {activeList && activeResults.length > 0 && (
                 <SearchResults>
-                  {searchResults.map((signer, index) => {
+                  {activeResults.map((signer, index) => {
                     const selected = signers.some((s) => s.email === signer.email);
                     return (
                       <SearchItem

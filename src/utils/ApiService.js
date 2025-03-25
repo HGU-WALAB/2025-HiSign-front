@@ -116,6 +116,14 @@ const ApiService = {
     return apiInstance.get(`/member/search?query=${query}`);
   },
   
+  searchSignersByEmail: async (email) => {
+    return apiInstance.get(`/member/search/email?query=${email}`);
+  },
+
+  searchSignersByName: async (name) => {
+    return apiInstance.get(`/member/search/name?query=${name}`);
+  },
+
   // ===================================================
   // ✅ 비로그인 상태에서도 사용 가능한 API (PublicaApiInstance)
   // ===================================================
