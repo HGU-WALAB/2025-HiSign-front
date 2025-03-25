@@ -359,6 +359,9 @@ const SearchItem = styled.li`
   &.highlighted {
     background-color: #f0f0f0;
   }
+  &:hover {
+    background-color: #dff1f1;
+  }
 `;
 
 const AddButtonContainer = styled.div`
