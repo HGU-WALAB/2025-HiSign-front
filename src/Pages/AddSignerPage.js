@@ -28,12 +28,13 @@ const AddSignerPage = () => {
     return () => clearTimeout(handler);
   }, [newName]);
 
-  const { data: searchResults = [] } = useQuery({
+  const { data: searchResponse  } = useQuery({
     queryKey: ["signers", debouncedQuery],
     queryFn: () => ApiService.searchSigners(debouncedQuery),
     enabled: !!debouncedQuery,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60,
   });
+  const searchResults = searchResponse?.data || [];
 
   const toggleSigner = (signer) => {
     const exists = signers.some((s) => s.email === signer.email);
@@ -41,12 +42,7 @@ const AddSignerPage = () => {
       setSigners(signers.filter((s) => s.email !== signer.email));
     } else {
       setSigners([...signers, signer]);
-      setNewName("");
-      setNewEmailPrefix("");
-      setNewEmailDomain("@handong.ac.kr");
     }
-    setHighlightedIndex(-1);
-    setActiveList(false);
   };
 
   const handleKeyDown = (e) => {
@@ -90,6 +86,11 @@ const AddSignerPage = () => {
 
   const handleNextStep = () => navigate("/align");
 
+  useEffect(() => {
+    console.log("searchResults", searchResults);
+    console.log("activeList", activeList);
+  }, [searchResults, debouncedQuery]);
+
   return (
     <Container>
       <StyledBody>
@@ -110,6 +111,19 @@ const AddSignerPage = () => {
                 onKeyDown={handleKeyDown}
                 autoComplete="off"
               />
+              <Input
+                placeholder="이메일"
+                value={newEmailPrefix}
+                onChange={(e) => setNewEmailPrefix(e.target.value)}
+              />
+              <span style={{ fontWeight: 'bold', fontSize: '1.2rem', }}>@</span>
+              <Select
+                value={newEmailDomain}
+                onChange={(e) => setNewEmailDomain(e.target.value)}
+              >
+                <option value="@handong.ac.kr">handong.ac.kr</option>
+                <option value="@handong.edu">handong.edu</option>
+              </Select>
               {activeList && searchResults.length > 0 && (
                 <SearchResults>
                   {searchResults.map((signer, index) => {
@@ -128,22 +142,9 @@ const AddSignerPage = () => {
                 </SearchResults>
               )}
             </RowContainer>
-            <RowContainer>
-              <Input
-                placeholder="이메일"
-                value={newEmailPrefix}
-                onChange={(e) => setNewEmailPrefix(e.target.value)}
-              />
-              <span style={{ fontWeight: 'bold', fontSize: '1.2rem', }}>@</span>
-              <Select
-                value={newEmailDomain}
-                onChange={(e) => setNewEmailDomain(e.target.value)}
-              >
-                <option value="@handong.ac.kr">handong.ac.kr</option>
-                <option value="@handong.edu">handong.edu</option>
-              </Select>
-            </RowContainer>
-            <AddButton onClick={handleAddSigner}>추가하기</AddButton>
+            <AddButtonContainer>
+              <AddButton onClick={handleAddSigner}>추가하기</AddButton>
+            </AddButtonContainer>
           </AddSignerSection>
 
           <AddSignerTitle>추가된 서명자 목록</AddSignerTitle>
@@ -219,7 +220,7 @@ const AddSignerSection = styled.div`
 const AddSignerTitle = styled.h2`
   font-size: 16px;
   font-weight: bold;
-  margin-bottom: 10px;
+  margin:0 0 20px 0;
 `;
 const RowContainer = styled.div`
   display: flex;
@@ -227,6 +228,7 @@ const RowContainer = styled.div`
   gap: 5px;
   margin-bottom: 10px;
   flex-direction: row;
+  position: relative;
 `;
 const Input = styled.input`
   border: 1px solid #ddd;
@@ -320,6 +322,7 @@ const SearchResults = styled.ul`
   max-height: 180px;
   overflow-y: auto;
   z-index: 2000;
+  padding: 0;
 `;
 const SearchItem = styled.li`
   display: flex;
@@ -330,4 +333,10 @@ const SearchItem = styled.li`
   &.highlighted {
     background-color: #f0f0f0;
   }
+`;
+
+const AddButtonContainer = styled.div`
+  display: flex;
+  justify-content: end;
+  margin-top: 10px;
 `;

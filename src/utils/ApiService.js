@@ -111,9 +111,9 @@ const ApiService = {
     return apiInstance.put(`/signature-requests/cancel/${documentId}`, { reason });
   },
   
-  // 🔐 서명자 검색색
+  // 🔐 서명자 검색
   searchSigners: async (query) => {
-    return apiInstance.get(`/signers/search?query=${query}`);
+    return apiInstance.get(`/member/search?query=${query}`);
   },
   
   // ===================================================
