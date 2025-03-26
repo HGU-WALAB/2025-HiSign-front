@@ -14,27 +14,41 @@ import ReceivedDocuments from "./Pages/ReceiveListPage";
 import RequestedDocuments from "./Pages/RequestListPage";
 import SetupTaskPage from "./Pages/SetupTaskPage";
 import SignPage from './Pages/SignPage';
+import RequireLogin from './utils/RequireLogin';
 
 function MyRoutes() {
     return (
         <Routes>
             <Route element={<Header />}>
                 <Route path="/" element={<LandingPage />} />
-                <Route path="/tasksetup" element={<SetupTaskPage />} />
-                <Route path="/detail/:documentId" element={<DetailPage />} />
                 <Route path="/login-ing" element={<LoginCallback />} />
-                <Route path="/request" element={<AddSignerPage />} />
-                <Route path="/align" element={<AllocatePage />} />
-                <Route path="/request-document" element={<RequestedDocuments />} />
-                <Route path="/receive-document" element={<ReceivedDocuments />} />
                 <Route path="/checkEmail" element={<CheckEmailPage />} />
-                <Route path="/preview" element={<PreviewTaskPage />} />
-                <Route path="/sign" element={<SignPage />} />
-                <Route path="/sign-complete" element={<CompleteSignPage/>} />
                 <Route path="/contact" element={<ContactPage />} />
+                <Route path="/sign" element={<SignPage />} />
+                <Route path="/sign-complete" element={<CompleteSignPage />} />
+                <Route path="/preview" element={<PreviewTaskPage />} />
+
+                {/* 로그인 필요한 구간 */}
+                <Route path="/tasksetup" element={
+                    <RequireLogin><SetupTaskPage /></RequireLogin>
+                } />
+                <Route path="/request" element={
+                    <RequireLogin><AddSignerPage /></RequireLogin>
+                } />
+                <Route path="/align" element={
+                    <RequireLogin><AllocatePage /></RequireLogin>
+                } />
+                <Route path="/request-document" element={
+                    <RequireLogin><RequestedDocuments /></RequireLogin>
+                } />
+                <Route path="/receive-document" element={
+                    <RequireLogin><ReceivedDocuments /></RequireLogin>
+                } />
+                <Route path="/detail/:documentId" element={
+                    <RequireLogin><DetailPage /></RequireLogin>
+                } />
             </Route>
-            
-        </Routes>
+    </Routes>
     );
 }
 
