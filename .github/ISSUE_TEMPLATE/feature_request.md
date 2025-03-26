@@ -1,8 +1,8 @@
 ---
 name: "✨ 기능 개발 요청"
 about: "새로운 기능 개발을 위한 이슈 템플릿"
-title: "[Feature] "
-labels: ["feature", "enhancement"]
+title: "[Feat] "
+labels: ["feature"]
 assignees: 
 ---
 
