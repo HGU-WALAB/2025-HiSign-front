@@ -61,11 +61,11 @@ const ReceivedDocuments = () => {
 
     const getStatusLabel = (status) => {
         const statusLabels = {
-            0: "서명 진행 중",
+            0: "서명중",
             1: "완료",
-            2: "거절됨",
-            3: "취소됨",
-            4: "만료됨",
+            2: "거절",
+            3: "취소",
+            4: "만료",
         };
         return statusLabels[status] || "알 수 없음";
     };
@@ -197,6 +197,7 @@ const ReceivedDocuments = () => {
                                 </button>
                             </div>
                         </div>
+
                     ))}
                 </div>
             )}

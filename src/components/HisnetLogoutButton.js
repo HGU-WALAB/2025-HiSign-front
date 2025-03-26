@@ -1,17 +1,12 @@
 import { useNavigate } from 'react-router-dom';
 import { useSetRecoilState } from 'recoil';
-import { authState } from '../recoil/atom/authState';
 import { loginMemberState } from '../recoil/atom/loginMemberState';
 
 const HisnetLogoutButton = () => {
-  const setAuth = useSetRecoilState(authState);
   const setMember = useSetRecoilState(loginMemberState);
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    setAuth({
-      isAuthenticated: false,
-    });
     setMember({
       unique_id: null,          // 사용자 ID
       name: '',          // 사용자 이름
@@ -21,6 +16,20 @@ const HisnetLogoutButton = () => {
     sessionStorage.removeItem('token'); // 로그아웃 시 토큰 삭제
     navigate('/'); // 로그아웃 후 로그인 페이지로 이동
   };
+
+  return (
+    <button
+      onClick={handleLogout}
+      style={buttonStyle}
+      onMouseOver={(e) => (e.currentTarget.style.backgroundColor = buttonHoverStyle.backgroundColor)}
+      onMouseOut={(e) => (e.currentTarget.style.backgroundColor = buttonStyle.backgroundColor)}
+    >
+      로그아웃
+    </button>
+  );
+};
+
+export default HisnetLogoutButton;
 
   // 버튼 스타일 정의
   const buttonStyle = {
@@ -40,20 +49,3 @@ const HisnetLogoutButton = () => {
     ...buttonStyle,
     backgroundColor: '#E64A19',
   };
-
-
-
-  
-  return (
-    <button
-      onClick={handleLogout}
-      style={buttonStyle}
-      onMouseOver={(e) => (e.currentTarget.style.backgroundColor = buttonHoverStyle.backgroundColor)}
-      onMouseOut={(e) => (e.currentTarget.style.backgroundColor = buttonStyle.backgroundColor)}
-    >
-      로그아웃
-    </button>
-  );
-};
-
-export default HisnetLogoutButton;

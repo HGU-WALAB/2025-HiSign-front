@@ -61,11 +61,11 @@ const RequestedDocuments = () => {
 
     const getStatusLabel = (status) => {
         const statusLabels = {
-            0: "서명 진행 중",
+            0: "서명중",
             1: "완료",
-            2: "거절됨",
-            3: "취소됨",
-            4: "만료됨",
+            2: "거절",
+            3: "취소",
+            4: "만료",
         };
         return statusLabels[status] || "알 수 없음";
     };
@@ -113,6 +113,7 @@ const RequestedDocuments = () => {
                 요청한 작업
             </h1>
 
+
             <div style={{ display: "flex", justifyContent: "flex-end", marginRight: "8%", marginBottom: "10px" }}>
                 <button onClick={() => setViewMode("list")} style={{ background: "none", border: "none", cursor: "pointer" }}>
                     <ViewListIcon color={viewMode === "list" ? "primary" : "disabled"} />
@@ -120,6 +121,7 @@ const RequestedDocuments = () => {
                 <button onClick={() => setViewMode("grid")} style={{ background: "none", border: "none", cursor: "pointer" }}>
                     <ViewModuleIcon color={viewMode === "grid" ? "primary" : "disabled"} />
                 </button>
+
             </div>
 
             {error && <p style={{ color: "red", textAlign: "center" }}>{error}</p>}
@@ -193,9 +195,11 @@ const RequestedDocuments = () => {
             <CancelModal isVisible={showModal} onClose={() => setShowModal(false)} onConfirm={handleConfirmCancel} cancelReason={cancelReason} setCancelReason={setCancelReason} />
 
             <Modal open={showSignersModal} onClose={() => setShowSignersModal(false)}>
+
                 <Box sx={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", bgcolor: "background.paper", boxShadow: 24, p: 4, width: "90%", maxWidth: "400px", minWidth: "280px", borderRadius: "8px" }}>
                     <Typography variant="h6" component="h2" sx={{ textAlign: "center" }}>서명자 정보</Typography>
                     <Box sx={{ maxHeight: "300px", overflowY: "auto", mt: 2, p: 1 }}>
+
                         {signers.length > 0 ? (
                             <ul>
                                 {signers.map((signer, index) => (
