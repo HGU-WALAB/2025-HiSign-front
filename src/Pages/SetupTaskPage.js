@@ -394,24 +394,25 @@ const RadioInput = styled.input`
   cursor: pointer;
 `;
 
-// ✅ 날짜 및 시간 선택 관련 스타일 추가/수정
+// ✅ 날짜 및 시간 선택 관련 스타일 최소화
 const DatePickerContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 12px;
   margin-top: 15px;
-  padding: 15px;
-  background-color: #f5f8ff;
-  border-radius: 5px;
-  border-left: 3px solid #007bff;
+  padding: 0; /* 패딩 제거 */
+  background-color: transparent; /* 배경색 제거 */
+  border-radius: 0; /* 테두리 둥글기 제거 */
+  border-left: none; /* 왼쪽 테두리 제거 */
 `;
 
 const DateTimePickerTitle = styled.h4`
   font-size: 15px;
-  font-weight: bold;
-  color: #007bff;
+  font-weight: normal; /* 굵기 기본값 */
+  color: inherit; /* 색상 상속 */
   margin: 0 0 5px 0;
 `;
+
 
 // ✅ 만료일 옵션 라디오 버튼 스타일 추가
 const ExpirationOptionContainer = styled.div`

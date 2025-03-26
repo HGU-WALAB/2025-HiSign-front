@@ -1,7 +1,7 @@
 import React from 'react';
 import { Route, Routes } from "react-router-dom";
 import LoginCallback from "./auth/LoginCallback";
-import Header from "./Layout/Header";
+import Sidebar from "./Layout/Sidebar";
 import AddSignerPage from "./Pages/AddSignerPage";
 import AllocatePage from "./Pages/AllocatePage";
 import CheckEmailPage from './Pages/CheckEmailPage';
@@ -19,10 +19,13 @@ import RequireLogin from './utils/RequireLogin';
 function MyRoutes() {
     return (
         <Routes>
-            <Route element={<Header />}>
+            <Route element={<Sidebar />}>
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/login-ing" element={<LoginCallback />} />
                 <Route path="/checkEmail" element={<CheckEmailPage />} />
+                <Route path="/preview" element={<PreviewTaskPage />} />
+                <Route path="/sign" element={<SignPage />} />
+                <Route path="/sign-complete" element={<CompleteSignPage />} />
                 <Route path="/contact" element={<ContactPage />} />
                 <Route path="/sign" element={<SignPage />} />
                 <Route path="/sign-complete" element={<CompleteSignPage />} />
@@ -48,7 +51,6 @@ function MyRoutes() {
                     <RequireLogin><DetailPage /></RequireLogin>
                 } />
             </Route>
-    </Routes>
     );
 }
 
