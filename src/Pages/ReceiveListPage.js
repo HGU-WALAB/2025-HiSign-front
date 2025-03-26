@@ -1,3 +1,4 @@
+// import 문과 상태 관리 부분은 그대로 유지
 import DeleteIcon from '@mui/icons-material/Delete';
 import DoDisturbIcon from '@mui/icons-material/DoDisturb';
 import DownloadIcon from '@mui/icons-material/Download';
@@ -158,13 +159,32 @@ const ReceivedDocuments = () => {
                     </table>
                 </div>
             ) : (
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "20px", padding: "20px", maxWidth: "85%", margin: "auto" }}>
+                <div style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(3, 1fr)",
+                    gap: "20px",
+                    padding: "20px",
+                    maxWidth: "85%",
+                    margin: "auto"
+                }}>
                     {documents.map((doc) => (
-                        <div key={doc.id} style={{ border: "1px solid #ddd", borderRadius: "8px", padding: "16px", boxShadow: "0px 4px 10px rgba(0,0,0,0.1)", backgroundColor: "#fff", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                        <div key={doc.id} style={{
+                            border: "1px solid #ddd",
+                            borderRadius: "8px",
+                            padding: "16px",
+                            boxShadow: "0px 4px 10px rgba(0,0,0,0.1)",
+                            backgroundColor: "#fff",
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "space-between"
+                        }}>
                             <div style={{ fontWeight: "bold", marginBottom: "8px" }}>{doc.requestName}</div>
-                            <div>
-                                <Link to={`/detail/${doc.id}`} style={{ textDecoration: "none", color: "#007BFF" }}>{doc.fileName}</Link>
-                            </div>
+                            <embed
+                                src={doc.previewUrl || doc.fileUrl}
+                                type="application/pdf"
+                                width="100%"
+                                height="150px"
+                            />
                             <div style={{ marginTop: "8px", fontSize: "14px" }}>
                                 상태: <span className={getStatusClass(doc.status)}>{getStatusLabel(doc.status)}</span><br/>
                                 생성일: {moment(doc.createdAt).format('YY년 MM월 DD일')}<br/>
@@ -187,7 +207,13 @@ const ReceivedDocuments = () => {
                 </div>
             )}
 
-            <RejectModal isVisible={showModal} onClose={() => setShowModal(false)} onConfirm={handleConfirmReject} rejectReason={rejectReason} setRejectReason={setRejectReason} />
+            <RejectModal
+                isVisible={showModal}
+                onClose={() => setShowModal(false)}
+                onConfirm={handleConfirmReject}
+                rejectReason={rejectReason}
+                setRejectReason={setRejectReason}
+            />
         </PageContainer>
     );
 };

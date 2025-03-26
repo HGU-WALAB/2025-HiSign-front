@@ -77,6 +77,7 @@ const AddSignerPage = () => {
                   <option value="@handong.ac.kr">@handong.ac.kr</option>
                   <option value="@handong.edu">@handong.edu</option>
                 </Select>
+                
               </RowContainer>
               <AddButton onClick={handleAddSigner} disabled={!isAddButtonEnabled}>
                 추가하기
@@ -192,6 +193,7 @@ const AddButton = styled.button`
   color: white;
   border: none;
   border-radius: 3px;
+  /* margin-left: 400px; */
   cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
 `;
 

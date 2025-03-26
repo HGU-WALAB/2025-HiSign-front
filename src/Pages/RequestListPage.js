@@ -164,8 +164,15 @@ const RequestedDocuments = () => {
                     </div>
                 </div>
             ) : (
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))", gap: "20px", maxWidth: "90%", margin: "auto", padding: "20px" }}>
-                    {documents.map((doc) => (
+                <div style={{ 
+                    display: "grid", 
+                    gridTemplateColumns: "repeat(3, 1fr)", // Changed to 3 columns
+                    gap: "20px", 
+                    maxWidth: "90%", 
+                    margin: "auto", 
+                    padding: "20px" 
+                }}>
+                    {paginatedDocuments.map((doc) => ( // Changed from documents to paginatedDocuments
                         <div key={doc.id} style={{ border: "1px solid #ddd", borderRadius: "10px", padding: "16px", backgroundColor: "#fff", boxShadow: "0 4px 8px rgba(0,0,0,0.05)", transition: "0.3s", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
                             <div>
                                 <div style={{ marginBottom: "8px", fontWeight: "bold" }}>{doc.requestName}</div>
