@@ -1,13 +1,16 @@
+import React, { useEffect } from "react";
 import { Link, Outlet } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import HisnetLoginButton from "../components/HisnetLoginButton";
 import HisnetLogoutButton from "../components/HisnetLogoutButton";
-import { authState } from "../recoil/atom/authState";
 import { loginMemberState } from "../recoil/atom/loginMemberState"; // 로그인한 사용자 정보 가져오기
 
 function HeaderBar() {
-    const auth = useRecoilValue(authState);
     const loginMember = useRecoilValue(loginMemberState); // 로그인한 멤버 정보
+
+    useEffect(() => {
+        console.log(loginMember);
+    }, [loginMember]);
 
     return (
         <div className="d-flex flex-column w-100">
@@ -33,7 +36,7 @@ function HeaderBar() {
                     />
                 </Link>
                 
-                {auth.isAuthenticated && (
+                {!!loginMember.unique_id && (
                     <div className="d-flex gap-3">
                         <Link to="/request-document" className="nav-link text-dark">
                             요청한 작업
@@ -57,11 +60,11 @@ function HeaderBar() {
                 )}
 
                 <div className="d-flex align-items-center gap-3 me-3">
-                    {auth.isAuthenticated && loginMember.name ? (
+                    {!!loginMember.unique_id && (
                         <span className="fw-bold text-dark">{loginMember.name}님, 반갑습니다!</span>
-                    ) : null}
+                    )}
 
-                    {auth.isAuthenticated ? <HisnetLogoutButton /> : <HisnetLoginButton />}
+                    {!!loginMember.unique_id ? <HisnetLogoutButton /> : <HisnetLoginButton />}
                 </div>
             </header>
             <div className="w-100" >

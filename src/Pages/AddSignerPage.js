@@ -59,12 +59,11 @@ const AddSignerPage = () => {
     if (exists) {
       setSigners(signers.filter((s) => s.email !== signer.email));
     } else {
-      setSigners([...signers, signer]);
+      setSigners([...signers,{ name: signer.name, email: signer.email, signatureFields: [] }]);
     }
   };
 
   const handleKeyDown = (e) => {
-    const activeResults = focusTarget === "name" ? nameResults : emailResults;
     if (!activeResults.length) return;
     if (e.key === "ArrowDown") {
       e.preventDefault();
@@ -90,9 +89,9 @@ const AddSignerPage = () => {
   }, []);
 
   const handleAddSigner = () => {
-    const email = newEmailPrefix + newEmailDomain;
-    if (!signers.some((s) => s.email === email)) {
-      setSigners([...signers, { name: newName, email, signatureFields: [] }]);
+    const newEmail = newEmailPrefix + newEmailDomain;
+    if (!signers.some((s) => s.email === newEmail)) {
+      setSigners([...signers, { name: newName, email: newEmail, signatureFields: [] }]);
       setNewName("");
       setNewEmailPrefix("");
       setNewEmailDomain("@handong.ac.kr");
