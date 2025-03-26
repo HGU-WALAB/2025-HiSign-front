@@ -17,10 +17,9 @@ function SideBar() {
 
         <>
             <CenterContainer>
-             {/* <img src={`${process.env.PUBLIC_URL}/assets/frame.png`} alt="CSEE 로고" /> */}
-             {<h2> 쉽고 빠르게 안전한 전자서명 솔루션 </h2>}
-             <h1> Hi-Sign </h1>
-              <br></br>
+                <h2> 쉽고 빠르게 안전한 전자서명 솔루션 </h2>
+                <h1> Hi-Sign </h1>
+                <br></br>
                 {auth.isAuthenticated ? (
                     <CenterLink to="/tasksetup">서명 요청 시작하기</CenterLink>
                 ) : (
