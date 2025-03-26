@@ -1,4 +1,5 @@
-import { Drawer, List, ListItem, ListItemText, Menu, MenuItem, Typography } from '@mui/material';
+// AllocatePage.js
+import { Drawer, Typography, Menu, MenuItem, Card, CardContent, CardActionArea } from '@mui/material';
 import { useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import { Rnd } from "react-rnd";
@@ -12,6 +13,8 @@ import SignatureService from "../utils/SignatureService";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
+const defaultColors = ['#FF6B6B', '#4ECDC4', '#FFD93D', '#1A535C', '#FF9F1C', '#6A4C93'];
+
 const AllocatePage = () => {
   const document = useRecoilValue(taskState);
   const [signers, setSigners] = useRecoilState(signerState);
@@ -19,6 +22,7 @@ const AllocatePage = () => {
   const [selectedSigner, setSelectedSigner] = useState(null);
   const [pageNum, setPageNum] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
+  const [hoveredField, setHoveredField] = useState(null);
 
   const handleMenuClick = (event, signer) => {
     setMenuAnchor(event.currentTarget);
@@ -47,21 +51,33 @@ const AllocatePage = () => {
               <StyledServTitle variant="h7">대상을 선택 후 위치를 지정하세요</StyledServTitle>
               <Divider />
             </DrawerHeader>
-            <List>
-              {signers.map((signer) => (
-                <ListItem button key={signer.email} onClick={(e) => handleMenuClick(e, signer)}>
-                  <ListItemText 
-                    primary={
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span>{signer.name}</span>
-                        <SignatureCount>서명 {signer.signatureFields.length}개 할당</SignatureCount>
-                      </div>
-                    }
-                    secondary={signer.email} 
-                  />
-                </ListItem>
-              ))}
-            </List>
+            {signers.map((signer, index) => (
+              <Card
+                key={signer.email}
+                sx={{ margin: '10px', cursor: 'pointer', borderLeft: `6px solid ${signer.color || defaultColors[index % defaultColors.length]}` }}
+                onClick={(e) => handleMenuClick(e, signer)}
+              >
+                <CardActionArea>
+                  <CardContent>
+                    <Typography variant="subtitle1" fontWeight="bold">
+                      {signer.name}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {signer.email}
+                    </Typography>
+                    <Typography variant="caption" sx={{
+                      backgroundColor: '#f5f5f5',
+                      padding: '2px 6px',
+                      borderRadius: '12px',
+                      display: 'inline-block',
+                      marginTop: '5px'
+                    }}>
+                      서명 {signer.signatureFields.length}개 할당
+                    </Typography>
+                  </CardContent>
+                </CardActionArea>
+              </Card>
+            ))}
           </StyledDrawer>
 
           <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={handleMenuClose}>
@@ -72,33 +88,38 @@ const AllocatePage = () => {
             {document.fileUrl ? (
               <DocumentContainer>
                 <Document file={document.fileUrl} onLoadSuccess={(data) => setTotalPages(data.numPages)}>
-                  <Page pageNumber={pageNum} width={800} onRenderSuccess={(page) => { console.log("렌더링된 페이지 높이: ", page.height);}} />
+                  <Page pageNumber={pageNum} width={800} />
                 </Document>
 
-                {signers.map((signer) =>
+                {signers.map((signer, index) =>
                   signer.signatureFields
                     .filter((box) => box.position.pageNumber === pageNum)
-                    .map((box, index) => (
+                    .map((box) => (
                       <Rnd
                         key={box.id}
                         bounds="parent"
                         size={{ width: box.width, height: box.height }}
                         position={{ x: box.position.x, y: box.position.y }}
+                        lockAspectRatio={2 / 1}
                         onDragStop={(e, d) => {
-                          console.log("선택된 박스 : ", signer, box.id);
                           SignatureService.updateSignaturePosition(setSigners, signer.email, box.id, { x: d.x, y: d.y });
                         }}
                         onResizeStop={(e, direction, ref, delta, pos) => {
-                          console.log("선택된 박스 : ", signer, box.id);
-                          SignatureService.updateSignatureSize(setSigners, signer.email, box.id, ref.offsetWidth, ref.offsetHeight, pos);
+                          const adjustedWidth = ref.offsetWidth;
+                          const adjustedHeight = adjustedWidth / 2;
+                          SignatureService.updateSignatureSize(setSigners, signer.email, box.id, adjustedWidth, adjustedHeight, pos);
                         }}
+                        onMouseEnter={() => setHoveredField(box.id)}
+                        onMouseLeave={() => setHoveredField(null)}
                       >
-                        <SignatureBoxContainer>
+                        <SignatureBoxContainer color={signer.color || defaultColors[index % defaultColors.length]}>
                           {signer.name}의 서명
-                          <DeleteButton onClick={(e) => {
-                            e.stopPropagation();
-                            SignatureService.removeSignatureBox(setSigners, signer.email, box.id);
-                          }}>삭제</DeleteButton>
+                          {hoveredField === box.id && (
+                            <DeleteButton onClick={(e) => {
+                              e.stopPropagation();
+                              SignatureService.removeSignatureBox(setSigners, signer.email, box.id);
+                            }}>삭제</DeleteButton>
+                          )}
                         </SignatureBoxContainer>
                       </Rnd>
                     ))
@@ -109,18 +130,17 @@ const AllocatePage = () => {
             )}
 
             <PagingControl pageNum={pageNum} setPageNum={setPageNum} totalPages={totalPages} />
+            <ButtonContainer>
+              <CompleteButton />
+            </ButtonContainer>
           </DocumentSection>
         </Container>
-
-        <ButtonContainer>
-          <CompleteButton />
-        </ButtonContainer>
       </ContentWrapper>
     </MainContainer>
   );
 };
 
-// ✅ ESLint 오류가 발생했던 스타일 컴포넌트 추가
+// 스타일 컴포넌트
 const MainContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -145,7 +165,7 @@ const DocumentSection = styled.div`
 `;
 
 const DocumentContainer = styled.div`
-  max-width: 800px;
+  max-width: 802px;
   margin: 20px auto;
   border: 1px solid #999;
   position: relative;
@@ -165,14 +185,16 @@ const Divider = styled.hr`
 
 const SignatureBoxContainer = styled.div`
   position: relative;
-  border: 2px dashed #000;
-  background-color: rgba(0, 0, 0, 0.1);
+  border: 2px dashed ${(props) => props.color || '#000'};
+  background-color: ${(props) => props.color ? `${props.color}20` : 'rgba(0, 0, 0, 0.1)'};
   cursor: move;
   padding: 10px;
   text-align: center;
   width: 100%;
   height: 100%;
   box-sizing: border-box;
+  font-weight: bold;
+  color: #333;
 `;
 
 const DeleteButton = styled.button`
@@ -192,13 +214,14 @@ const StyledDrawer = styled(Drawer)`
   && {
     width: 300px;
     flex-shrink: 0;
-    
+
     .MuiDrawer-paper {
       width: 250px;
       top: 80px;
       height: calc(100% - 80px);
       background-color: white;
       border-right: 1px solid #e0e0e0;
+      padding: 10px;
     }
   }
 `;
@@ -212,14 +235,6 @@ const StyledServTitle = styled(Typography)`
   color: #666;
   font-size: 0.9rem;
   margin: 8px 0;
-`;
-
-const SignatureCount = styled.span`
-  font-size: 0.8rem;
-  color: #666;
-  background-color: #f5f5f5;
-  padding: 2px 8px;
-  border-radius: 12px;
 `;
 
 const LoadingMessage = styled.p`

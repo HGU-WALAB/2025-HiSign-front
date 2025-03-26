@@ -1,11 +1,12 @@
-import { Button } from '@mui/material';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilState, useRecoilValue } from 'recoil';
+import styled from 'styled-components';
 import { loginMemberState } from '../../recoil/atom/loginMemberState';
 import { signerState } from '../../recoil/atom/signerState';
 import { taskState } from '../../recoil/atom/taskState';
 import ApiService from '../../utils/ApiService';
+import ButtonBase from '../ButtonBase';
 import CompleteModal from './CompleteModal';
 
 const CompleteButton = () => {
@@ -82,9 +83,9 @@ const CompleteButton = () => {
 
   return (
     <>
-      <Button variant="contained" color="primary" onClick={handleOpenModal}>
+      <BigButton variant="contained" color="primary" onClick={handleOpenModal}>
         완료
-      </Button>
+      </BigButton>
 
       <CompleteModal open={open} onClose={handleCloseModal} onConfirm={handleConfirm} />
     </>
@@ -92,3 +93,9 @@ const CompleteButton = () => {
 };
 
 export default CompleteButton;
+
+const BigButton = styled(ButtonBase)`
+  background-color: ${({ disabled }) => (disabled ? "#ccc" : "#03A3FF")};
+  font-size: 1rem;
+  font-weight: bold;
+`;

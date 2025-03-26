@@ -4,6 +4,7 @@ import "react-pdf/dist/esm/entry.webpack";
 import { useNavigate } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
 import styled from "styled-components";
+import ButtonBase from "../components/ButtonBase";
 import Drop from "../components/Drop";
 import { loginMemberState } from "../recoil/atom/loginMemberState";
 import { taskState } from "../recoil/atom/taskState";
@@ -20,10 +21,37 @@ const SetupTaskPage = () => {
   const [expirationTime, setExpirationTime] = useState("23:59"); // ✅ 서명 만료 시간 상태 추가
   const [previewUrl, setPreviewUrl] = useState(null); // ✅ 파일 미리보기 상태 추가
   const [numPages, setNumPages] = useState(null);
+  // ✅ 만료일 선택 옵션 상태 추가
+  const [expirationOption, setExpirationOption] = useState("custom");
   const navigate = useNavigate();
 
   // ✅ 오늘 날짜를 기본 최소값으로 설정
   const today = new Date().toISOString().split('T')[0];
+
+  // ✅ 만료일 옵션 계산 함수
+  const calculateExpirationDate = (option) => {
+    const now = new Date();
+    
+    switch(option) {
+      case "today":
+        return now.toISOString().split('T')[0];
+      case "threeDays":
+        now.setDate(now.getDate() + 3);
+        return now.toISOString().split('T')[0];
+      case "oneWeek":
+        now.setDate(now.getDate() + 7);
+        return now.toISOString().split('T')[0];
+      default:
+        return expirationDate;
+    }
+  };
+
+  // ✅ 만료일 옵션 변경 핸들러
+  const handleExpirationOptionChange = (option) => {
+    setExpirationOption(option);
+    const newDate = calculateExpirationDate(option);
+    setExpirationDate(newDate);
+  };
 
   const handlePostFiles = (file) => {
     if (!file) {
@@ -89,7 +117,7 @@ const SetupTaskPage = () => {
   }, [document]);
 
   return (
-      <Container style={{paddingTop: "2.5rem"}}>
+      <Container>
         <StyledBody>
           <MainArea>
             <Title>작업 정보 입력</Title>
@@ -145,41 +173,76 @@ const SetupTaskPage = () => {
                 </RadioLabel>
               </RadioContainer>
               
-              {/* ✅ 만료일 및 시간 선택  */}
-            
-                <DatePickerContainer>
-                  <DateTimePickerTitle>서명 만료 설정</DateTimePickerTitle>
+              {/* ✅ 만료일 및 시간 선택 */}
+              <DatePickerContainer>
+                <DateTimePickerTitle>서명 만료 설정</DateTimePickerTitle>
+                
+                {/* ✅ 만료일 옵션 라디오 버튼 추가 */}
+                <ExpirationOptionContainer>
+                  <ExpirationOptionLabel>
+                    <RadioInput
+                      type="radio"
+                      name="expirationOption"
+                      value="today"
+                      checked={expirationOption === "today"}
+                      onChange={() => handleExpirationOptionChange("today")}
+                    />
+                    오늘
+                  </ExpirationOptionLabel>
+                  <ExpirationOptionLabel>
+                    <RadioInput
+                      type="radio"
+                      name="expirationOption"
+                      value="threeDays"
+                      checked={expirationOption === "threeDays"}
+                      onChange={() => handleExpirationOptionChange("threeDays")}
+                    />
+                    3일 후
+                  </ExpirationOptionLabel>
+                  <ExpirationOptionLabel>
+                    <RadioInput
+                      type="radio"
+                      name="expirationOption"
+                      value="oneWeek"
+                      checked={expirationOption === "oneWeek"}
+                      onChange={() => handleExpirationOptionChange("oneWeek")}
+                    />
+                    일주일 후
+                  </ExpirationOptionLabel>
+                </ExpirationOptionContainer>
+                
+                <DateTimePickerRow>
+                  <DateTimePickerColumn>
+                    <DatePickerLabel> 
+                      만료일 <RequiredMark>*</RequiredMark>
+                    </DatePickerLabel>
+                    <DatePickerInput
+                      type="date"
+                      min={today}
+                      value={expirationDate}
+                      onChange={(e) => {
+                        setExpirationDate(e.target.value);
+                        setExpirationOption("custom");
+                      }}
+                    />
+                  </DateTimePickerColumn>
                   
-                  <DateTimePickerRow>
-                    <DateTimePickerColumn>
-                      <DatePickerLabel>
-                        만료일 <RequiredMark>*</RequiredMark>
-                      </DatePickerLabel>
-                      <DatePickerInput
-                        type="date"
-                        min={today}
-                        value={expirationDate}
-                        onChange={(e) => setExpirationDate(e.target.value)}
-                      />
-                    </DateTimePickerColumn>
-                    
-                    <DateTimePickerColumn>
-                      <DatePickerLabel>
-                        만료 시간 <RequiredMark>*</RequiredMark>
-                      </DatePickerLabel>
-                      <DatePickerInput
-                        type="time"
-                        value={expirationTime}
-                        onChange={(e) => setExpirationTime(e.target.value)}
-                      />
-                    </DateTimePickerColumn>
-                  </DateTimePickerRow>
-                  
-                  <DatePickerHint>
-                    서명 요청이 만료되는 날짜와 시간을 선택하세요. 만료 시점 이후에는 서명이 불가합니다.
-                  </DatePickerHint>
-                </DatePickerContainer>
-              
+                  <DateTimePickerColumn>
+                    <DatePickerLabel>
+                      만료 시간 <RequiredMark>*</RequiredMark>
+                    </DatePickerLabel>
+                    <DatePickerInput
+                      type="time"
+                      value={expirationTime}
+                      onChange={(e) => setExpirationTime(e.target.value)}
+                    />
+                  </DateTimePickerColumn>
+                </DateTimePickerRow>
+                
+                <DatePickerHint>
+                  서명 요청이 만료되는 날짜와 시간을 선택하세요. 만료 시점 이후에는 서명이 불가합니다.
+                </DatePickerHint>
+              </DatePickerContainer>
             </InputRow>
             
             {/* 문서 선택 (파일 업로드) */}
@@ -209,7 +272,7 @@ const SetupTaskPage = () => {
                           </Document>
                       )}
                       <SelectedFileText>{document.fileName}</SelectedFileText>
-                      <ButtonContainer>
+                      <FileButtonContainer>
                         <ChangeFileButton
                             onClick={() =>
                                 setTaskState((previousDocument) => ({
@@ -221,7 +284,7 @@ const SetupTaskPage = () => {
                         >
                           다른 문서 선택
                         </ChangeFileButton>
-                      </ButtonContainer>
+                      </FileButtonContainer>
                     </SelectedFileBox>
                 )}
               </UploadSection>
@@ -230,12 +293,12 @@ const SetupTaskPage = () => {
         </StyledBody>
 
         {/* 하단 이동 버튼 */}
-        <FloatingButtonContainer>
+        <ButtonContainer>
           <GrayButton onClick={() => navigate(`/request-document`)}>나가기</GrayButton>
           <NextButton onClick={handleNextStep}>
             서명자 추가
           </NextButton>
-        </FloatingButtonContainer>
+        </ButtonContainer>
       </Container>
   );
 };
@@ -248,6 +311,7 @@ const Container = styled.div`
   min-height: 100vh;
   background-color: #e5e5e5;
   position: relative;
+  padding-top: 80px;
 `;
 
 const StyledBody = styled.main`
@@ -330,23 +394,52 @@ const RadioInput = styled.input`
   cursor: pointer;
 `;
 
-// ✅ 날짜 및 시간 선택 관련 스타일 추가/수정
+// ✅ 날짜 및 시간 선택 관련 스타일 최소화
 const DatePickerContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 12px;
   margin-top: 15px;
-  padding: 15px;
-  background-color: #f5f8ff;
-  border-radius: 5px;
-  border-left: 3px solid #007bff;
+  padding: 0; /* 패딩 제거 */
+  background-color: transparent; /* 배경색 제거 */
+  border-radius: 0; /* 테두리 둥글기 제거 */
+  border-left: none; /* 왼쪽 테두리 제거 */
 `;
 
 const DateTimePickerTitle = styled.h4`
   font-size: 15px;
-  font-weight: bold;
-  color: #007bff;
+  font-weight: normal; /* 굵기 기본값 */
+  color: inherit; /* 색상 상속 */
   margin: 0 0 5px 0;
+`;
+
+
+// ✅ 만료일 옵션 라디오 버튼 스타일 추가
+const ExpirationOptionContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 10px;
+  padding: 10px;
+  background-color: #f0f5ff;
+  border-radius: 5px;
+`;
+
+const ExpirationOptionLabel = styled.label`
+  font-size: 14px;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  cursor: pointer;
+  
+  &:hover {
+    background-color: #f0f0f0;
+  }
 `;
 
 const DateTimePickerRow = styled.div`
@@ -414,7 +507,7 @@ const SelectedFileText = styled.span`
   font-weight: bold;
 `;
 
-const ButtonContainer = styled.div`
+const FileButtonContainer = styled.div`
   margin-top: 10px;
 `;
 
@@ -431,32 +524,23 @@ const ChangeFileButton = styled.button`
   }
 `;
 
-const FloatingButtonContainer = styled.div`
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 20px;
-  z-index: 1000;
+const ButtonContainer = styled.div`
+  display: flex; /* 버튼들을 가로로 배치 */
+  justify-content: center; /* 중앙 정렬 */
+  align-items: center;
+  gap: 10px; /* ✅ 버튼 간 간격 조정 */
+  margin: 20px 0;
+  padding: 20px;
 `;
 
-const GrayButton = styled.button`
+const GrayButton = styled(ButtonBase)`
   background-color: #ccc;
-  padding: 12px 24px;
   color: white;
-  border: none;
-  border-radius: 25px;
-  cursor: pointer;
 `;
 
-const NextButton = styled.button`
+const NextButton = styled(ButtonBase)`
   background-color: ${({ disabled }) => (disabled ? "#ccc" : "#03A3FF")};
-  padding: 12px 24px;
   color: white;
-  border: none;
-  border-radius: 25px;
-  cursor: pointer;
 `;
 
 const FileInfoContainer = styled.div`

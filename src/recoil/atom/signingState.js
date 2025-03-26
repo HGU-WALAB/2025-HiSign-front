@@ -3,10 +3,15 @@ import { atom } from 'recoil';
 export const signingState = atom({
   key: 'signingState',
   default: {
+    requesterName: '', // 요청자 이름
+    requestName: '',   // 요청 이름
+    description: '',   // 요청 설명
+    isRejectable: false, // 거부 가능 여부
     signerEmail: '',  // 서명자의 이메일
     signerName: '',   // 서명자의 이름 (API 요청에 필요)
     documentId: null, // 서명할 문서 ID
     documentName: '', // 서명할 문서 이름
+    token: '',        // 서명 요청 토큰
     fileUrl: '',      // 서명할 문서의 PDF 파일 URL
     signatureFields: [], // ✅ 모든 필드에 `signerEmail` 포함
   },
