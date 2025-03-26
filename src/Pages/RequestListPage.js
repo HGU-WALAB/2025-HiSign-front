@@ -23,11 +23,12 @@ const RequestedDocuments = () => {
     const [cancelReason, setCancelReason] = useState("");
     const [signers, setSigners] = useState([]);
     const [showSignersModal, setShowSignersModal] = useState(false);
+
     const [viewMode, setViewMode] = useState("list");
 
     useEffect(() => {
         ApiService.fetchDocuments("requested")
-            .then((response) => {
+            .then(async (response) => {
                 const filteredDocuments = response.data.filter(doc => doc.status !== 5);
                 const sortedDocuments = filteredDocuments.sort((a, b) => {
                     if (a.status === 0 && b.status !== 0) return -1;
@@ -36,6 +37,20 @@ const RequestedDocuments = () => {
                     else return new Date(b.createdAt) - new Date(a.createdAt);
                 });
                 setDocuments(sortedDocuments);
+
+                const counts = {};
+                await Promise.all(sortedDocuments.map(async (doc) => {
+                    try {
+                        const response = await ApiService.fetchSignersByDocument(doc.id);
+                        const total = response.length;
+                        const signed = response.filter(s => s.status === 1).length;
+                        counts[doc.id] = `${signed}/${total}`;
+                    } catch (e) {
+                        counts[doc.id] = "0/0";
+                    }
+                }));
+
+                setSignerCounts(counts);
             })
             .catch((error) => {
                 setError("문서를 불러오는 중 문제가 발생했습니다: " + error.message);
@@ -113,6 +128,125 @@ const RequestedDocuments = () => {
                 요청한 작업
             </h1>
 
+            <div style={{
+                maxWidth: "85%",
+                margin: "auto",
+                boxShadow: "0px 6px 15px rgba(0, 0, 0, 0.1)",
+                borderRadius: "8px",
+                overflow: "hidden",
+                backgroundColor: "#fff"
+            }}>
+                <table style={{
+                    width: "100%",
+                    borderCollapse: "separate",
+                    borderSpacing: "0",
+                    border: "1px solid #ddd",
+                    borderRadius: "8px",
+                    overflow: "hidden",
+                }}>
+                    <thead>
+                    <tr style={{
+                        backgroundColor: "#FFFFFF",
+                        color: "#333",
+                        height: "45px",
+                        textAlign: "center",
+                        fontSize: "16px",
+                        fontWeight: "bold",
+                        borderBottom: "1px solid #ddd"
+                    }}>
+
+                        <th style={{padding: "12px"}}>No</th>
+                        <th style={{padding: "12px", textAlign: "center", paddingRight: "6rem"}}>상태</th>
+                        <th style={{padding: "12px 12px 12px 4px", textAlign: "left"}}>작업명</th>
+                        <th style={{padding: "12px"}}>요청 생성일</th>
+                        <th style={{padding: "12px"}}>요청 만료일</th>
+                        <th style={{padding: "12px"}}>추가메뉴</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {documents.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((doc, index) => (
+                        <tr key={doc.id} style={{
+                            borderBottom: "1px solid #ddd",
+                            height: "50px",
+                            backgroundColor: "white",
+                            transition: "all 0.2s ease-in-out",
+                        }}>
+                            <td style={{textAlign: "center", fontWeight: "bold"}}>
+                                {(currentPage - 1) * itemsPerPage + index + 1}
+                            </td>
+
+                            <td style={{textAlign: "center", paddingRight: "5rem"}}>
+                                <span className={getStatusClass(doc.status)}
+                                      style={{
+                                          minWidth: "70px",
+                                          display: "inline-block",
+                                          textAlign: "center"
+                                      }}
+                                >
+                                    {getStatusLabel(doc.status)}
+                                </span>
+                            </td>
+
+                            <td style={{textAlign: "left", color: "black"}}>
+                                {doc.requestName}
+                                <button
+                                    onClick={() => handleSearchClick(doc.id)}
+                                    style={{
+                                        backgroundColor: "white",
+                                        marginLeft: "8px",
+                                        padding: "2px 6px",
+                                        border: "none",
+                                        cursor: "pointer",
+                                        fontSize: "12px",
+                                    }}
+                                >
+                                    {signerCounts[doc.id] || ""}
+                                </button>
+                            </td>
+
+                            <td style={{
+                                textAlign: "center",
+                                color: "black",
+                            }}>{moment(doc.createdAt).format('YYYY/MM/DD')}</td>
+                            <td style={{
+                                textAlign: "center",
+                                color:
+                                    doc.status === 0 && moment(doc.expiredAt).isSame(moment(), 'day')
+                                        ? "red"
+                                        : "black"
+                            }}>
+                                {moment(doc.expiredAt).format('YYYY/MM/DD HH:mm')}
+                            </td>
+
+                            <td style={{textAlign: "center"}}>
+                                <Dropdown>
+                                    <Dropdown.Toggle variant="light" style={{
+                                        padding: "5px 10px",
+                                        borderRadius: "5px",
+                                        fontWeight: "bold",
+                                        border: "none"
+                                    }}></Dropdown.Toggle>
+                                    <Dropdown.Menu>
+                                        <Dropdown.Item as={Link} to={`/detail/${doc.id}`}>
+                                            <DownloadIcon fontSize="small" style={{marginRight: "6px"}}/>
+                                            문서 보기
+                                        </Dropdown.Item>
+                                        <Dropdown.Item disabled><DownloadIcon/> 다운로드</Dropdown.Item>
+                                        <Dropdown.Item onClick={() => handleCancelClick(doc)}
+                                                       disabled={doc.status !== 0}><DoDisturbIcon/> 요청
+                                            거절</Dropdown.Item>
+                                        <Dropdown.Item disabled><DeleteIcon/> 삭제</Dropdown.Item>
+                                    </Dropdown.Menu>
+                                </Dropdown>
+                            </td>
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
+            </div>
+            <div style={{display: "flex", justifyContent: "center", marginTop: "20px"}}>
+                <Pagination count={Math.ceil(documents.length / itemsPerPage)} color="default" page={currentPage}
+                            onChange={handlePageChange}/>
 
             <div style={{ display: "flex", justifyContent: "flex-end", marginRight: "8%", marginBottom: "10px" }}>
                 <button onClick={() => setViewMode("list")} style={{ background: "none", border: "none", cursor: "pointer" }}>
@@ -121,6 +255,7 @@ const RequestedDocuments = () => {
                 <button onClick={() => setViewMode("grid")} style={{ background: "none", border: "none", cursor: "pointer" }}>
                     <ViewModuleIcon color={viewMode === "grid" ? "primary" : "disabled"} />
                 </button>
+
 
             </div>
 
@@ -195,6 +330,23 @@ const RequestedDocuments = () => {
             <CancelModal isVisible={showModal} onClose={() => setShowModal(false)} onConfirm={handleConfirmCancel} cancelReason={cancelReason} setCancelReason={setCancelReason} />
 
             <Modal open={showSignersModal} onClose={() => setShowSignersModal(false)}>
+                <Box sx={{
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                    backgroundColor: "background.paper",
+                    boxShadow: 24,
+                    p: 4,
+                    width: "90%",
+                    maxWidth: "430px",
+                    minWidth: "280px",
+                    borderRadius: "8px",
+                }}>
+                    <Typography variant="h6" component="h2" sx={{ textAlign: "center" }}>
+                        서명자 정보
+                    </Typography>
+
 
                 <Box sx={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", bgcolor: "background.paper", boxShadow: 24, p: 4, width: "90%", maxWidth: "400px", minWidth: "280px", borderRadius: "8px" }}>
                     <Typography variant="h6" component="h2" sx={{ textAlign: "center" }}>서명자 정보</Typography>
@@ -220,3 +372,4 @@ const RequestedDocuments = () => {
 };
 
 export default RequestedDocuments;
+

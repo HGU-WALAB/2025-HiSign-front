@@ -23,6 +23,7 @@ const ReceivedDocuments = () => {
     const [showModal, setShowModal] = useState(false);
     const [selectedDocument, setSelectedDocument] = useState(null);
     const [rejectReason, setRejectReason] = useState("");
+
     const [viewMode, setViewMode] = useState("list");
     const [loginMember] = useRecoilState(loginMemberState);
 
@@ -41,6 +42,7 @@ const ReceivedDocuments = () => {
                 });
 
                 setDocuments(sortedDocuments);
+
             })
             .catch((error) => {
                 console.error("문서 불러오기 오류:", error);
@@ -74,6 +76,7 @@ const ReceivedDocuments = () => {
         setSelectedDocument(doc);
         setRejectReason("");
         setShowModal(true);
+        console.log("선택된 문서:", doc);
     };
 
     const handleConfirmReject = () => {
@@ -104,7 +107,7 @@ const ReceivedDocuments = () => {
 
     return (
         <PageContainer>
-            <h1 style={{ textAlign: "center", marginBottom: "20px", fontSize: "24px", fontWeight: "bold", paddingTop: "1rem" }}>
+            <h1 style={{ textAlign: "center", marginBottom: "20px", fontSize: "24px", fontWeight: "bold", paddingTop: "2rem" }}>
                 요청받은 작업
             </h1>
             {error && <p style={{ color: "red", textAlign: "center" }}>{error}</p>}
@@ -167,6 +170,99 @@ const ReceivedDocuments = () => {
                     maxWidth: "85%",
                     margin: "auto"
                 }}>
+                    <thead>
+                    <tr style={{
+                        backgroundColor: "#FFFFFF",
+                        color: "#333",
+                        height: "45px",
+                        textAlign: "center",
+                        fontSize: "16px",
+                        fontWeight: "bold",
+                        borderBottom: "1px solid #ddd"
+                    }}>
+                        <th style={{padding: "12px"}}>No</th>
+                        <th style={{padding: "12px", textAlign: "center", paddingRight: "6rem"}}>상태</th>
+                        <th style={{ padding: "12px 12px 12px 4px", textAlign: "left" }}>작업명</th>
+                        <th style={{padding: "12px"}}>요청 생성일</th>
+                        <th style={{padding: "12px"}}>요청 만료일</th>
+                        <th style={{padding: "12px"}}>요청자</th>
+                        <th style={{padding: "12px"}}>추가메뉴</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {documents.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((doc, index) => (
+                        <tr key={doc.id} style={{
+                            borderBottom: "1px solid #ddd",
+                            height: "50px",
+                            backgroundColor: "white",
+                            transition: "all 0.2s ease-in-out",
+                        }}>
+                            <td style={{textAlign: "center", fontWeight: "bold"}}>
+                                {(currentPage - 1) * itemsPerPage + index + 1}
+                            </td>
+
+                            <td style={{textAlign: "center", paddingRight: "5rem"}}>
+                                <span className={getStatusClass(doc.status)}
+                                      style={{
+                                          minWidth: "70px",
+                                          display: "inline-block",
+                                          textAlign: "center"
+                                      }}
+                                >
+                                    {getStatusLabel(doc.status)}
+                                </span>
+                            </td>
+                            <td style={{textAlign: "left", color: "black"}}>{doc.requestName}</td>
+                            <td style={{
+                                textAlign: "center",
+                                color: "black"
+                            }}>{moment(doc.createdAt).format('YYYY/MM/DD')}</td>
+                            <td style={{
+                                textAlign: "center",
+                                color:
+                                    doc.status === 0 && moment(doc.expiredAt).isSame(moment(), 'day')
+                                        ? "red"
+                                        : "black"
+                            }}>
+                                {moment(doc.expiredAt).format('YYYY/MM/DD HH:mm')}
+                            </td>
+
+                            <td style={{textAlign: "center", color: "black"}}>{doc.requesterName || "알 수 없음"}</td>
+                            <td style={{textAlign: "center"}}>
+                                <Dropdown>
+                                    <Dropdown.Toggle variant="light" style={{
+                                        padding: "5px 10px",
+                                        borderRadius: "5px",
+                                        fontWeight: "bold",
+                                        border: "none"
+                                    }}></Dropdown.Toggle>
+                                    <Dropdown.Menu>
+                                        <Dropdown.Item as={Link} to={`/detail/${doc.id}`}>
+                                            <DownloadIcon fontSize="small" style={{marginRight: "6px"}}/>
+                                            문서 보기
+                                        </Dropdown.Item>
+                                        <Dropdown.Item disabled><DownloadIcon/> 다운로드</Dropdown.Item>
+                                        <Dropdown.Item onClick={() => handleRejectClick(doc)}
+                                                       disabled={doc.status !== 0 || doc.isRejectable !== 1}>
+                                            <DoDisturbIcon/> 요청 거절
+                                        </Dropdown.Item>
+                                        <Dropdown.Item disabled><DeleteIcon/> 삭제</Dropdown.Item>
+                                    </Dropdown.Menu>
+                                </Dropdown>
+                            </td>
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
+            </div>
+
+            <div style={{display: "flex", justifyContent: "center", marginTop: "20px"}}>
+                <Pagination count={Math.ceil(documents.length / itemsPerPage)} color="default" page={currentPage}
+                            onChange={handlePageChange}/>
+            </div>
+
+            <RejectModal isVisible={showModal} onClose={() => setShowModal(false)} onConfirm={handleConfirmReject}
+                         rejectReason={rejectReason} setRejectReason={setRejectReason}/>
                     {documents.map((doc) => (
                         <div key={doc.id} style={{
                             border: "1px solid #ddd",
@@ -220,3 +316,4 @@ const ReceivedDocuments = () => {
 };
 
 export default ReceivedDocuments;
+
