@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, Outlet } from "react-router-dom";
 import LoginCallback from "./auth/LoginCallback";
 import Sidebar from "./Layout/Sidebar";
 import AddSignerPage from "./Pages/AddSignerPage";
@@ -27,11 +27,8 @@ function MyRoutes() {
                 <Route path="/sign" element={<SignPage />} />
                 <Route path="/sign-complete" element={<CompleteSignPage />} />
                 <Route path="/contact" element={<ContactPage />} />
-                <Route path="/sign" element={<SignPage />} />
-                <Route path="/sign-complete" element={<CompleteSignPage />} />
-                <Route path="/preview" element={<PreviewTaskPage />} />
 
-                {/* 로그인 필요한 구간 */}
+                {/* Login-required routes */}
                 <Route path="/tasksetup" element={
                     <RequireLogin><SetupTaskPage /></RequireLogin>
                 } />
@@ -51,6 +48,7 @@ function MyRoutes() {
                     <RequireLogin><DetailPage /></RequireLogin>
                 } />
             </Route>
+        </Routes>
     );
 }
 
