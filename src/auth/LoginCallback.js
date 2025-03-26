@@ -3,14 +3,12 @@ import { jwtDecode } from 'jwt-decode';
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useSetRecoilState } from 'recoil';
-import { authState } from '../recoil/atom/authState';
 import { loginMemberState } from '../recoil/atom/loginMemberState';
 import ApiService from '../utils/ApiService';
 
 const LoginCallback = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const setAuthState = useSetRecoilState(authState);
   const setloginMemberState = useSetRecoilState(loginMemberState);
 
   // URL에서 토큰 추출
@@ -25,18 +23,13 @@ const LoginCallback = () => {
   
       if (token) {
         try {
-          console.log(token);
           const response = await ApiService.login(token);
           
           // 세션 스토리지에 토큰 저장
           sessionStorage.setItem('token', response.data.token);
 
-          // 인증 상태 변경
-          setAuthState({ isAuthenticated: true });
-
           // 토큰 정보 디코딩
           const payload = jwtDecode(response.data.token);
-          console.log('payload:', payload);
 
           // 사용자 정보 상태 변경
           setloginMemberState({
@@ -45,6 +38,7 @@ const LoginCallback = () => {
             email: payload.email,
             level: payload.level,
           });
+          
           // 페이지 이동
           navigate('/');
         } catch (error) {
@@ -56,7 +50,7 @@ const LoginCallback = () => {
     };
   
     handleToken();
-  }, [location.search, navigate, setAuthState, setloginMemberState]);
+  }, [location.search, navigate, setloginMemberState]);
 };
 
 export default LoginCallback;
