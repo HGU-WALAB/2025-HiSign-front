@@ -23,11 +23,13 @@ const RequestedDocuments = () => {
 
     const [signers, setSigners] = useState([]);
     const [showSignersModal, setShowSignersModal] = useState(false);
+    const [signerCounts, setSignerCounts] = useState({});
+
 
 
     useEffect(() => {
         ApiService.fetchDocuments("requested")
-            .then((response) => {
+            .then(async (response) => {
                 const filteredDocuments = response.data.filter(doc => doc.status !== 5);
                 const sortedDocuments = filteredDocuments.sort((a, b) => {
                     if (a.status === 0 && b.status !== 0) return -1;
@@ -37,6 +39,20 @@ const RequestedDocuments = () => {
                 });
 
                 setDocuments(sortedDocuments);
+
+                const counts = {};
+                await Promise.all(sortedDocuments.map(async (doc) => {
+                    try {
+                        const response = await ApiService.fetchSignersByDocument(doc.id);
+                        const total = response.length;
+                        const signed = response.filter(s => s.status === 1).length;
+                        counts[doc.id] = `${signed}/${total}`;
+                    } catch (e) {
+                        counts[doc.id] = "0/0";
+                    }
+                }));
+
+                setSignerCounts(counts);
             })
             .catch((error) => {
                 setError("문서를 불러오는 중 문제가 발생했습니다: " + error.message);
@@ -94,7 +110,6 @@ const RequestedDocuments = () => {
             });
     };
 
-    // 🔹 추가: 서명자 정보 가져오기
     const handleSearchClick = (docId) => {
         ApiService.fetchSignersByDocument(docId)
             .then((response) => {
@@ -117,7 +132,7 @@ const RequestedDocuments = () => {
                 marginBottom: "20px",
                 fontSize: "24px",
                 fontWeight: "bold",
-                paddingTop: "1rem"
+                paddingTop: "2rem"
             }}>
                 요청한 작업
             </h1>
@@ -149,47 +164,70 @@ const RequestedDocuments = () => {
                         fontWeight: "bold",
                         borderBottom: "1px solid #ddd"
                     }}>
-                        <th style={{padding: "12px"}}>상태</th>
-                        <th style={{padding: "12px"}}>작업명</th>
-                        {/*<th style={{padding: "12px"}}>파일명</th>*/}
+
+                        <th style={{padding: "12px"}}>No</th>
+                        <th style={{padding: "12px", textAlign: "center", paddingRight: "6rem"}}>상태</th>
+                        <th style={{padding: "12px 12px 12px 4px", textAlign: "left"}}>작업명</th>
                         <th style={{padding: "12px"}}>요청 생성일</th>
                         <th style={{padding: "12px"}}>요청 만료일</th>
                         <th style={{padding: "12px"}}>추가메뉴</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {documents.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((doc) => (
+                    {documents.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((doc, index) => (
                         <tr key={doc.id} style={{
                             borderBottom: "1px solid #ddd",
                             height: "50px",
                             backgroundColor: "white",
                             transition: "all 0.2s ease-in-out",
                         }}>
-                            <td style={{textAlign: "center"}}>
-                                <span className={getStatusClass(doc.status)}>
+                            <td style={{textAlign: "center", fontWeight: "bold"}}>
+                                {(currentPage - 1) * itemsPerPage + index + 1}
+                            </td>
+
+                            <td style={{textAlign: "center", paddingRight: "5rem"}}>
+                                <span className={getStatusClass(doc.status)}
+                                      style={{
+                                          minWidth: "70px",
+                                          display: "inline-block",
+                                          textAlign: "center"
+                                      }}
+                                >
                                     {getStatusLabel(doc.status)}
                                 </span>
                             </td>
-                            <td style={{textAlign: "center", color: "black"}}>
+
+                            <td style={{textAlign: "left", color: "black"}}>
                                 {doc.requestName}
-                                <FaSearch style={{marginLeft: "8px", cursor: "pointer", color: "black"}}
-                                          onClick={() => handleSearchClick(doc.id)}/>
+                                <button
+                                    onClick={() => handleSearchClick(doc.id)}
+                                    style={{
+                                        backgroundColor: "white",
+                                        marginLeft: "8px",
+                                        padding: "2px 6px",
+                                        border: "none",
+                                        cursor: "pointer",
+                                        fontSize: "12px",
+                                    }}
+                                >
+                                    {signerCounts[doc.id] || ""}
+                                </button>
                             </td>
-                            {/*<td style={{textAlign: "center"}}>*/}
-                            {/*    <Link to={`/detail/${doc.id}`} style={{textDecoration: "none", color: "#007BFF"}}>*/}
-                            {/*        {doc.fileName}*/}
-                            {/*    </Link>*/}
-                            {/*</td>*/}
+
                             <td style={{
                                 textAlign: "center",
-                                color: "black"
+                                color: "black",
                             }}>{moment(doc.createdAt).format('YYYY/MM/DD')}</td>
                             <td style={{
                                 textAlign: "center",
-                                color: moment(doc.expiredAt).isSame(moment(), 'day') ? "red" : "black"
+                                color:
+                                    doc.status === 0 && moment(doc.expiredAt).isSame(moment(), 'day')
+                                        ? "red"
+                                        : "black"
                             }}>
                                 {moment(doc.expiredAt).format('YYYY/MM/DD HH:mm')}
                             </td>
+
                             <td style={{textAlign: "center"}}>
                                 <Dropdown>
                                     <Dropdown.Toggle variant="light" style={{
@@ -199,6 +237,10 @@ const RequestedDocuments = () => {
                                         border: "none"
                                     }}></Dropdown.Toggle>
                                     <Dropdown.Menu>
+                                        <Dropdown.Item as={Link} to={`/detail/${doc.id}`}>
+                                            <DownloadIcon fontSize="small" style={{marginRight: "6px"}}/>
+                                            문서 보기
+                                        </Dropdown.Item>
                                         <Dropdown.Item disabled><DownloadIcon/> 다운로드</Dropdown.Item>
                                         <Dropdown.Item onClick={() => handleCancelClick(doc)}
                                                        disabled={doc.status !== 0}><DoDisturbIcon/> 요청
@@ -227,7 +269,7 @@ const RequestedDocuments = () => {
                     top: "50%",
                     left: "50%",
                     transform: "translate(-50%, -50%)",
-                    bgcolor: "background.paper",
+                    backgroundColor: "background.paper",
                     boxShadow: 24,
                     p: 4,
                     width: "90%",
@@ -278,3 +320,4 @@ const RequestedDocuments = () => {
 };
 
 export default RequestedDocuments;
+
