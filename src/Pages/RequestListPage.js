@@ -324,7 +324,7 @@ const RequestedDocuments = () => {
                     boxShadow: 24,
                     p: 4,
                     width: "90%",
-                    maxWidth: "400px",
+                    maxWidth: "600px",
                     minWidth: "280px",
                     borderRadius: "8px"
                 }}>
@@ -334,10 +334,15 @@ const RequestedDocuments = () => {
                         {signers.length > 0 ? (
                             <ul>
                                 {signers.map((signer, index) => (
-                                    <li key={index}>{signer.name} ({signer.email})
-                                        - {signer.status === 1 ? "서명 완료" : "서명 전"}</li>
+                                    <li key={index}>
+                                        {signer.name} ({signer.email}) -{" "}
+                                        {signer.status === 1
+                                            ? `서명 완료 (${moment(signer.signedAt).format("YYYY-MM-DD HH:mm")})`
+                                            : "서명 전"}
+                                    </li>
                                 ))}
                             </ul>
+
                         ) : (
                             <Typography textAlign="center">서명자 정보가 없습니다.</Typography>
                         )}
