@@ -24,6 +24,8 @@ const LoginCallback = () => {
       if (token) {
         try {
           const response = await ApiService.login(token);
+          
+          // 토큰 정보 디코딩
           console.log("로그인 성공:", response);
           // 토큰 정보 디코
           const payload = jwtDecode(response.data.token);
