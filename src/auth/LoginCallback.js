@@ -25,18 +25,17 @@ const LoginCallback = () => {
         try {
           const response = await ApiService.login(token);
           
-          // 세션 스토리지에 토큰 저장
-          sessionStorage.setItem('token', response.data.token);
-
           // 토큰 정보 디코딩
+          console.log("로그인 성공:", response);
+          // 토큰 정보 디코
           const payload = jwtDecode(response.data.token);
-
+          console.log("디코딩된 페이로드:", payload);
           // 사용자 정보 상태 변경
           setloginMemberState({
-            unique_id: payload.uniqueId,
+            unique_id: payload.sub,
             name: payload.name,
             email: payload.email,
-            level: payload.level,
+            level: payload.role,
           });
           
           // 페이지 이동
