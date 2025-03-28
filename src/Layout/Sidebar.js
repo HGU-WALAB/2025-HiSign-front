@@ -3,11 +3,9 @@ import { Link, Outlet } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import HisnetLoginButton from "../components/HisnetLoginButton";
 import HisnetLogoutButton from "../components/HisnetLogoutButton";
-import { authState } from "../recoil/atom/authState";
 import { loginMemberState } from "../recoil/atom/loginMemberState";
 
 function Sidebar() {
-    const auth = useRecoilValue(authState);
     const loginMember = useRecoilValue(loginMemberState);
     const [showLogout, setShowLogout] = useState(false);
 
@@ -49,12 +47,12 @@ function Sidebar() {
                         style: { height: "60px" }
                     })
                 ),
-                auth.isAuthenticated && React.createElement(
+                !!loginMember.unique_id && React.createElement(
                     "div",
                     { className: "fw-bold text-dark mb-4 ps-1" },
                     fullName // ex: "김솔미"
                 ),
-                auth.isAuthenticated && React.createElement("nav", { className: "nav flex-column gap-2" },
+                !!loginMember.unique_id && React.createElement("nav", { className: "nav flex-column gap-2" },
                     React.createElement(Link, { to: "/request-document", className: "nav-link text-dark" }, "요청한 작업"),
                     React.createElement(Link, { to: "/receive-document", className: "nav-link text-dark" }, "요청받은 작업"),
                     React.createElement(Link, { to: "/tasksetup", className: "nav-link text-dark" }, "문서 업로드하기"),
@@ -65,7 +63,7 @@ function Sidebar() {
             ),
 
             // 하단 프로필
-            auth.isAuthenticated ? React.createElement(
+            !!loginMember.unique_id ? React.createElement(
                 "div",
                 { className: "mt-auto", style: { position: "relative" } },
                 React.createElement(
