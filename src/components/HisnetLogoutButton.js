@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useSetRecoilState } from 'recoil';
 import { loginMemberState } from '../recoil/atom/loginMemberState';
+import ApiService from '../utils/ApiService';
 
 const HisnetLogoutButton = () => {
   const setMember = useSetRecoilState(loginMemberState);
@@ -13,7 +14,7 @@ const HisnetLogoutButton = () => {
       email: '',         // 사용자 이메일
       level: '',         // 사용자 권한
     });
-    sessionStorage.removeItem('token'); // 로그아웃 시 토큰 삭제
+    ApiService.logout(); // 로그아웃 API 호출
     navigate('/'); // 로그아웃 후 로그인 페이지로 이동
   };
 

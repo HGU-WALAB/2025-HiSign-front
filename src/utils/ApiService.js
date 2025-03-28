@@ -10,6 +10,7 @@ const HISNET_ACCESS_KEY = process.env.REACT_APP_HISNET_ACCESS_KEY;
 const apiInstance = axios.create({
   baseURL: BASE_URL,
   headers: { 'Content-Type': 'application/json' },
+  withCredentials: true,
 });
 
 // ✅ 공개 인스턴스 (비회원 / 서명자 접근 가능)
@@ -17,15 +18,6 @@ const PublicaApiInstance = axios.create({
   baseURL: BASE_URL,
   headers: { 'Content-Type': 'application/json' },
 });
-
-// 🔐 요청 시 JWT 토큰 자동 포함
-apiInstance.interceptors.request.use((config) => {
-  const token = sessionStorage.getItem('token');
-  if (token) {
-    config.headers['Authorization'] = `Bearer ${token}`;
-  }
-  return config;
-}, (error) => Promise.reject(error));
 
 // 🔐 응답 시 401 처리
 apiInstance.interceptors.response.use(
@@ -124,6 +116,10 @@ const ApiService = {
     return apiInstance.get(`/member/search/name?query=${name}`);
   },
 
+  // 🔐 로그아웃
+  logout: async () => {
+    return apiInstance.get('/auth/logout');
+  },
   // ===================================================
   // ✅ 비로그인 상태에서도 사용 가능한 API (PublicaApiInstance)
   // ===================================================
@@ -214,6 +210,7 @@ const ApiService = {
   login: async (hisnetToken) => {
     return axios.post(`${BASE_URL}/auth/login`, { hisnetToken }, {
       headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+      withCredentials: true,
     });
   }
 };

@@ -166,7 +166,7 @@ const ReceivedDocuments = () => {
                                 transition: "all 0.2s ease-in-out",
                             }}>
                                 <td style={{textAlign: "center", fontWeight: "bold"}}>
-                                    {(currentPage - 1) * itemsPerPage + index + 1}
+                                    {documents.length - ((currentPage - 1) * itemsPerPage + index)}
                                 </td>
 
                                 <td style={{textAlign: "center", paddingRight: "5rem"}}>

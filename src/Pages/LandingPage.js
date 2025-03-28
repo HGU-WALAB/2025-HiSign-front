@@ -1,3 +1,5 @@
+import React, { useEffect } from "react";
+
 import { Link } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import styled from "styled-components";
@@ -6,7 +8,7 @@ import { loginMemberState } from "../recoil/atom/loginMemberState";
 
 function SideBar() {
     const loginMember = useRecoilValue(loginMemberState);
-
+    useEffect(() => {console.log("loginMember", loginMember)}, [loginMember]);
     return (
 
         <>
