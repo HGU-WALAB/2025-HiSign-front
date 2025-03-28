@@ -25,9 +25,6 @@ const LoginCallback = () => {
         try {
           const response = await ApiService.login(token);
           
-          // 세션 스토리지에 토큰 저장
-          sessionStorage.setItem('token', response.data.token);
-
           // 토큰 정보 디코딩
           const payload = jwtDecode(response.data.token);
 
