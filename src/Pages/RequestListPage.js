@@ -12,6 +12,8 @@ import DoDisturbIcon from "@mui/icons-material/DoDisturb";
 import ViewListIcon from "@mui/icons-material/ViewList";
 import FindInPageIcon from '@mui/icons-material/FindInPage';
 import ViewModuleIcon from "@mui/icons-material/ViewModule";
+import TuneIcon from '@mui/icons-material/Tune';
+
 import moment from "moment/moment";
 
 const RequestedDocuments = () => {
@@ -27,11 +29,12 @@ const RequestedDocuments = () => {
     const [viewMode, setViewMode] = useState("list");
 
     const [signerCounts, setSignerCounts] = useState({});
+
     const [searchQuery, setSearchQuery] = useState("");
 
     useEffect(() => {
         ApiService.fetchDocuments("requested")
-            .then(response => {
+            .then(async (response) => {
                 const filteredDocuments = response.data.filter(doc => doc.status !== 5);
                 const sortedDocuments = filteredDocuments.sort((a, b) => {
                     if (a.status === 0 && b.status !== 0) return -1;
@@ -41,11 +44,28 @@ const RequestedDocuments = () => {
                 });
 
                 setDocuments(sortedDocuments);
+
+                const counts = {};
+                await Promise.all(sortedDocuments.map(async (doc) => {
+                    try {
+                        const response = await ApiService.fetchSignersByDocument(doc.id);
+                        const total = response.length;
+                        const signed = response.filter(s => s.status === 1).length;
+                        counts[doc.id] = `${signed}/${total}`;
+                    } catch (e) {
+                        counts[doc.id] = "0/0";
+                    }
+                }));
+
+                console.log("signerCounts:", counts); // 값을 확인
+
+                setSignerCounts(counts);
             })
             .catch((error) => {
                 setError("문서를 불러오는 중 문제가 발생했습니다: " + error.message);
             });
     }, []);
+
 
     const handleCancelClick = (doc) => {
         setSelectedDocument(doc);
@@ -137,7 +157,8 @@ const RequestedDocuments = () => {
 
 
             <div style={{display: "flex", justifyContent: "flex-end", marginRight: "8%", marginBottom: "10px"}}>
-                <div style={{textAlign: "center", marginBottom: "0.2rem"}}>
+                {/*<TuneIcon style={{color:"gray"}}/>*/}
+                <div style={{textAlign: "center", marginTop: "0.5rem"}}>
                     <input
                         type="text"
                         placeholder="작업명 검색"
@@ -233,6 +254,7 @@ const RequestedDocuments = () => {
                                         {signerCounts[doc.id] || ""}
                                     </button>
                                 </td>
+
                                 <td style={{
                                     textAlign: "center",
                                     color: "black",
