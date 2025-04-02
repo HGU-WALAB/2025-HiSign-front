@@ -12,6 +12,8 @@ import DoDisturbIcon from "@mui/icons-material/DoDisturb";
 import ViewListIcon from "@mui/icons-material/ViewList";
 import FindInPageIcon from '@mui/icons-material/FindInPage';
 import ViewModuleIcon from "@mui/icons-material/ViewModule";
+import TuneIcon from '@mui/icons-material/Tune';
+
 import moment from "moment/moment";
 
 const RequestedDocuments = () => {
@@ -28,6 +30,7 @@ const RequestedDocuments = () => {
 
     const [signerCounts, setSignerCounts] = useState({});
 
+    const [searchQuery, setSearchQuery] = useState("");
 
     useEffect(() => {
         ApiService.fetchDocuments("requested")
@@ -54,12 +57,15 @@ const RequestedDocuments = () => {
                     }
                 }));
 
+                console.log("signerCounts:", counts); // 값을 확인
+
                 setSignerCounts(counts);
             })
             .catch((error) => {
                 setError("문서를 불러오는 중 문제가 발생했습니다: " + error.message);
             });
     }, []);
+
 
     const handleCancelClick = (doc) => {
         setSelectedDocument(doc);
@@ -124,26 +130,54 @@ const RequestedDocuments = () => {
         setCurrentPage(value);
     };
 
-    const paginatedDocuments = documents.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+    const handleSearchChange = (event) => {
+        setSearchQuery(event.target.value);
+    };
+
+    const filteredDocuments = documents.filter(doc =>
+        doc.requestName.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    const paginatedDocuments = filteredDocuments.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
 
     return (
         <PageContainer>
-            <h1 style={{ textAlign: "center", marginBottom: "20px", fontSize: "24px", fontWeight: "bold", paddingTop: "1rem" }}>
+            <h1 style={{
+                textAlign: "center",
+                marginBottom: "20px",
+                fontSize: "24px",
+                fontWeight: "bold",
+                paddingTop: "1rem"
+            }}>
                 요청한 작업
             </h1>
 
 
-            <div style={{ display: "flex", justifyContent: "flex-end", marginRight: "8%", marginBottom: "10px" }}>
-                <button onClick={() => setViewMode("list")} style={{ background: "none", border: "none", cursor: "pointer" }}>
-                    <ViewListIcon color={viewMode === "list" ? "primary" : "disabled"} />
+            <div style={{display: "flex", justifyContent: "flex-end", marginRight: "8%", marginBottom: "10px"}}>
+                {/*<TuneIcon style={{color:"gray"}}/>*/}
+                <div style={{textAlign: "center", marginTop: "0.5rem"}}>
+                    <input
+                        type="text"
+                        placeholder="작업명 검색"
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                        style={{padding: "0.1rem", width: "9rem"}}
+                    />
+                </div>
+                <button onClick={() => setViewMode("list")}
+                        style={{background: "none", border: "none", cursor: "pointer"}}>
+                    <ViewListIcon color={viewMode === "list" ? "primary" : "disabled"}/>
                 </button>
-                <button onClick={() => setViewMode("grid")} style={{ background: "none", border: "none", cursor: "pointer" }}>
-                    <ViewModuleIcon color={viewMode === "grid" ? "primary" : "disabled"} />
+                <button onClick={() => setViewMode("grid")}
+                        style={{background: "none", border: "none", cursor: "pointer"}}>
+                    <ViewModuleIcon color={viewMode === "grid" ? "primary" : "disabled"}/>
                 </button>
-
             </div>
 
-            {error && <p style={{ color: "red", textAlign: "center" }}>{error}</p>}
+            {error && <p style={{color: "red", textAlign: "center"}}>{error}</p>}
 
             {viewMode === "list" ? (
                 <div style={{
@@ -172,7 +206,6 @@ const RequestedDocuments = () => {
                             fontWeight: "bold",
                             borderBottom: "1px solid #ddd"
                         }}>
-
                             <th style={{padding: "12px"}}>No</th>
                             <th style={{padding: "12px", textAlign: "center", paddingRight: "6rem"}}>상태</th>
                             <th style={{padding: "12px 12px 12px 4px", textAlign: "left"}}>작업명</th>
@@ -182,7 +215,7 @@ const RequestedDocuments = () => {
                         </tr>
                         </thead>
                         <tbody>
-                        {documents.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((doc, index) => (
+                        {paginatedDocuments.map((doc, index) => (
                             <tr key={doc.id} style={{
                                 borderBottom: "1px solid #ddd",
                                 height: "50px",
@@ -222,12 +255,6 @@ const RequestedDocuments = () => {
                                     </button>
                                 </td>
 
-
-                                {/*<td style={{textAlign: "center"}}>*/}
-                                {/*    <Link to={`/detail/${doc.id}`} style={{textDecoration: "none", color: "#007BFF"}}>*/}
-                                {/*        {doc.fileName}*/}
-                                {/*    </Link>*/}
-                                {/*</td>*/}
                                 <td style={{
                                     textAlign: "center",
                                     color: "black",
@@ -271,13 +298,13 @@ const RequestedDocuments = () => {
             ) : (
                 <div style={{
                     display: "grid",
-                    gridTemplateColumns: "repeat(3, 1fr)", // Changed to 3 columns
+                    gridTemplateColumns: "repeat(3, 1fr)",
                     gap: "20px",
                     maxWidth: "90%",
                     margin: "auto",
                     padding: "20px"
                 }}>
-                    {paginatedDocuments.map((doc) => ( // Changed from documents to paginatedDocuments
+                    {paginatedDocuments.map((doc) => (
                         <div key={doc.id} style={{
                             border: "1px solid #ddd",
                             borderRadius: "10px",
@@ -355,7 +382,7 @@ const RequestedDocuments = () => {
             </Modal>
             {viewMode === "list" && (
                 <div style={{display: "flex", justifyContent: "center", marginTop: "20px"}}>
-                    <Pagination count={Math.ceil(documents.length / itemsPerPage)} color="default" page={currentPage}
+                    <Pagination count={Math.ceil(filteredDocuments.length / itemsPerPage)} color="default" page={currentPage}
                                 onChange={handlePageChange}/>
                 </div>
             )}
@@ -364,3 +391,4 @@ const RequestedDocuments = () => {
 };
 
 export default RequestedDocuments;
+
