@@ -42,15 +42,16 @@ function Sidebar() {
                     className: "text-decoration-none text-dark fs-4 mb-4 d-block"
                 },
                     React.createElement("img", {
-                        src: `${process.env.PUBLIC_URL}/hi-sign-logo.png`,
+                        src: `${process.env.PUBLIC_URL}/hisignlogo_resized.png`,
                         alt: "HI-Sign 로고",
-                        style: { height: "60px" }
+                        style: { height: "120px" 
+                        }
                     })
                 ),
                 !!loginMember.unique_id && React.createElement(
                     "div",
                     { className: "fw-bold text-dark mb-4 ps-1" },
-                    fullName // ex: "김솔미"
+                    fullName + "님" // ex: "김솔미"
                 ),
                 !!loginMember.unique_id && React.createElement("nav", { className: "nav flex-column gap-2" },
                     React.createElement(Link, { to: "/request-document", className: "nav-link text-dark" }, "요청한 작업"),

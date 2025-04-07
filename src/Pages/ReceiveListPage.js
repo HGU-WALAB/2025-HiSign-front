@@ -238,47 +238,57 @@ const ReceivedDocuments = () => {
                     maxWidth: "85%",
                     margin: "auto"
                 }}>
-                    {documents.map((doc) => (
-                        <div key={doc.id} style={{
-                            border: "1px solid #ddd",
-                            borderRadius: "8px",
-                            padding: "16px",
-                            boxShadow: "0px 4px 10px rgba(0,0,0,0.1)",
-                            backgroundColor: "#fff",
-                            display: "flex",
-                            flexDirection: "column",
-                            justifyContent: "space-between"
-                        }}>
-                            <div style={{fontWeight: "bold", marginBottom: "8px"}}>{doc.requestName}</div>
-                            <embed
-                                src={doc.previewUrl || doc.fileUrl}
-                                type="application/pdf"
-                                width="100%"
-                                height="150px"
-                            />
-                            <div style={{marginTop: "8px", fontSize: "14px"}}>
-                                상태: <span
-                                className={getStatusClass(doc.status)}>{getStatusLabel(doc.status)}</span><br/>
-                                생성일: {moment(doc.createdAt).format('YY년 MM월 DD일')}<br/>
-                                만료일: <span
-                                style={{color: moment(doc.expiredAt).isSame(moment(), 'day') ? "red" : "black"}}>{moment(doc.expiredAt).format('YY년 MM월 DD일 HH:mm')}</span><br/>
-                                요청자: {doc.requesterName || "알 수 없음"}
-                            </div>
-                            <div style={{textAlign: "right", marginTop: "10px"}}>
-                                <button onClick={() => handleRejectClick(doc)} disabled={doc.status !== 0} style={{
-                                    backgroundColor: "#f44336",
-                                    color: "#fff",
-                                    border: "none",
-                                    padding: "6px 12px",
-                                    borderRadius: "4px",
-                                    cursor: "pointer"
-                                }}>
-                                    요청 거절
-                                </button>
-                            </div>
-                        </div>
+                   {documents.map((doc) => (
+    <div key={doc.id} style={{
+        border: "1px solid #ddd",
+        borderRadius: "8px",
+        padding: "16px",
+        boxShadow: "0px 4px 10px rgba(0,0,0,0.1)",
+        backgroundColor: "#fff",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between"
+    }}>
+        <div style={{ fontWeight: "bold", marginBottom: "8px" }}>{doc.requestName}</div>
 
-                    ))}
+        {/* PDF 미리보기 영역 */}
+        <embed
+            src={doc.previewUrl || doc.fileUrl}
+            type="application/pdf"
+            width="100%"
+            height="150px"
+        />
+
+        {/* 상태, 날짜, 요청자 정보 */}
+        <div style={{ marginTop: "8px", fontSize: "14px" }}>
+            <span className={getStatusClass(doc.status)}>{getStatusLabel(doc.status)}</span><br/>
+            생성일: {moment(doc.createdAt).format('YY년 MM월 DD일')}<br/>
+            만료일: <span style={{ color: moment(doc.expiredAt).isSame(moment(), 'day') ? "red" : "black" }}>
+                {moment(doc.expiredAt).format('YY년 MM월 DD일 HH:mm')}
+            </span><br/>
+            요청자: {doc.requesterName || "알 수 없음"}
+        </div>
+
+        {/* 요청 거절 버튼 왼쪽 정렬로 이동 */}
+        <div style={{ marginTop: "10px", textAlign: "left" }}>
+            <button
+                onClick={() => handleRejectClick(doc)}
+                disabled={doc.status !== 0 || doc.isRejectable !== 1}
+                style={{
+                    backgroundColor: "#f44336",
+                    color: "#fff",
+                    border: "none",
+                    padding: "6px 12px",
+                    borderRadius: "4px",
+                    cursor: doc.status !== 0 || doc.isRejectable !== 1 ? "not-allowed" : "pointer"
+                }}
+            >
+                요청 거절
+            </button>
+        </div>
+    </div>
+))}
+
                 </div>
             )}
 
