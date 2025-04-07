@@ -6,7 +6,6 @@ import AddSignerPage from "./Pages/AddSignerPage";
 import AllocatePage from "./Pages/AllocatePage";
 import CheckEmailPage from './Pages/CheckEmailPage';
 import CompleteSignPage from "./Pages/CompleteSignPage";
-import ContactPage from './Pages/ContactPage';
 import DetailPage from "./Pages/DetailPage";
 import LandingPage from "./Pages/LandingPage";
 import PreviewTaskPage from './Pages/PreviewTaskPage';
@@ -26,7 +25,7 @@ function MyRoutes() {
                 <Route path="/preview" element={<PreviewTaskPage />} />
                 <Route path="/sign" element={<SignPage />} />
                 <Route path="/sign-complete" element={<CompleteSignPage />} />
-                <Route path="/contact" element={<ContactPage />} />
+    
 
                 {/* Login-required routes */}
                 <Route path="/tasksetup" element={

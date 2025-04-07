@@ -58,8 +58,8 @@ function Sidebar() {
                     React.createElement(Link, { to: "/receive-document", className: "nav-link text-dark" }, "요청받은 작업"),
                     React.createElement(Link, { to: "/tasksetup", className: "nav-link text-dark" }, "문서 업로드하기"),
                     React.createElement(Link, { to: "/request", className: "nav-link text-dark" }, "서명자 등록하기"),
-                    React.createElement(Link, { to: "/align", className: "nav-link text-dark" }, "서명 할당하기"),
-                    React.createElement(Link, { to: "/contact", className: "nav-link text-dark" }, "문의 페이지")
+                    // React.createElement(Link, { to: "/align", className: "nav-link text-dark" }, "서명 할당하기"),
+                    // React.createElement(Link, { to: "/contact", className: "nav-link text-dark" }, "문의 페이지")
                 )
             ),
 
