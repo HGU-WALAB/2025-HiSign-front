@@ -23,7 +23,8 @@ const PublicaApiInstance = axios.create({
 apiInstance.interceptors.response.use(
   (res) => res,
   (error) => {
-    if (error.response?.status === 401) {
+    const isMeEndpoint = error.config?.url?.includes('/member/me');
+    if (error.response?.status === 401 && !isMeEndpoint) {
       alert('다시 로그인해 주세요.');
       sessionStorage.removeItem('token');
       window.location.href = '/hisign';
@@ -119,6 +120,11 @@ const ApiService = {
   // 🔐 로그아웃
   logout: async () => {
     return apiInstance.get('/auth/logout');
+  },
+
+  // 🔐 사용자 정보 조회
+  fetchMyInfo: async () => {
+    return apiInstance.get('/member/me');
   },
   // ===================================================
   // ✅ 비로그인 상태에서도 사용 가능한 API (PublicaApiInstance)

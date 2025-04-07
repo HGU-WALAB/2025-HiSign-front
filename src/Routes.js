@@ -1,6 +1,7 @@
 import React from 'react';
-import { Route, Routes, Outlet } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import LoginCallback from "./auth/LoginCallback";
+import useRestoreLoginFromCookie from './hooks/useRestoreLoginFromCookie';
 import Sidebar from "./Layout/Sidebar";
 import AddSignerPage from "./Pages/AddSignerPage";
 import AllocatePage from "./Pages/AllocatePage";
@@ -15,8 +16,8 @@ import RequestedDocuments from "./Pages/RequestListPage";
 import SetupTaskPage from "./Pages/SetupTaskPage";
 import SignPage from './Pages/SignPage';
 import RequireLogin from './utils/RequireLogin';
-
 function MyRoutes() {
+    useRestoreLoginFromCookie();
     return (
         <Routes>
             <Route element={<Sidebar />}>
