@@ -15,6 +15,7 @@ import RequestedDocuments from "./Pages/RequestListPage";
 import SetupTaskPage from "./Pages/SetupTaskPage";
 import SignPage from './Pages/SignPage';
 import RequireLogin from './utils/RequireLogin';
+
 function MyRoutes() {
     useRestoreLoginFromCookie();
     return (
