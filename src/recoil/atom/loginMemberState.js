@@ -6,6 +6,7 @@ export const loginMemberState = atom({
         unique_id: null,
         name: '',
         email: '',
-        level: '',
+        role: '',
+        isLoading: true,
       },
 });
