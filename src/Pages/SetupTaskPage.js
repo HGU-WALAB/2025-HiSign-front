@@ -8,6 +8,14 @@ import ButtonBase from "../components/ButtonBase";
 import Drop from "../components/Drop";
 import { loginMemberState } from "../recoil/atom/loginMemberState";
 import { taskState } from "../recoil/atom/taskState";
+import RadioGroup from '@mui/material/RadioGroup';
+import Radio from '@mui/material/Radio';
+import FormControlLabel from '@mui/material/FormControlLabel';
+
+import Containers from 'react-bootstrap/Container';
+import Nav from 'react-bootstrap/Nav';
+import Navbar from 'react-bootstrap/Navbar';
+import NavDropdown from 'react-bootstrap/NavDropdown';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
@@ -16,37 +24,29 @@ const SetupTaskPage = () => {
   const member = useRecoilValue(loginMemberState);
   const [requestName, setRequestName] = useState("");
   const [description, setDescription] = useState("");
-  const [isRejectable, setIsRejectable] = useState(0); // ✅ 기본값: 거절 불가능 (0)
-  const [expirationDate, setExpirationDate] = useState(""); // ✅ 서명 만료 날짜 상태
-  const [expirationTime, setExpirationTime] = useState("23:59"); // ✅ 서명 만료 시간 상태 추가
-  const [previewUrl, setPreviewUrl] = useState(null); // ✅ 파일 미리보기 상태 추가
+  const [isRejectable, setIsRejectable] = useState(0);
+  const [expirationDate, setExpirationDate] = useState("");
+  const [expirationTime, setExpirationTime] = useState("23:59");
+  const [previewUrl, setPreviewUrl] = useState(null);
   const [numPages, setNumPages] = useState(null);
-  // ✅ 만료일 선택 옵션 상태 추가
   const [expirationOption, setExpirationOption] = useState("custom");
+  const [taskType, setTaskType] = useState("taTask");
+  const [selectedSubject, setSelectedSubject] = useState("");
+  const [selectedMonth, setSelectedMonth] = useState("");
   const navigate = useNavigate();
 
-  // ✅ 오늘 날짜를 기본 최소값으로 설정
   const today = new Date().toISOString().split('T')[0];
 
-  // ✅ 만료일 옵션 계산 함수
   const calculateExpirationDate = (option) => {
     const now = new Date();
-    
     switch(option) {
-      case "today":
-        return now.toISOString().split('T')[0];
-      case "threeDays":
-        now.setDate(now.getDate() + 3);
-        return now.toISOString().split('T')[0];
-      case "oneWeek":
-        now.setDate(now.getDate() + 7);
-        return now.toISOString().split('T')[0];
-      default:
-        return expirationDate;
+      case "today": return now.toISOString().split('T')[0];
+      case "threeDays": now.setDate(now.getDate() + 3); return now.toISOString().split('T')[0];
+      case "oneWeek": now.setDate(now.getDate() + 7); return now.toISOString().split('T')[0];
+      default: return expirationDate;
     }
   };
 
-  // ✅ 만료일 옵션 변경 핸들러
   const handleExpirationOptionChange = (option) => {
     setExpirationOption(option);
     const newDate = calculateExpirationDate(option);
@@ -54,16 +54,11 @@ const SetupTaskPage = () => {
   };
 
   const handlePostFiles = (file) => {
-    if (!file) {
-      alert("파일을 선택해주세요.");
-      return;
-    }
-  
+    if (!file) return alert("파일을 선택해주세요.");
     const blobUrl = URL.createObjectURL(file);
-    setPreviewUrl(blobUrl); // ✅ PDF URL 저장
-  
-    setTaskState((previousDocument) => ({
-      ...previousDocument,
+    setPreviewUrl(blobUrl);
+    setTaskState(prev => ({
+      ...prev,
       ownerId: member.unique_id,
       fileName: file.name,
       fileUrl: blobUrl,
@@ -71,46 +66,59 @@ const SetupTaskPage = () => {
   };
 
   const handleNextStep = () => {
-    if (!requestName.trim()) {
-      alert("요청명을 입력해 주세요.");
-      return;
-    }
-    if (!description.trim()) {
-      alert("문서 설명을 입력해 주세요.");
-      return;
-    }
-    if (!document.fileUrl) {
-      alert("문서를 선택해 주세요.");
-      return;
-    }
-    
-    // ✅ 거절 가능한 경우 만료일 검증 추가
-    if (isRejectable === 1) {
-      if (!expirationDate) {
-        alert("서명 만료일을 선택해 주세요.");
+    if (taskType === "taTask") {
+      if (!selectedSubject || !selectedMonth) {
+        alert("과목명과 월을 모두 선택해 주세요.");
         return;
       }
-      if (!expirationTime) {
-        alert("서명 만료 시간을 선택해 주세요.");
+      if (!document.fileUrl) {
+        alert("문서를 선택해 주세요.");
         return;
       }
     }
 
-    // ✅ 날짜와 시간을 합쳐서 저장
-    const formattedExpiration = isRejectable === 1 
-      ? `${expirationDate}T${expirationTime}:00` // ISO 형식으로 변환 (YYYY-MM-DDTHH:MM:00)
-      : null;
+    if (taskType === "basicTask") {
+      if (!requestName.trim()) {
+        alert("작업명을 입력해 주세요.");
+        return;
+      }
+      if (!description.trim()) {
+        alert("문서 설명을 입력해 주세요.");
+        return;
+      }
+      if (!document.fileUrl) {
+        alert("문서를 선택해 주세요.");
+        return;
+      }
+      if (isRejectable === 1) {
+        // 더 이상 사용자 입력을 받지 않고 자동으로 7일 후로 고정
+      }
+    }
 
-    setTaskState((previousDocument) => ({
-      ...previousDocument,
-      requestName: requestName,
-      description: description,
-      isRejectable: isRejectable,
-      expirationDateTime: formattedExpiration, // ✅ 날짜와 시간이 합쳐진 값으로 저장
+    const now = new Date();
+    const sevenDaysLater = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    const isoExpiration = sevenDaysLater.toISOString().slice(0, 19);
+    const formattedExpiration = isoExpiration; // 항상 7일 후로 고정
+    const finalRequestName = taskType === "taTask"
+        ? `${selectedSubject}_${selectedMonth}_${member.name}_${member.unique_id}`
+        : requestName;
+
+    const type = taskType === "taTask" ? 1 : 0;
+
+    setTaskState(prev => ({
+      ...prev,
+      requestName: finalRequestName,
+      description: taskType === "taTask" ? "" : description,
+      isRejectable,
+      expirationDateTime: formattedExpiration,
+      type,
     }));
 
     navigate(`/request`);
   };
+
+
+
 
   useEffect(() => {
     console.log(document);
@@ -121,167 +129,175 @@ const SetupTaskPage = () => {
         <StyledBody>
           <MainArea>
             <Title>작업 정보 입력</Title>
-
-            {/* 요청 이름 입력 */}
-            <InputRow>
-              <RequiredNotice>* 항목은 필수 입력란입니다.</RequiredNotice>
-              <Label>
-                작업명 <RequiredMark>*</RequiredMark>
-              </Label>
-              <InputField
-                  placeholder="예: 2024년 1분기 계약서 서명 요청"
-                  value={requestName}
-                  onChange={(e) => setRequestName(e.target.value)}
+            <RequiredNotice>* 항목은 필수 입력란입니다.</RequiredNotice>
+            <RadioGroup name="use-radio-group" value={taskType} onChange={(e) => setTaskType(e.target.value)} row>
+              <FormControlLabel
+                  value="taTask"
+                  control={<Radio />}
+                  label={<span style={{ fontSize: "14px" }}>TA 근무일지 작업</span>}
               />
-            </InputRow>
-
-            {/* 문서 설명 입력 */}
-            <InputRow>
-              <Label>
-                작업 요청 설명 <RequiredMark>*</RequiredMark>
-              </Label>
-              <Textarea
-                  placeholder="예: 최대한 빠르게 서명을 완료해주세요."
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
+              <FormControlLabel
+                  value="basicTask"
+                  control={<Radio />}
+                  label={<span style={{ fontSize: "14px" }}>기본 작업</span>}
               />
-            </InputRow>
+            </RadioGroup>
 
-            {/* 작업 설정 (라디오 버튼) */}
-            <InputRow>
-              <Label>작업 설정</Label>
-              <RadioContainer>
-                <RadioLabel>
-                  <RadioInput
-                      type="radio"
-                      name="rejectable"
-                      value={0}
-                      checked={isRejectable === 0}
-                      onChange={() => setIsRejectable(0)}
+            {taskType === "taTask" && (
+                <InputRow>
+                  <Label>
+                    과목명 <RequiredMark>*</RequiredMark>
+                  </Label>
+                  <select value={selectedSubject} onChange={(e) => setSelectedSubject(e.target.value)}>
+                    <option value="">과목을 선택하세요</option>
+                    <option value="C프로그래밍">C프로그래밍</option>
+                    <option value="운영체제">운영체제</option>
+                    <option value="Software Engineering">Software Engineering</option>
+                    <option value="Logic Design">Logic Design</option>
+                    <option value="데이타구조">데이타구조</option>
+                  </select>
+
+                  <Label>
+                    월 <RequiredMark>*</RequiredMark>
+                  </Label>
+                  <select value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)}>
+                    <option value="">월 선택</option>
+                    {[...Array(12)].map((_, i) => (
+                        <option key={i + 1} value={`${i + 1}월`}>{i + 1}월</option>
+                    ))}
+                  </select>
+
+                </InputRow>
+            )}
+
+            {taskType === "basicTask" && (
+                <InputRow>
+                  <Label>
+                    작업명 <RequiredMark>*</RequiredMark>
+                  </Label>
+                  <InputField
+                      placeholder="예: 2025년 1학기 팀 MT 계획서"
+                      value={requestName}
+                      onChange={(e) => setRequestName(e.target.value)}
                   />
-                  거절 불가능
-                </RadioLabel>
-                <RadioLabel>
-                  <RadioInput
-                      type="radio"
-                      name="rejectable"
-                      value={1}
-                      checked={isRejectable === 1}
-                      onChange={() => setIsRejectable(1)}
+                  <Label>
+                    작업 요청 설명 <RequiredMark>*</RequiredMark>
+                  </Label>
+                  <Textarea
+                      placeholder="예: 최대한 빠르게 서명을 완료해주세요."
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
                   />
-                  거절 가능
-                </RadioLabel>
-              </RadioContainer>
-              
-              {/* ✅ 만료일 및 시간 선택 */}
-              <DatePickerContainer>
-                <DateTimePickerTitle>서명 만료 설정</DateTimePickerTitle>
-                
-                {/* ✅ 만료일 옵션 라디오 버튼 추가 */}
-                <ExpirationOptionContainer>
-                  <ExpirationOptionLabel>
-                    <RadioInput
-                      type="radio"
-                      name="expirationOption"
-                      value="today"
-                      checked={expirationOption === "today"}
-                      onChange={() => handleExpirationOptionChange("today")}
-                    />
-                    오늘
-                  </ExpirationOptionLabel>
-                  <ExpirationOptionLabel>
-                    <RadioInput
-                      type="radio"
-                      name="expirationOption"
-                      value="threeDays"
-                      checked={expirationOption === "threeDays"}
-                      onChange={() => handleExpirationOptionChange("threeDays")}
-                    />
-                    3일 후
-                  </ExpirationOptionLabel>
-                  <ExpirationOptionLabel>
-                    <RadioInput
-                      type="radio"
-                      name="expirationOption"
-                      value="oneWeek"
-                      checked={expirationOption === "oneWeek"}
-                      onChange={() => handleExpirationOptionChange("oneWeek")}
-                    />
-                    일주일 후
-                  </ExpirationOptionLabel>
-                </ExpirationOptionContainer>
-                
-                <DateTimePickerRow>
-                  <DateTimePickerColumn>
-                    <DatePickerLabel> 
-                      만료일 <RequiredMark>*</RequiredMark>
-                    </DatePickerLabel>
-                    <DatePickerInput
-                      type="date"
-                      min={today}
-                      value={expirationDate}
-                      onChange={(e) => {
-                        setExpirationDate(e.target.value);
-                        setExpirationOption("custom");
-                      }}
-                    />
-                  </DateTimePickerColumn>
-                  
-                  <DateTimePickerColumn>
-                    <DatePickerLabel>
-                      만료 시간 <RequiredMark>*</RequiredMark>
-                    </DatePickerLabel>
-                    <DatePickerInput
-                      type="time"
-                      value={expirationTime}
-                      onChange={(e) => setExpirationTime(e.target.value)}
-                    />
-                  </DateTimePickerColumn>
-                </DateTimePickerRow>
-                
-                <DatePickerHint>
-                  서명 요청이 만료되는 날짜와 시간을 선택하세요. 만료 시점 이후에는 서명이 불가합니다.
-                </DatePickerHint>
-              </DatePickerContainer>
-            </InputRow>
-            
-            {/* 문서 선택 (파일 업로드) */}
+                  <Label>작업 설정</Label>
+                  <RadioContainer>
+                    <RadioLabel>
+                      <RadioInput
+                          type="radio"
+                          name="rejectable"
+                          value={0}
+                          checked={isRejectable === 0}
+                          onChange={() => setIsRejectable(0)}
+                      />
+                      거절 불가능
+                    </RadioLabel>
+                    <RadioLabel>
+                      <RadioInput
+                          type="radio"
+                          name="rejectable"
+                          value={1}
+                          checked={isRejectable === 1}
+                          onChange={() => setIsRejectable(1)}
+                      />
+                      거절 가능
+                    </RadioLabel>
+                  </RadioContainer>
+                  <DatePickerContainer>
+                    <DateTimePickerTitle>서명 만료 설정</DateTimePickerTitle>
+                    <ExpirationOptionContainer>
+                      <ExpirationOptionLabel>
+                        <RadioInput
+                            type="radio"
+                            name="expirationOption"
+                            value="today"
+                            checked={expirationOption === "today"}
+                            onChange={() => handleExpirationOptionChange("today")}
+                        />
+                        오늘
+                      </ExpirationOptionLabel>
+                      <ExpirationOptionLabel>
+                        <RadioInput
+                            type="radio"
+                            name="expirationOption"
+                            value="threeDays"
+                            checked={expirationOption === "threeDays"}
+                            onChange={() => handleExpirationOptionChange("threeDays")}
+                        />
+                        3일 후
+                      </ExpirationOptionLabel>
+                      <ExpirationOptionLabel>
+                        <RadioInput
+                            type="radio"
+                            name="expirationOption"
+                            value="oneWeek"
+                            checked={expirationOption === "oneWeek"}
+                            onChange={() => handleExpirationOptionChange("oneWeek")}
+                        />
+                        일주일 후
+                      </ExpirationOptionLabel>
+                    </ExpirationOptionContainer>
+                    <DateTimePickerRow>
+                      <DateTimePickerColumn>
+                        <DatePickerLabel>
+                          만료일 <RequiredMark>*</RequiredMark>
+                        </DatePickerLabel>
+                        <DatePickerInput
+                            type="date"
+                            min={today}
+                            value={expirationDate}
+                            onChange={(e) => {
+                              setExpirationDate(e.target.value);
+                              setExpirationOption("custom");
+                            }}
+                        />
+                      </DateTimePickerColumn>
+                      <DateTimePickerColumn>
+                        <DatePickerLabel>
+                          만료 시간 <RequiredMark>*</RequiredMark>
+                        </DatePickerLabel>
+                        <DatePickerInput
+                            type="time"
+                            value={expirationTime}
+                            onChange={(e) => setExpirationTime(e.target.value)}
+                        />
+                      </DateTimePickerColumn>
+                    </DateTimePickerRow>
+                    <DatePickerHint>
+                      서명 요청이 만료되는 날짜와 시간을 선택하세요. 만료 시점 이후에는 서명이 불가합니다.
+                    </DatePickerHint>
+                  </DatePickerContainer>
+                </InputRow>
+            )}
+
             <InputRow>
               <Label>
                 문서 선택 <RequiredMark>*</RequiredMark>
               </Label>
               <UploadSection>
                 {!document.fileUrl ? (
-                    <Drop
-                        onLoaded={(files) => {
-                          const file = files[0];
-                          if (file) {
-                            handlePostFiles(file);
-                          }
-                        }}
-                    />
+                    <Drop onLoaded={(files) => {
+                      const file = files[0];
+                      if (file) handlePostFiles(file);
+                    }} />
                 ) : (
                     <SelectedFileBox>
-                      {/* ✅ PDF 미리보기 추가 */}
                       {previewUrl && (
-                          <Document
-                              file={previewUrl}
-                              onLoadSuccess={({numPages}) => setNumPages(numPages)}
-                          >
-                            <Page pageNumber={1} width={250}/> {/* 첫 페이지 미리보기 */}
+                          <Document file={previewUrl} onLoadSuccess={({ numPages }) => setNumPages(numPages)}>
+                            <Page pageNumber={1} width={250} />
                           </Document>
                       )}
                       <SelectedFileText>{document.fileName}</SelectedFileText>
                       <FileButtonContainer>
-                        <ChangeFileButton
-                            onClick={() =>
-                                setTaskState((previousDocument) => ({
-                                  ...previousDocument,
-                                  fileName: "",
-                                  fileUrl: null,
-                                }))
-                            }
-                        >
+                        <ChangeFileButton onClick={() => setTaskState(prev => ({ ...prev, fileName: "", fileUrl: null }))}>
                           다른 문서 선택
                         </ChangeFileButton>
                       </FileButtonContainer>
@@ -291,13 +307,9 @@ const SetupTaskPage = () => {
             </InputRow>
           </MainArea>
         </StyledBody>
-
-        {/* 하단 이동 버튼 */}
         <ButtonContainer>
           <GrayButton onClick={() => navigate(`/request-document`)}>나가기</GrayButton>
-          <NextButton onClick={handleNextStep}>
-            서명자 추가
-          </NextButton>
+          <NextButton onClick={handleNextStep}>서명자 추가</NextButton>
         </ButtonContainer>
       </Container>
   );
@@ -549,3 +561,9 @@ const FileInfoContainer = styled.div`
   align-items: center;
   gap: 8px;
 `;
+
+
+
+
+
+
