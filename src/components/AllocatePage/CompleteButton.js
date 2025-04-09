@@ -42,7 +42,7 @@ const CompleteButton = () => {
       console.log("파일 변환 완료:", file);
       console.log("문서 정보:", document);
       // 2 문서 업로드 API 호출 (순차 실행 보장)
-      const uploadResponse = await ApiService.uploadDocument(file, document.ownerId, document.requestName, document.description, document.isRejectable);
+      const uploadResponse = await ApiService.uploadDocument(file, document.ownerId, document.requestName, document.description, document.isRejectable, document.type);
 
       if (uploadResponse.status !== 200) {
         throw new Error("문서 업로드에 실패했습니다.");
@@ -68,6 +68,7 @@ const CompleteButton = () => {
             fileUrl: "",
             file: null,
             isRejectable: null,
+            fileType: null,
         });
         setSigners([]);
           navigate("/request-document");

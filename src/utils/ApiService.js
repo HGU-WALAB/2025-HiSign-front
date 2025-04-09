@@ -40,7 +40,7 @@ apiInstance.interceptors.response.use(
 const ApiService = {
 
   // 🔐 문서 업로드
-  uploadDocument: async (file, uniqueId, requestName, description, isRejectable) => {
+  uploadDocument: async (file, uniqueId, requestName, description, isRejectable, type) => {
     if (!file) throw new Error('업로드할 파일이 없습니다.');
     const formData = new FormData();
     formData.append('file', file, file.name);
@@ -48,7 +48,7 @@ const ApiService = {
     formData.append('request_name', requestName);
     formData.append('description', description);
     formData.append('is_rejectable', isRejectable);
-
+    formData.append('type', type);
     return apiInstance.post('/files/document/upload', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
