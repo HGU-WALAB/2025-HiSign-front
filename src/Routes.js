@@ -28,7 +28,6 @@ function MyRoutes() {
                 <Route path="/sign" element={<SignPage />} />
                 <Route path="/sign-complete" element={<CompleteSignPage />} />
     
-
                 {/* Login-required routes */}
                 <Route path="/tasksetup" element={
                     <RequireLogin><SetupTaskPage /></RequireLogin>

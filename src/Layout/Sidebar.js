@@ -1,121 +1,282 @@
-import React, { useState } from "react";
-import { Link, Outlet } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, Outlet, useLocation } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import HisnetLoginButton from "../components/HisnetLoginButton";
 import HisnetLogoutButton from "../components/HisnetLogoutButton";
 import { loginMemberState } from "../recoil/atom/loginMemberState";
+import styled from "styled-components";
 
 function Sidebar() {
-    const loginMember = useRecoilValue(loginMemberState);
-    const [showLogout, setShowLogout] = useState(false);
+  const location = useLocation();
+  const currentPath = location.pathname;
 
-    const handleProfileClick = () => {
-        setShowLogout(prev => !prev);
+  const loginMember = useRecoilValue(loginMemberState);
+  const [showLogout, setShowLogout] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
+
+  const handleProfileClick = () => setShowLogout((prev) => !prev);
+  const handleToggleSidebar = () => setSidebarOpen((prev) => !prev);
+
+  // 사이드바 외부 클릭 시 닫히는 기능 추가
+  const handleClickOutside = (e) => {
+    if (isMobile && sidebarOpen && !e.target.closest('.sidebar') && !e.target.closest('.toggle-btn')) {
+      setSidebarOpen(false);
+    }
+  };
+
+  const fullName = loginMember.name || "";
+  const firstChar = fullName.charAt(0);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (!mobile) setSidebarOpen(true);
+      else setSidebarOpen(false);
     };
 
-    const fullName = loginMember.name || "";
-    const firstChar = fullName.charAt(0);
+    window.addEventListener("resize", handleResize);
+    document.addEventListener("mousedown", handleClickOutside);
+    
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isMobile, sidebarOpen]);
 
-    return React.createElement(
-        "div",
-        { className: "d-flex", style: { minHeight: "100vh" } },
+  return (
+    <Container>
+      {/* 햄버거 버튼 (모바일) */}
+      {isMobile && (
+        <ToggleButton 
+          onClick={handleToggleSidebar}
+          className="toggle-btn"
+        >
+          ☰
+        </ToggleButton>
+      )}
 
-        // Sidebar
-        React.createElement(
-            "aside",
-            {
-                className: "d-flex flex-column justify-content-between p-3",
-                style: {
-                    width: "250px",
-                    backgroundColor: "#f8f9fa",
-                    borderRight: "1px solid #ddd",
-                    position: "fixed",
-                    top: 0,
-                    left: 0,
-                    bottom: 0,
-                },
-            },
-            // 상단 학부생 이름만 표시
-            React.createElement("div", null,
-                React.createElement(Link, {
-                    to: "/",
-                    className: "text-decoration-none text-dark fs-4 mb-4 d-block"
-                },
-                    React.createElement("img", {
-                        src: `${process.env.PUBLIC_URL}/hisignlogo_resized.png`,
-                        alt: "HI-Sign 로고",
-                        style: { height: "120px" 
-                        }
-                    })
-                ),
-                !!loginMember.unique_id && React.createElement(
-                    "div",
-                    { className: "fw-bold text-dark mb-4 ps-1" },
-                    fullName + "님" // ex: "김솔미"
-                ),
-                !!loginMember.unique_id && React.createElement("nav", { className: "nav flex-column gap-2" },
-                    React.createElement(Link, { to: "/request-document", className: "nav-link text-dark" }, "요청한 작업"),
-                    React.createElement(Link, { to: "/receive-document", className: "nav-link text-dark" }, "요청받은 작업"),
-                    React.createElement(Link, { to: "/tasksetup", className: "nav-link text-dark" }, "문서 업로드하기"),
-                    React.createElement(Link, { to: "/request", className: "nav-link text-dark" }, "서명자 등록하기"),
-                    // React.createElement(Link, { to: "/align", className: "nav-link text-dark" }, "서명 할당하기"),
-                    // React.createElement(Link, { to: "/contact", className: "nav-link text-dark" }, "문의 페이지")
-                )
-            ),
+      {/* 사이드바 */}
+      <SidebarWrapper 
+        className="sidebar"
+        $isOpen={sidebarOpen} 
+        $isMobile={isMobile}
+      >
+        <div>
+          <LogoLink to="/" className="text-decoration-none text-dark fs-4 mb-4 d-block">
+            <LogoImage
+              src={`${process.env.PUBLIC_URL}/hisignlogo_resized.png`}
+              alt="HI-Sign 로고"
+            />
+          </LogoLink>
 
-            // 하단 프로필
-            !!loginMember.unique_id ? React.createElement(
-                "div",
-                { className: "mt-auto", style: { position: "relative" } },
-                React.createElement(
-                    "div",
-                    {
-                        onClick: handleProfileClick,
-                        style: {
-                            width: "40px",
-                            height: "40px",
-                            borderRadius: "50%",
-                            backgroundColor: "#343a40",
-                            color: "#fff",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            cursor: "pointer",
-                            userSelect: "none",
-                        }
-                    },
-                    firstChar
-                ),
-                showLogout && React.createElement(
-                    "div",
-                    {
-                        style: {
-                            position: "absolute",
-                            left: "50px",
-                            bottom: "0",
-                            backgroundColor: "#fff",
-                            border: "1px solid #ddd",
-                            borderRadius: "5px",
-                            padding: "5px",
-                            boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-                            zIndex: 999,
-                        }
-                    },
-                    React.createElement(HisnetLogoutButton, null)
-                )
-            ) : React.createElement(HisnetLoginButton, null)
-        ),
+          {!!loginMember.unique_id && (
+            <ProfileContainer>
+              <div className="fw-bold text-dark">{fullName + "님"}</div>
+              <ProfileCircle onClick={handleProfileClick}>
+                {firstChar}
+              </ProfileCircle>
+              {showLogout && (
+                <LogoutContainer>
+                  <HisnetLogoutButton />
+                </LogoutContainer>
+              )}
+            </ProfileContainer>
+          )}
 
-        // Main Content
-        React.createElement(
-            "div",
-            {
-                className: "flex-grow-1",
-                style: { marginLeft: "250px", padding: "20px" }
-            },
-            React.createElement(Outlet, null)
-        )
-    );
+          {!loginMember.unique_id && (
+            <div className="mb-4">
+              <HisnetLoginButton />
+            </div>
+          )}
+
+          {!!loginMember.unique_id && (
+            <Nav className="nav flex-column">
+              <NavItem to="/request-document" $active={currentPath === "/request-document"}>
+                내 작업
+              </NavItem>
+              <NavItem to="/receive-document" $active={currentPath === "/receive-document"}>
+                요청받은 작업
+              </NavItem>
+              <NavItem to="/tasksetup" $active={currentPath === "/tasksetup"}>
+                문서 업로드하기
+              </NavItem>
+              <NavItem to="/request" $active={currentPath === "/request"}>
+                서명자 등록하기
+              </NavItem>
+            </Nav>
+          )}
+        </div>
+
+        <Copyright>
+          Copyright © WA LAB. HiSign 김솔미 김홍찬 류찬미
+        </Copyright>
+      </SidebarWrapper>
+
+      {/* 모바일에서 사이드바가 열렸을 때 배경 오버레이 */}
+      {isMobile && sidebarOpen && <Overlay onClick={handleToggleSidebar} />}
+
+      {/* Main Content */}
+      <MainContent $sidebarOpen={sidebarOpen} $isMobile={isMobile}>
+        <Outlet />
+      </MainContent>
+    </Container>
+  );
 }
 
 export default Sidebar;
+
+// 스타일드 컴포넌트 정의
+const Container = styled.div`
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+`;
+
+const ToggleButton = styled.button`
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 1001;
+  background: #343a40;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: #495057;
+  }
+`;
+
+const SidebarWrapper = styled.aside`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1rem;
+  width: 250px;
+  background-color: #f8f9fa;
+  border-right: 1px solid #ddd;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 1000;
+  transition: transform 0.3s ease-in-out;
+  transform: translateX(${props => (props.$isOpen ? '0' : '-100%')});
+  box-shadow: ${props => (props.$isOpen && props.$isMobile ? '0 0 10px rgba(0,0,0,0.1)' : 'none')};
+  overflow-y: auto;
+`;
+
+const Overlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+`;
+
+const LogoLink = styled(Link)`
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+`;
+
+const LogoImage = styled.img`
+  height: 120px;
+  max-width: 100%;
+`;
+
+const ProfileContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  padding-left: 0.25rem;
+  position: relative;
+`;
+
+const ProfileCircle = styled.div`
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #343a40;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s;
+  
+  &:hover {
+    background-color: #495057;
+  }
+`;
+
+const LogoutContainer = styled.div`
+  position: absolute;
+  right: 0;
+  top: 55px;
+  border-radius: 10px;
+  padding: 1px;
+  z-index: 999;
+  background-color: white;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+`;
+
+const Nav = styled.nav`
+  margin-top: 1rem;
+`;
+
+const NavItem = styled(Link)`
+  position: relative;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background-color: ${({ $active }) => ($active ? '#e9ecef' : '#f4f4f4')};
+  margin-bottom: 8px;
+  text-decoration: none;
+  color: #212529;
+  display: block;
+  transition: all 0.2s;
+  font-weight: ${({ $active }) => ($active ? 'bold' : 'normal')};
+
+  &:hover {
+    background-color: #e9ecef;
+    transform: translateY(-2px);
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 12px;
+    right: 12px;
+    height: 3px;
+    background-color: ${({ $active }) => ($active ? "#1a73e8" : "transparent")};
+    border-radius: 2px;
+    transition: background-color 0.3s;
+  }
+`;
+
+const Copyright = styled.div`
+  margin-top: auto;
+  font-size: 12px;
+  color: #888;
+  text-align: center;
+  padding-top: 1rem;
+`;
+
+const MainContent = styled.div`
+  flex-grow: 1;
+  margin-left: ${props => (props.$sidebarOpen && !props.$isMobile ? '250px' : '0')};
+  padding: 20px;
+  width: 100%;
+  transition: margin-left 0.3s ease-in-out;
+  padding-top: ${props => (props.$isMobile ? '60px' : '20px')};
+`;

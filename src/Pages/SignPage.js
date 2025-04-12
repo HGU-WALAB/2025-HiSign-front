@@ -402,7 +402,7 @@ const StyledDrawer = styled(Drawer)`
     flex-shrink: 0;
     
     .MuiDrawer-paper {
-      width: 250px;
+      width: 300px; // 기존 250px → 300px
       top: 80px;
       height: calc(100% - 80px);
       background-color: white;
