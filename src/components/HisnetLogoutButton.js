@@ -36,14 +36,14 @@ export default HisnetLogoutButton;
   const buttonStyle = {
     backgroundColor: '#FF5733',
     color: 'white',
-    padding: '12px 24px',
+    padding: '10px 20px',
     border: 'none',
-    borderRadius: '8px',
+    borderRadius: '10px',
     fontSize: '16px',
     fontWeight: 'bold',
     cursor: 'pointer',
     transition: 'all 0.3s ease',
-    margin: '10px 0',
+    // margin: '5px',
   };
 
   const buttonHoverStyle = {
