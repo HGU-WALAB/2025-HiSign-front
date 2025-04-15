@@ -2,9 +2,10 @@
 import DeleteIcon from '@mui/icons-material/Delete';
 import DoDisturbIcon from '@mui/icons-material/DoDisturb';
 import DownloadIcon from '@mui/icons-material/Download';
+import DrawIcon from '@mui/icons-material/Draw';
+import FindInPageIcon from '@mui/icons-material/FindInPage';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import ViewModuleIcon from '@mui/icons-material/ViewModule';
-import FindInPageIcon from '@mui/icons-material/FindInPage';
 import { Pagination } from "@mui/material";
 import moment from 'moment';
 import React, { useEffect, useState } from "react";
@@ -210,6 +211,11 @@ const ReceivedDocuments = () => {
                                             border: "none"
                                         }}></Dropdown.Toggle>
                                         <Dropdown.Menu>
+                                            <Dropdown.Item
+                                                onClick={()=>{}}
+                                                disabled={doc.status !== 0}>
+                                                    <DrawIcon/>서명하기
+                                            </Dropdown.Item>
                                             <Dropdown.Item as={Link} to={`/detail/${doc.id}`}>
                                                 <FindInPageIcon fontSize="small" style={{marginRight: "6px"}}/>
                                                 문서 보기
