@@ -9,9 +9,10 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import styled from "styled-components";
 import ButtonBase from "../components/ButtonBase";
 import Drop from "../components/Drop";
+import PasswordInputSection from "../components/SetupTask/PasswordInputSection";
 import { loginMemberState } from "../recoil/atom/loginMemberState";
 import { taskState } from "../recoil/atom/taskState";
-
+import { InputRow, Label, RequiredMark } from "../styles/SetupTaskStyle";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
@@ -29,6 +30,8 @@ const SetupTaskPage = () => {
   const [taskType, setTaskType] = useState("taTask");
   const [selectedSubject, setSelectedSubject] = useState("");
   const [selectedMonth, setSelectedMonth] = useState("");
+  const [password, setPassword] = useState("");
+
   const navigate = useNavigate();
 
   const today = new Date().toISOString().split("T")[0];
@@ -160,7 +163,7 @@ const SetupTaskPage = () => {
                 onChange={(e) => setSelectedSubject(e.target.value)}
               >
                 <option value="">과목을 선택하세요.</option>
-                <option value="3D 디지털 콘텐츠 제작">
+                <option value="3D디지털 콘텐츠제작">
                   3D 디지털 콘텐츠 제작
                 </option>
                 <option value="3D 프린터">3D 프린터</option>
@@ -351,7 +354,7 @@ const SetupTaskPage = () => {
               </DatePickerContainer>
             </InputRow>
           )}
-
+          <PasswordInputSection onValid={(pw) => setPassword(pw)} />
           <InputRow>
             <Label>
               문서 선택 <RequiredMark>*</RequiredMark>
@@ -437,24 +440,6 @@ const Title = styled.h2`
   text-align: center;
   color: #333;
   margin-bottom: 20px;
-`;
-
-const InputRow = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  margin-bottom: 20px;
-`;
-
-const Label = styled.label`
-  font-size: 14px;
-  font-weight: bold;
-  color: #333;
-`;
-
-const RequiredMark = styled.span`
-  color: #ff4d4f;
-  margin-left: 4px;
 `;
 
 const InputField = styled.input`
@@ -641,11 +626,4 @@ const GrayButton = styled(ButtonBase)`
 const NextButton = styled(ButtonBase)`
   background-color: ${({ disabled }) => (disabled ? "#ccc" : "#03A3FF")};
   color: white;
-`;
-
-const FileInfoContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
 `;
