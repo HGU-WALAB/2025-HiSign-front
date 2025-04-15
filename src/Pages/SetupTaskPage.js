@@ -1,3 +1,6 @@
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
 import React, { useEffect, useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/esm/entry.webpack";
@@ -8,14 +11,7 @@ import ButtonBase from "../components/ButtonBase";
 import Drop from "../components/Drop";
 import { loginMemberState } from "../recoil/atom/loginMemberState";
 import { taskState } from "../recoil/atom/taskState";
-import RadioGroup from "@mui/material/RadioGroup";
-import Radio from "@mui/material/Radio";
-import FormControlLabel from "@mui/material/FormControlLabel";
 
-import Containers from "react-bootstrap/Container";
-import Nav from "react-bootstrap/Nav";
-import Navbar from "react-bootstrap/Navbar";
-import NavDropdown from "react-bootstrap/NavDropdown";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
@@ -109,13 +105,15 @@ const SetupTaskPage = () => {
       taskType === "taTask"
         ? `${selectedSubject}_${selectedMonth}_${member.name}_${member.unique_id}`
         : requestName;
-
+    const isRejectable = taskType === "taTask" ? 0 : isRejectable;
     const type = taskType === "taTask" ? 1 : 0;
+    const finalDescription =
+      taskType === "taTask" ? `[${selectedSubject}] ${selectedMonth} TA 근무일지 입니다.` : description;
 
     setTaskState((prev) => ({
       ...prev,
       requestName: finalRequestName,
-      description: taskType === "taTask" ? "" : description,
+      description: taskType === "taTask" ? finalDescription : description,
       isRejectable,
       expirationDateTime: formattedExpiration,
       type,
