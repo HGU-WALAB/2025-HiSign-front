@@ -8,12 +8,9 @@ import ApiService from "../utils/ApiService";
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DownloadIcon from '@mui/icons-material/Download';
-import DoDisturbIcon from "@mui/icons-material/DoDisturb";
 import ViewListIcon from "@mui/icons-material/ViewList";
 import FindInPageIcon from '@mui/icons-material/FindInPage';
 import ViewModuleIcon from "@mui/icons-material/ViewModule";
-import TuneIcon from '@mui/icons-material/Tune';
-
 import moment from "moment/moment";
 
 const RequestedDocuments = () => {
@@ -152,7 +149,7 @@ const RequestedDocuments = () => {
                 fontWeight: "bold",
                 paddingTop: "1rem"
             }}>
-                요청한 작업
+                내작업
             </h1>
 
 
@@ -181,119 +178,82 @@ const RequestedDocuments = () => {
 
             {viewMode === "list" ? (
                 <div style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "12px",
                     maxWidth: "85%",
                     margin: "auto",
-                    boxShadow: "0px 6px 15px rgba(0, 0, 0, 0.1)",
-                    borderRadius: "8px",
-                    overflow: "hidden",
-                    backgroundColor: "#fff"
+                    padding: "12px"
                 }}>
-                    <table style={{
-                        width: "100%",
-                        borderCollapse: "separate",
-                        borderSpacing: "0",
-                        border: "1px solid #ddd",
-                        borderRadius: "8px",
-                        overflow: "hidden",
-                    }}>
-                        <thead>
-                        <tr style={{
-                            backgroundColor: "#FFFFFF",
-                            color: "#333",
-                            height: "45px",
-                            textAlign: "center",
-                            fontSize: "16px",
-                            fontWeight: "bold",
-                            borderBottom: "1px solid #ddd"
+                    {paginatedDocuments.map((doc, index) => (
+                        <div key={doc.id} style={{
+                            border: "1px solid #ddd",
+                            borderRadius: "10px",
+                            padding: "16px",
+                            backgroundColor: "#fff",
+                            boxShadow: "0 4px 8px rgba(0,0,0,0.05)",
+                            display: "flex",
+                            flexDirection: "row",
+                            justifyContent: "space-between",
+                            alignItems: "center"
                         }}>
-                            <th style={{padding: "12px"}}>No</th>
-                            <th style={{padding: "12px", textAlign: "center", paddingRight: "6rem"}}>상태</th>
-                            <th style={{padding: "12px 12px 12px 4px", textAlign: "left"}}>작업명</th>
-                            <th style={{padding: "12px"}}>요청 생성일</th>
-                            <th style={{padding: "12px"}}>요청 만료일</th>
-                            <th style={{padding: "12px"}}>추가메뉴</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {paginatedDocuments.map((doc, index) => (
-                            <tr key={doc.id} style={{
-                                borderBottom: "1px solid #ddd",
-                                height: "50px",
-                                backgroundColor: "white",
-                                transition: "all 0.2s ease-in-out",
-                            }}>
-                                <td style={{textAlign: "center", fontWeight: "bold"}}>
-                                    {documents.length - ((currentPage - 1) * itemsPerPage + index)}
-                                </td>
-
-                                <td style={{textAlign: "center", paddingRight: "5rem"}}>
-                                <span className={getStatusClass(doc.status)}
-                                      style={{
-                                          minWidth: "70px",
-                                          display: "inline-block",
-                                          textAlign: "center"
-                                      }}
-                                >
-                                    {getStatusLabel(doc.status)}
-                                </span>
-                                </td>
-
-                                <td style={{textAlign: "left", color: "black"}}>
+                            <div style={{flex: 1}}>
+                                <div style={{fontSize: "16px", fontWeight: "bold", display: "flex", alignItems: "center"}}>
                                     {doc.requestName}
                                     <button
                                         onClick={() => handleSearchClick(doc.id)}
                                         style={{
-                                            backgroundColor: "white",
                                             marginLeft: "8px",
                                             padding: "2px 6px",
                                             border: "none",
+                                            backgroundColor: "white",
+                                            color: "#000000",
                                             cursor: "pointer",
-                                            fontSize: "12px",
+                                            fontSize: "13px",
                                         }}
                                     >
                                         {signerCounts[doc.id] || ""}
                                     </button>
-                                </td>
-
-                                <td style={{
-                                    textAlign: "center",
-                                    color: "black",
-                                }}>{moment(doc.createdAt).format('YYYY/MM/DD')}</td>
-                                <td style={{
-                                    textAlign: "center",
-                                    color:
-                                        doc.status === 0 && moment(doc.expiredAt).isSame(moment(), 'day')
-                                            ? "red"
-                                            : "black"
+                                </div>
+                                <div style={{marginTop: "6px"}}>
+                                    상태: <span className={getStatusClass(doc.status)}>{getStatusLabel(doc.status)}</span>
+                                </div>
+                                <div style={{marginTop: "4px"}}>
+                                    생성일: {moment(doc.createdAt).format('YYYY/MM/DD')}
+                                </div>
+                                <div style={{
+                                    marginTop: "4px",
+                                    color: doc.status === 0 && moment(doc.expiredAt).isSame(moment(), 'day') ? "red" : "black"
                                 }}>
-                                    {moment(doc.expiredAt).format('YYYY/MM/DD HH:mm')}
-                                </td>
+                                    만료일: {moment(doc.expiredAt).format('YYYY/MM/DD HH:mm')}
+                                </div>
+                            </div>
 
-                                <td style={{textAlign: "center"}}>
-                                    <Dropdown>
-                                        <Dropdown.Toggle variant="light" style={{
-                                            padding: "5px 10px",
-                                            borderRadius: "5px",
-                                            fontWeight: "bold",
-                                            border: "none"
-                                        }}></Dropdown.Toggle>
-                                        <Dropdown.Menu>
-                                            <Dropdown.Item as={Link} to={`/detail/${doc.id}`}>
-                                                <FindInPageIcon fontSize="small" style={{marginRight: "6px"}}/>
-                                                문서 보기
-                                            </Dropdown.Item>
-                                            <Dropdown.Item disabled><DownloadIcon/> 다운로드</Dropdown.Item>
-                                            <Dropdown.Item onClick={() => handleCancelClick(doc)}
-                                                           disabled={doc.status !== 0}><CloseIcon/> 요청
-                                                취소</Dropdown.Item>
-                                            <Dropdown.Item disabled><DeleteIcon/> 삭제</Dropdown.Item>
-                                        </Dropdown.Menu>
-                                    </Dropdown>
-                                </td>
-                            </tr>
-                        ))}
-                        </tbody>
-                    </table>
+                            <div>
+                                <Dropdown>
+                                    <Dropdown.Toggle variant="light" style={{
+                                        padding: "5px 10px",
+                                        borderRadius: "5px",
+                                        fontWeight: "bold",
+                                        border: "none"
+                                    }}>
+                                        메뉴
+                                    </Dropdown.Toggle>
+                                    <Dropdown.Menu>
+                                        <Dropdown.Item as={Link} to={`/detail/${doc.id}`}>
+                                            <FindInPageIcon fontSize="small" style={{marginRight: "6px"}} />
+                                            문서 보기
+                                        </Dropdown.Item>
+                                        <Dropdown.Item disabled><DownloadIcon /> 다운로드</Dropdown.Item>
+                                        <Dropdown.Item onClick={() => handleCancelClick(doc)} disabled={doc.status !== 0}>
+                                            <CloseIcon /> 요청 취소
+                                        </Dropdown.Item>
+                                        <Dropdown.Item disabled><DeleteIcon /> 삭제</Dropdown.Item>
+                                    </Dropdown.Menu>
+                                </Dropdown>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             ) : (
                 <div style={{
