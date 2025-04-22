@@ -236,7 +236,9 @@ const RequestedDocuments = () => {
                                         borderRadius: "5px",
                                         fontWeight: "bold",
                                         border: "none"
-                                    }}></Dropdown.Toggle>
+                                    }}>
+                                        메뉴
+                                    </Dropdown.Toggle>
                                     <Dropdown.Menu>
                                         <Dropdown.Item as={Link} to={`/detail/${doc.id}`}>
                                             <FindInPageIcon fontSize="small" style={{marginRight: "6px"}} />
