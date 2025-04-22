@@ -7,12 +7,12 @@ import "react-pdf/dist/esm/entry.webpack";
 import { useNavigate } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
 import styled from "styled-components";
-import ButtonBase from "../components/ButtonBase";
 import Drop from "../components/Drop";
 import PasswordInputSection from "../components/SetupTask/PasswordInputSection";
 import { loginMemberState } from "../recoil/atom/loginMemberState";
 import { taskState } from "../recoil/atom/taskState";
-import { InputRow, Label, RequiredMark } from "../styles/SetupTaskStyle";
+import { ButtonContainer, Container, GrayButton, InputRow, Label, MainArea, NextButton, StyledBody } from "../styles/CommonStyles";
+import { RequiredMark } from "../styles/SetupTaskStyle";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
@@ -31,7 +31,8 @@ const SetupTaskPage = () => {
   const [selectedSubject, setSelectedSubject] = useState("");
   const [selectedMonth, setSelectedMonth] = useState("");
   const [password, setPassword] = useState("");
-
+  const [passwordMatch, setPasswordMatch] = useState(false);
+  
   const navigate = useNavigate();
 
   const today = new Date().toISOString().split("T")[0];
@@ -71,6 +72,17 @@ const SetupTaskPage = () => {
   };
 
   const handleNextStep = () => {
+    // 비밀번호 확인 추가
+    if (!password || password.length !== 5 || !/^\d{5}$/.test(password)) {
+      alert("유효한 인증 비밀번호를 입력해 주세요. (숫자 5자리)");
+      return;
+    }
+    
+    if (!passwordMatch) {
+      alert("비밀번호가 일치하지 않습니다.");
+      return;
+    }
+
     if (taskType === "taTask") {
       if (!selectedSubject || !selectedMonth) {
         alert("과목명과 월을 모두 선택해 주세요.");
@@ -81,7 +93,7 @@ const SetupTaskPage = () => {
         return;
       }
     }
-
+  
     if (taskType === "basicTask") {
       if (!requestName.trim()) {
         alert("작업명을 입력해 주세요.");
@@ -99,7 +111,7 @@ const SetupTaskPage = () => {
         // 더 이상 사용자 입력을 받지 않고 자동으로 7일 후로 고정
       }
     }
-
+  
     const now = new Date();
     const sevenDaysLater = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
     const isoExpiration = sevenDaysLater.toISOString().slice(0, 19);
@@ -108,22 +120,24 @@ const SetupTaskPage = () => {
       taskType === "taTask"
         ? `${selectedSubject}_${selectedMonth}_${member.name}_${member.unique_id}`
         : requestName;
-    const isRejectable = taskType === "taTask" ? 0 : isRejectable;
+    const isRejectableFinal = taskType === "taTask" ? 0 : isRejectable;
     const type = taskType === "taTask" ? 1 : 0;
     const finalDescription =
       taskType === "taTask" ? `[${selectedSubject}] ${selectedMonth} TA 근무일지 입니다.` : description;
-
+  
     setTaskState((prev) => ({
       ...prev,
       requestName: finalRequestName,
-      description: taskType === "taTask" ? finalDescription : description,
-      isRejectable,
+      description: finalDescription,
+      isRejectable: isRejectableFinal,
       expirationDateTime: formattedExpiration,
       type,
+      password,
     }));
-
+  
     navigate(`/request`);
   };
+  
 
   useEffect(() => {
     console.log(document);
@@ -354,7 +368,10 @@ const SetupTaskPage = () => {
               </DatePickerContainer>
             </InputRow>
           )}
-          <PasswordInputSection onValid={(pw) => setPassword(pw)} />
+          <PasswordInputSection onValid={(pw,match) => {
+            setPassword(pw);
+            setPasswordMatch(match);
+            }}/>
           <InputRow>
             <Label>
               문서 선택 <RequiredMark>*</RequiredMark>
@@ -369,9 +386,9 @@ const SetupTaskPage = () => {
                 />
               ) : (
                 <SelectedFileBox>
-                  {previewUrl && (
+                  {document.fileUrl && (
                     <Document
-                      file={previewUrl}
+                      file={document.fileUrl}
                       onLoadSuccess={({ numPages }) => setNumPages(numPages)}
                     >
                       <Page pageNumber={1} width={250} />
@@ -401,38 +418,13 @@ const SetupTaskPage = () => {
         <GrayButton onClick={() => navigate(`/request-document`)}>
           나가기
         </GrayButton>
-        <NextButton onClick={handleNextStep}>서명자 추가</NextButton>
+        <NextButton onClick={handleNextStep}>다음단계</NextButton>
       </ButtonContainer>
     </Container>
   );
 };
 export default SetupTaskPage;
 
-// 스타일 컴포넌트
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  background-color: #e5e5e5;
-  position: relative;
-  padding-top: 80px;
-`;
-
-const StyledBody = styled.main`
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-`;
-
-const MainArea = styled.div`
-  background-color: white;
-  border-radius: 10px;
-  padding: 30px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  width: 600px;
-`;
 
 const Title = styled.h2`
   font-size: 20px;
@@ -607,23 +599,4 @@ const ChangeFileButton = styled.button`
   &:hover {
     background-color: #0056b3;
   }
-`;
-
-const ButtonContainer = styled.div`
-  display: flex; /* 버튼들을 가로로 배치 */
-  justify-content: center; /* 중앙 정렬 */
-  align-items: center;
-  gap: 10px; /* ✅ 버튼 간 간격 조정 */
-  margin: 20px 0;
-  padding: 20px;
-`;
-
-const GrayButton = styled(ButtonBase)`
-  background-color: #ccc;
-  color: white;
-`;
-
-const NextButton = styled(ButtonBase)`
-  background-color: ${({ disabled }) => (disabled ? "#ccc" : "#03A3FF")};
-  color: white;
 `;

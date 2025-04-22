@@ -13,29 +13,35 @@ const PasswordInputSection = ({ onValid }) => {
     if (/^\d{0,5}$/.test(value)) {
       setPassword(value);
       setPasswordError(value.length !== 5 ? "숫자 5자리를 입력해주세요." : "");
+  
       if (value.length === 5 && passwordConfirm.length === 5) {
         const match = value === passwordConfirm;
         setPasswordMatch(match);
-        if (match) onValid(value);
+        onValid(value, match); // ✅ 일치 여부 전달
       } else {
         setPasswordMatch(null);
+        onValid(value, false);
       }
     }
   };
-
+  
   const handlePasswordConfirmChange = (value) => {
     if (/^\d{0,5}$/.test(value)) {
       setPasswordConfirm(value);
-      if (password.length === 5 && value.length === 5) {
-        const match = password === value;
+
+      const match = password === value;
+      const shouldCompare = password.length > 0 || value.length > 0;
+
+      if (shouldCompare) {
         setPasswordMatch(match);
-        if (match) onValid(password);
+        onValid(password, match); // 실시간 전달
       } else {
-        setPasswordMatch(null);
+        setPasswordMatch(null); // 둘 다 비어있을 경우
+        onValid(password, false);
       }
     }
   };
-
+  
   return (
     <InputRow>
       <Label>
@@ -46,17 +52,14 @@ const PasswordInputSection = ({ onValid }) => {
           type="password"
           placeholder="비밀번호 (숫자 5자리)"
           value={password}
-          onChange={(e) => handlePasswordChange(e.target.value)}
+          onChange={(e) => {
+            handlePasswordChange(e.target.value);
+            handlePasswordConfirmChange(passwordConfirm);
+          }}
           error={!!passwordError || passwordMatch === false}
           success={passwordMatch === true}
           helperText={
-            passwordError
-              ? passwordError
-              : passwordMatch === false
-              ? "비밀번호가 일치하지 않습니다"
-              : passwordMatch === true
-              ? "비밀번호가 일치합니다"
-              : ""
+            passwordError ? passwordError : ""
           }
           size="small"
           sx={{ flex: 1, mr: 1 }}

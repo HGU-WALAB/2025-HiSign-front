@@ -11,5 +11,6 @@ export const taskState = atom({
     // file: null,           // 선택한 파일 객체 (File)
     isRejectable : null,  // 거부 가능 여부
     type: null,
+    password: null,
   },
 });

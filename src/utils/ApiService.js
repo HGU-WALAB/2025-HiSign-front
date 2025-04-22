@@ -80,16 +80,24 @@ const ApiService = {
   },
 
   // 🔐 서명 요청 전송
-  sendSignatureRequest: async (documentId, memberName, signers) => {
+  sendSignatureRequest: async (documentId, memberName, signers, password) => {
     if (!documentId) throw new Error('문서 정보가 없습니다.');
     if (signers.length === 0) throw new Error('서명자를 추가해주세요.');
     if (!memberName) throw new Error('이름 정보가 없습니다. 다시 로그인해주세요.');
+
+    console.log("서명 요청 정보:", {
+      documentId,
+      memberName,
+      signers,
+      password,
+    });
 
     try {
       return await apiInstance.post("/signature-requests/request", {
         documentId,
         memberName,
-        signers
+        signers,
+        password,
       });
     } catch (error) {
       alert(error.response?.data?.message || "서명 요청 중 알 수 없는 오류가 발생했습니다.");
@@ -179,7 +187,7 @@ const ApiService = {
   // 🌐 서명 요청 검증 (이메일 입력 후)
   validateSignatureRequest: async (token, email) => {
     if (!token || !email) throw new Error('토큰과 이메일이 필요합니다.');
-    const res = await PublicaApiInstance.post('/signature-requests/validate', { token, email });
+    const res = await PublicaApiInstance.post('/auth/signer/validate', { token, email });
     return res.data;
   },
 
