@@ -1,4 +1,4 @@
-// hooks/useRestoreLoginFromCookie.js
+// hooks/useRestoreLoginFromCookieuseRestoreLoginFromCookie.js
 import { useEffect } from 'react';
 import { useSetRecoilState } from 'recoil';
 import { loginMemberState } from '../recoil/atom/loginMemberState';
@@ -19,12 +19,16 @@ const useRestoreLoginFromCookie = () => {
           name: user.name,
           email: user.email,
           role: user.level === 0? "ROLE_USER" : user.level === 1? "ROLE_ADMIN" : "ROLE_ADMIN",
+          isLoading: false, // 🔽 복원 완료
         });
 
-        console.log("✅ 로그인 정보 복원 성공:", user);
+        //console.log("✅ 로그인 정보 복원 성공:", user);
       } catch (error) {
         console.log("🚫 로그인 정보 복원 실패 (비로그인 상태일 수 있음):", error);
-        // 필요시 setLoginState를 초기화할 수도 있습니다.
+        setLoginState(prev => ({
+          ...prev,
+          isLoading: false, // 🔽 로그인 복원 실패이더라도 로딩 완료 처리
+        }));
       }
     };
 

@@ -6,6 +6,7 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import styled from "styled-components";
 import { signerState } from "../recoil/atom/signerState";
 import { taskState } from "../recoil/atom/taskState";
+import { ButtonContainer, Container, GrayButton, MainArea, NextButton, StyledBody } from "../styles/CommonStyles";
 import ApiService from "../utils/ApiService";
 
 const AddSignerPage = () => {
@@ -186,41 +187,17 @@ const AddSignerPage = () => {
           ))}
         </MainArea>
       </StyledBody>
-
-      <FloatingButtonContainer>
+      <ButtonContainer>
         <GrayButton onClick={() => navigate(`/tasksetup`)}>이전으로</GrayButton>
         <GrayButton onClick={() => navigate(`/request-document`)}>나가기</GrayButton>
         <NextButton onClick={handleNextStep} disabled={signers.length === 0}>다음단계</NextButton>
-      </FloatingButtonContainer>
+      </ButtonContainer>
     </Container>
   );
 };
 
 export default AddSignerPage;
 
-// 🔽 스타일 컴포넌트 추가 스타일 포함
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  background-color: #e5e5e5;
-  position: relative;
-`;
-const StyledBody = styled.main`
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #e5e5e5;
-  padding: 20px;
-`;
-const MainArea = styled.div`
-  background-color: white;
-  border-radius: 10px;
-  padding: 30px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  width: 600px;
-`;
 const RequestName = styled.h2`
   font-size: 20px;
   font-weight: bold;
@@ -309,31 +286,6 @@ const DeleteButton = styled.button`
     width: 20px;
     height: 20px;
   }
-`;
-const FloatingButtonContainer = styled.div`
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 20px;
-  z-index: 1000;
-`;
-const GrayButton = styled.button`
-  background-color: #b5b5b5;
-  color: white;
-  padding: 12px 24px;
-  border: none;
-  border-radius: 25px;
-  cursor: pointer;
-`;
-const NextButton = styled.button`
-  background-color: #03a3ff;
-  color: white;
-  padding: 12px 24px;
-  border: none;
-  border-radius: 25px;
-  cursor: pointer;
 `;
 const SearchResults = styled.ul`
   position: absolute;

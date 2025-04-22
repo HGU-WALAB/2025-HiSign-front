@@ -49,12 +49,13 @@ const CompleteButton = () => {
       }
 
       console.log("문서 업로드 성공:", uploadResponse.data);
-      console.log("documentId 타입:", typeof uploadResponse.data.documentId);
-
+      console.log("document : ", document);
+      console.log("document.passaword 타입:", typeof document.password);
+      console.log("document.passaword:", document.password);
       const documentId = uploadResponse.data.documentId;
       
       // 3 서명 요청 API 호출 (업로드 완료 후 실행)
-      const signatureResponse = await ApiService.sendSignatureRequest(documentId, member.name, signers);
+      const signatureResponse = await ApiService.sendSignatureRequest(documentId, member.name, signers, document.password);
       
       console.log("서명 요청 결과:", signatureResponse);
 

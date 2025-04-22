@@ -27,3 +27,4 @@ yarn-error.log*
 public/email_templete.html
 
 .vscode/
+hisign_sample_email.html

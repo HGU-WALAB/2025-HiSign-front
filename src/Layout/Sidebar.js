@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { useRecoilValue } from "recoil";
+import styled from "styled-components";
 import HisnetLoginButton from "../components/HisnetLoginButton";
 import HisnetLogoutButton from "../components/HisnetLogoutButton";
 import { loginMemberState } from "../recoil/atom/loginMemberState";
-import styled from "styled-components";
 
 function Sidebar() {
   const location = useLocation();
@@ -289,8 +289,7 @@ const MainContent = styled.div`
   flex-grow: 1;
   margin-left: ${(props) =>
     props.$sidebarOpen && !props.$isMobile ? "250px" : "0"};
-  padding: 20px;
   width: 100%;
   transition: margin-left 0.3s ease-in-out;
-  padding-top: ${(props) => (props.$isMobile ? "60px" : "20px")};
+  padding-top: ${(props) => (props.$isMobile ? "60px" : "0")};
 `;
