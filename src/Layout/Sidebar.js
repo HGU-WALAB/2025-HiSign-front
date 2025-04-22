@@ -108,7 +108,7 @@ function Sidebar() {
                 to="/receive-document"
                 $active={currentPath === "/receive-document"}
               >
-                요청받은 작업
+                공유 작업
               </NavItem>
               <NavItem to="/tasksetup" $active={currentPath === "/tasksetup"}>
                 문서 업로드하기

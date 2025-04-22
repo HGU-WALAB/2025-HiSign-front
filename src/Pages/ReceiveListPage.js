@@ -106,7 +106,7 @@ const ReceivedDocuments = () => {
     return (
         <PageContainer>
             <h1 style={{ textAlign: "center", marginBottom: "20px", fontSize: "24px", fontWeight: "bold", paddingTop: "1rem" }}>
-                요청받은 작업
+                공유 작업
             </h1>
             {error && <p style={{ color: "red", textAlign: "center" }}>{error}</p>}
 
@@ -121,114 +121,79 @@ const ReceivedDocuments = () => {
 
             {viewMode === "list" ? (
                 <div style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "12px",
                     maxWidth: "85%",
                     margin: "auto",
-                    boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-                    borderRadius: "8px",
-                    overflow: "hidden",
-                    backgroundColor: "#fff"
+                    padding: "12px"
                 }}>
-                    <table style={{
-                        width: "100%",
-                        borderCollapse: "separate",
-                        borderSpacing: "0",
-                        border: "1px solid #ddd",
-                        borderRadius: "8px",
-                        overflow: "hidden",
-
-                    }}>
-                        <thead>
-                        <tr style={{
-                            backgroundColor: "#FFFFFF",
-                            color: "#333",
-                            height: "45px",
-                            textAlign: "center",
-                            fontSize: "16px",
-                            fontWeight: "bold",
-                            borderBottom: "1px solid #ddd"
+                    {documents.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((doc, index) => (
+                        <div key={doc.id} style={{
+                            border: "1px solid #ddd",
+                            borderRadius: "10px",
+                            padding: "16px",
+                            backgroundColor: "#fff",
+                            boxShadow: "0 4px 8px rgba(0,0,0,0.05)",
+                            display: "flex",
+                            flexDirection: "row",
+                            justifyContent: "space-between",
+                            alignItems: "center"
                         }}>
-                            <th style={{padding: "12px"}}>No</th>
-                            <th style={{padding: "12px", textAlign: "center", paddingRight: "6rem"}}>상태</th>
-                            <th style={{padding: "12px 12px 12px 4px", textAlign: "left"}}>작업명</th>
-                            {/*<th style={{padding: "12px"}}>파일명</th>*/}
-                            <th style={{padding: "12px"}}>요청 생성일</th>
-                            <th style={{padding: "12px"}}>요청 만료일</th>
-                            <th style={{padding: "12px"}}>요청자</th>
-                            <th style={{padding: "12px"}}>추가메뉴</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {documents.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((doc, index) => (
-                            <tr key={doc.id} style={{
-                                borderBottom: "1px solid #ddd",
-                                height: "50px",
-                                backgroundColor: "white",
-                                transition: "all 0.2s ease-in-out",
-                            }}>
-                                <td style={{textAlign: "center", fontWeight: "bold"}}>
-                                    {documents.length - ((currentPage - 1) * itemsPerPage + index)}
-                                </td>
-
-                                <td style={{textAlign: "center", paddingRight: "5rem"}}>
-                                <span className={getStatusClass(doc.status)}
-                                      style={{
-                                          minWidth: "70px",
-                                          display: "inline-block",
-                                          textAlign: "center"
-                                      }}
-                                >
-                                    {getStatusLabel(doc.status)}
-                                </span>
-                                </td>
-                                <td style={{textAlign: "left", color: "black"}}>{doc.requestName}</td>
-                                {/*<td style={{textAlign: "center"}}>*/}
-                                {/*    <Link to={`/detail/${doc.id}`} style={{textDecoration: "none", color: "#007BFF"}}>*/}
-                                {/*        {doc.fileName}*/}
-                                {/*    </Link>*/}
-                                {/*</td>*/}
-                                <td style={{
-                                    textAlign: "center",
-                                    color: "black"
-                                }}>{moment(doc.createdAt).format('YYYY/MM/DD')}</td>
-                                <td style={{
-                                    textAlign: "center",
-                                    color:
-                                        doc.status === 0 && moment(doc.expiredAt).isSame(moment(), 'day')
-                                            ? "red"
-                                            : "black"
+                            <div style={{flex: 1}}>
+                                <div style={{fontSize: "16px", fontWeight: "bold"}}>
+                                    {doc.requestName}
+                                </div>
+                                <div style={{marginTop: "6px"}}>
+                                    상태: <span className={getStatusClass(doc.status)}>{getStatusLabel(doc.status)}</span>
+                                </div>
+                                <div style={{marginTop: "4px"}}>
+                                    생성일: {moment(doc.createdAt).format('YYYY/MM/DD')}
+                                </div>
+                                <div style={{
+                                    marginTop: "4px",
+                                    color: doc.status === 0 && moment(doc.expiredAt).isSame(moment(), 'day') ? "red" : "black"
                                 }}>
-                                    {moment(doc.expiredAt).format('YYYY/MM/DD HH:mm')}
-                                </td>
+                                    만료일: {moment(doc.expiredAt).format('YYYY/MM/DD HH:mm')}
+                                </div>
+                                <div style={{marginTop: "4px"}}>
+                                    요청자: {doc.requesterName || "알 수 없음"}
+                                </div>
+                            </div>
 
-                                <td style={{textAlign: "center", color: "black"}}>{doc.requesterName || "알 수 없음"}</td>
-                                <td style={{textAlign: "center"}}>
-                                    <Dropdown>
-                                        <Dropdown.Toggle variant="light" style={{
-                                            padding: "5px 10px",
-                                            borderRadius: "5px",
-                                            fontWeight: "bold",
-                                            border: "none"
-                                        }}></Dropdown.Toggle>
-                                        <Dropdown.Menu>
-                                            <Dropdown.Item as={Link} to={`/detail/${doc.id}`}>
-                                                <FindInPageIcon fontSize="small" style={{marginRight: "6px"}}/>
-                                                문서 보기
-                                            </Dropdown.Item>
-                                            <Dropdown.Item disabled><DownloadIcon/> 다운로드</Dropdown.Item>
-                                            <Dropdown.Item onClick={() => handleRejectClick(doc)}
-                                                           disabled={doc.status !== 0 || doc.isRejectable !== 1}>
-                                                <DoDisturbIcon/> 요청 거절
-                                            </Dropdown.Item>
-                                            <Dropdown.Item disabled><DeleteIcon/> 삭제</Dropdown.Item>
-                                        </Dropdown.Menu>
-                                    </Dropdown>
-                                </td>
-                            </tr>
-                        ))}
-                        </tbody>
-                    </table>
+                            <div>
+                                <Dropdown>
+                                    <Dropdown.Toggle variant="light" style={{
+                                        padding: "5px 10px",
+                                        borderRadius: "5px",
+                                        fontWeight: "bold",
+                                        border: "none"
+                                    }}>
+                                        메뉴
+                                    </Dropdown.Toggle>
+                                    <Dropdown.Menu>
+                                        <Dropdown.Item as={Link} to={`/detail/${doc.id}`}>
+                                            <FindInPageIcon fontSize="small" style={{marginRight: "6px"}}/>
+                                            문서 보기
+                                        </Dropdown.Item>
+                                        <Dropdown.Item disabled>
+                                            <DownloadIcon/> 다운로드
+                                        </Dropdown.Item>
+                                        <Dropdown.Item
+                                            onClick={() => handleRejectClick(doc)}
+                                            disabled={doc.status !== 0 || doc.isRejectable !== 1}
+                                        >
+                                            <DoDisturbIcon/> 요청 거절
+                                        </Dropdown.Item>
+                                        <Dropdown.Item disabled>
+                                            <DeleteIcon/> 삭제
+                                        </Dropdown.Item>
+                                    </Dropdown.Menu>
+                                </Dropdown>
+                            </div>
+                        </div>
+                    ))}
                 </div>
-
             ) : (
                 <div style={{
                     display: "grid",
@@ -251,7 +216,6 @@ const ReceivedDocuments = () => {
     }}>
         <div style={{ fontWeight: "bold", marginBottom: "8px" }}>{doc.requestName}</div>
 
-        {/* PDF 미리보기 영역 */}
         <embed
             src={doc.previewUrl || doc.fileUrl}
             type="application/pdf"
@@ -259,7 +223,6 @@ const ReceivedDocuments = () => {
             height="150px"
         />
 
-        {/* 상태, 날짜, 요청자 정보 */}
         <div style={{ marginTop: "8px", fontSize: "14px" }}>
             <span className={getStatusClass(doc.status)}>{getStatusLabel(doc.status)}</span><br/>
             생성일: {moment(doc.createdAt).format('YY년 MM월 DD일')}<br/>
