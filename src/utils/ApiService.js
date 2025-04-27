@@ -17,6 +17,7 @@ const apiInstance = axios.create({
 const PublicaApiInstance = axios.create({
   baseURL: BASE_URL,
   headers: { 'Content-Type': 'application/json' },
+  withCredentials: true,
 });
 
 // 🔐 응답 시 401 처리
