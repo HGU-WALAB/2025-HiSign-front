@@ -135,8 +135,13 @@ const ApiService = {
   fetchMyInfo: async () => {
     return apiInstance.get('/member/me');
   },
+
+  reqeustCheckTask: async (documentId) => {
+    if (!documentId) throw new Error('문서 ID가 필요합니다.');
+    return apiInstance.get(`/documents/request-check/${documentId}`);
+  },
   // ===================================================
-  // ✅ 비로그인 상태에서도 사용 가능한 API (PublicaApiInstance)
+  // ✅ 서명자 상태에서도 사용 가능한 API (PublicaApiInstance)
   // ===================================================
 
   // 🌐 서명 이미지 업로드
