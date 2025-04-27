@@ -6,6 +6,7 @@ import Sidebar from "./Layout/Sidebar";
 import AddSignerPage from "./Pages/AddSignerPage";
 import AllocatePage from "./Pages/AllocatePage";
 import CheckEmailPage from './Pages/CheckEmailPage';
+import CheckTaskPage from './Pages/CheckTaskPage';
 import CompleteSignPage from "./Pages/CompleteSignPage";
 import DetailPage from "./Pages/DetailPage";
 import LandingPage from "./Pages/LandingPage";
@@ -46,6 +47,9 @@ function MyRoutes() {
                 } />
                 <Route path="/detail/:documentId" element={
                     <RequireLogin><DetailPage /></RequireLogin>
+                } />
+                <Route path="/check-task" element={
+                    <RequireLogin><CheckTaskPage /></RequireLogin>
                 } />
             </Route>
         </Routes>
