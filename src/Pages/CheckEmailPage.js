@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
-import EmailInputModal from "../components/SignPage/EmailInputModal";
+import PasswardInputModal from "../components/SignPage/PasswardInputModal";
 import { signingState } from "../recoil/atom/signingState";
 import ApiService from "../utils/ApiService";
 
@@ -19,13 +19,15 @@ const CheckEmailPage = () => {
       setError("❌ 유효하지 않은 접근입니다.");
       return;
     }
-  
+    
     ApiService.checkSignatureToken(token)
-      .then(() => {
+      .then((res) => {
+        console.log("서명 요청 검증 결과:", res);
         setIsValid(true);
         setSigning((prevState) => ({
           ...prevState,
           token: token,
+          signerEmail: res.signerEmail,
         }));
       })
       .catch((err) => {
@@ -39,13 +41,9 @@ const CheckEmailPage = () => {
   }, [token]);
 
   // ✅ 2. 이메일 인증 후 문서 + 서명 위치 불러오기
-  const handleEmailSubmit = (inputEmail, setModalError) => {
-    setSigning((prevState) => ({
-      ...prevState,
-      signerEmail: inputEmail,
-    }));
+  const handlePasswordSubmit = (password, setModalError) => {
 
-    ApiService.validateSignatureRequest(token, inputEmail)
+    ApiService.validateSignatureRequest(token, password)
       .then((response) => {
         console.log("서명 요청 검증 결과:", response);
 
@@ -70,7 +68,7 @@ const CheckEmailPage = () => {
           })
           .then(() => {
             // ✅ 서명 필드 정보 불러오기 (PDF 로딩 후 실행)
-            return ApiService.fetchSignatureFields(response.documentId, inputEmail);
+            return ApiService.fetchSignatureFields(response.documentId, signing.signerEmail);
           })
           .then((fieldsResponse) => {
             setSigning((prevState) => ({
@@ -83,7 +81,7 @@ const CheckEmailPage = () => {
       })
       .catch((err) => {
         console.error("서명 요청 검증 실패:", err);
-        const errorMessage = err.response?.data?.message || "이메일 인증에 실패했습니다. 다시 시도해주세요.";
+        const errorMessage = err.response?.data?.message || "비밀번호 인증에 실패했습니다. 다시 시도해주세요.";
         setModalError(errorMessage); // 모달 내부 에러 메시지 설정
         alert(errorMessage);
         // 실패시 모달을 닫지 않음
@@ -95,9 +93,9 @@ const CheckEmailPage = () => {
       {error && <ErrorMessage>{error}</ErrorMessage>}
       {isValid === null && <LoadingMessage>로딩 중...</LoadingMessage>}
       {isValid && !signing.documentId && (
-        <EmailInputModal
+        <PasswardInputModal
           open={true}
-          onSubmit={handleEmailSubmit}
+          onSubmit={handlePasswordSubmit}
           onClose={() => {}} // 닫기 버튼 비활성화
         />
       )}

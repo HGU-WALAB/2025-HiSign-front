@@ -191,9 +191,9 @@ const ApiService = {
   },
 
   // 🌐 서명 요청 검증 (이메일 입력 후)
-  validateSignatureRequest: async (token, email) => {
-    if (!token || !email) throw new Error('토큰과 이메일이 필요합니다.');
-    const res = await PublicaApiInstance.post('/auth/signer/validate', { token, email });
+  validateSignatureRequest: async (token, password) => {
+    if (!token || !password) throw new Error('토큰과 이메일이 필요합니다.');
+    const res = await PublicaApiInstance.post('/auth/signer/validate', { token, password });
     return res.data;
   },
 
