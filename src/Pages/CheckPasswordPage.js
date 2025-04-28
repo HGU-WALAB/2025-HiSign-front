@@ -6,7 +6,7 @@ import PasswardInputModal from "../components/SignPage/PasswardInputModal";
 import { signingState } from "../recoil/atom/signingState";
 import ApiService from "../utils/ApiService";
 
-const CheckEmailPage = () => {
+const CheckPassowrdPage = () => {
   const [searchParams] = useSearchParams();
   const [isValid, setIsValid] = useState(null);
   const token = searchParams.get("token");
@@ -102,7 +102,7 @@ const CheckEmailPage = () => {
     </MainContainer>
   );
 }
-export default CheckEmailPage;
+export default CheckPassowrdPage;
 
 const MainContainer = styled.div`
   display: flex;

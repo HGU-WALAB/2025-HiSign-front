@@ -106,6 +106,32 @@ const ApiService = {
     }
   },
 
+  // 🔐 서명 요청 정보 저장
+  storeSignatureRequest: async (documentId, memberName, signers, password) => {
+    if (!documentId) throw new Error('문서 정보가 없습니다.');
+    if (signers.length === 0) throw new Error('서명자를 추가해주세요.');
+    if (!memberName) throw new Error('이름 정보가 없습니다. 다시 로그인해주세요.');
+
+    console.log("서명 요청 정보:", {
+      documentId,
+      memberName,
+      signers,
+      password,
+    });
+
+    try {
+      return await apiInstance.post("/signature-requests/store", {
+        documentId,
+        memberName,
+        signers,
+        password,
+      });
+    } catch (error) {
+      alert(error.response?.data?.message || "서명 요청 정보 저장 중 알 수 없는 오류가 발생했습니다.");
+      throw error;
+    }
+  },
+
   // 🔐 서명 요청 취소
   cancelSignatureRequest: async (documentId, reason) => {
     if (!documentId) throw new Error('문서 ID가 필요합니다.');
@@ -139,6 +165,17 @@ const ApiService = {
   reqeustCheckTask: async (documentId) => {
     if (!documentId) throw new Error('문서 ID가 필요합니다.');
     return apiInstance.get(`/documents/request-check/${documentId}`);
+  },
+
+  fetchDocumentTitle: async (documentId) => {
+    if (!documentId) throw new Error('문서 ID가 필요합니다.');
+    return apiInstance.get(`/documents/${documentId}/title`).then(res => res.data);
+  },
+
+  sendSignatureRequest: async   (documentId, memberName, password) => {
+    if (!documentId) throw new Error('문서 ID가 필요합니다.');
+    if (!memberName) throw new Error('이름 정보가 없습니다. 다시 로그인해주세요.');
+    return apiInstance.post("/signature-requests/send-email", { documentId, memberName,password,});
   },
   // ===================================================
   // ✅ 서명자 상태에서도 사용 가능한 API (PublicaApiInstance)

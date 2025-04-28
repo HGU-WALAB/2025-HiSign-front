@@ -54,10 +54,16 @@ const CompleteButton = () => {
       const documentId = uploadResponse.data.documentId;
 
       let signatureResponse;
-      if (document.type === 1) {
-        signatureResponse = await ApiService.reqeustCheckTask(documentId);
-      } else {
-        signatureResponse = await ApiService.sendSignatureRequest(documentId, member.name, signers, document.password);
+      try {
+        if (document.type === 1) {
+          await ApiService.reqeustCheckTask(documentId);
+          signatureResponse = await ApiService.storeSignatureRequest(documentId, member.name, signers, document.password);
+        } else {
+          signatureResponse = await ApiService.sendSignatureRequest(documentId, member.name, signers, document.password);
+        }
+      } catch (error) {
+        console.error("서명 요청 처리 중 오류:", error);
+        alert(error.response?.data?.message || "서명 요청 중 오류가 발생했습니다.");
       }
 
       if (signatureResponse.status === 200) {
