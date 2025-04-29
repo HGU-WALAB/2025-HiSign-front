@@ -95,7 +95,7 @@ function Sidebar() {
             <div className="mb-4">
               <HisnetLoginButton />
             </div>
-          )} */}
+          )}
 
           {!!loginMember.uniqueId && (
             <Nav className="nav flex-column">
