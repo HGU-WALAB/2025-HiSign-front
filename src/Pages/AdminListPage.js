@@ -248,7 +248,23 @@ const AdminDocuments = () => {
                                 </div>
                                 <div style={{ marginTop: "4px" }}>요청자: {doc.requesterName || "알 수 없음"}</div>
                             </div>
-                            <div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                {/* ✅ 새 버튼 */}
+                                <button
+                                onClick={() => navigate(`/check-task/${doc.id}`)}
+                                disabled={doc.status !== 7}
+                                style={{
+                                    padding: "5px 10px",
+                                    borderRadius: "5px",
+                                    fontWeight: "bold",
+                                    border: "none",
+                                    backgroundColor: doc.status === 7 ? "#1976d2" : "#ccc",  // 활성화: 파랑, 비활성화: 회색
+                                    color: "#fff",
+                                    cursor: doc.status === 7 ? "pointer" : "not-allowed",
+                                }}
+                                >
+                                검토
+                                </button>
                                 <Dropdown>
                                     <Dropdown.Toggle variant="light" style={{ padding: "5px 10px", borderRadius: "5px", fontWeight: "bold", border: "none" }}>
                                         메뉴

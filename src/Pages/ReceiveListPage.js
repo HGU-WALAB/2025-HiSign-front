@@ -248,6 +248,13 @@ const ReceivedDocuments = () => {
                                             <FindInPageIcon fontSize="small" style={{marginRight: "6px"}}/>
                                             문서 보기
                                         </Dropdown.Item>
+                                        <Dropdown.Item
+                                            as={Link} to={`/checkEmail?token=${doc.token}`}
+                                            disabled={doc.status !== 0}
+                                        >
+                                        <DrawIcon fontSize="small" style={{ marginRight: "6px" }} />
+                                        서명 하기
+                                        </Dropdown.Item>
                                         <Dropdown.Item disabled><DownloadIcon/> 다운로드</Dropdown.Item>
                                         <Dropdown.Item onClick={() => handleRejectClick(doc)}
                                                        disabled={doc.status !== 0 || doc.isRejectable !== 1}>
