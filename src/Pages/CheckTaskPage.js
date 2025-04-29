@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import ButtonBase from "../components/ButtonBase";
+import ConfirmModal from "../components/ConfirmModal";
 import RejectModal from "../components/ListPage/RejectModal";
 import SignatureMarker from "../components/PreviewPage/SignatureMarker";
 import PDFViewer from "../components/SignPage/PDFViewer";
@@ -21,6 +22,8 @@ const CheckTaskPage = () => {
   const navigate = useNavigate();
   const { documentId } = useParams();
   const [error, setError] = useState(null);
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     ApiService.fetchDocumentInfo(documentId)
@@ -85,16 +88,27 @@ const CheckTaskPage = () => {
       });
   }, [documentId]);
 
-  const handleConfirm= () => {
-    ApiService.sendRequestMail(signing.documentId, signing.signerName)
-      .then(() => {
-        alert("서명 요청이 성공적으로 전송되었습니다.");
-        navigate("/");
-      })
-      .catch((error) => {
-        console.error("서명 요청 전송 중 오류 발생:", error);
-        alert("서명 요청 전송에 실패했습니다.");
-      });
+  const handleOpenModal = () => {
+    setOpen(true);
+  };
+  
+  const handleCloseModal = () => {
+    setOpen(false);
+  };
+
+  const handleConfirm= async  () => {
+    setLoading(true);
+    try {
+      await ApiService.sendRequestMail(signing.documentId, signing.signerName);
+      alert("서명 요청이 성공적으로 전송되었습니다.");
+      navigate("/");
+    } catch (error) {
+      console.error(error);
+      alert("서명 요청 전송에 실패했습니다.");
+    } finally {
+      setLoading(false);
+      setOpen(false);
+    }
   };
 
   const handleReject = () => {
@@ -158,7 +172,7 @@ const CheckTaskPage = () => {
 
           <ButtonContainer>
             <RejectButton onClick={handleReject}>요청 반려</RejectButton>
-            <NextButton onClick={handleConfirm}>요청 승인</NextButton>
+            <NextButton onClick={handleOpenModal}>요청 승인</NextButton>
           </ButtonContainer>
         </Sidebar>
 
@@ -184,6 +198,15 @@ const CheckTaskPage = () => {
         rejectReason={rejectReason}
         setRejectReason={setRejectReason}
         type={"return"}
+      />
+
+      <ConfirmModal
+        open={open}
+        loading={loading}
+        onClose={handleCloseModal}
+        onConfirm={handleConfirm}
+        title="요청 승인"
+        message="이 작업을 승인하시겠습니까?"
       />
     </MainContainer>
   );

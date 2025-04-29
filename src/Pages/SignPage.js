@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import ButtonBase from "../components/ButtonBase";
+import ConfirmModal from "../components/ConfirmModal";
 import PDFViewer from "../components/SignPage/PDFViewer";
 import SignatureOverlay from "../components/SignPage/SignatureOverlay";
 import { signingState } from "../recoil/atom/signingState";
@@ -18,10 +19,20 @@ function SignPage() {
   const [openSavedSignatures, setOpenSavedSignatures] = useState(false);
   const [selectedSavedSignature, setSelectedSavedSignature] = useState(null);
   const [signaturesByPage, setSignaturesByPage] = useState({});
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   // 특정 페이지로 이동하는 함수
   const navigateToPage = (pageNumber) => {
   setCurrentPage(pageNumber);
+  };
+
+  const handleOpenModal = () => {
+    setOpen(true);
+  };
+  
+  const handleCloseModal = () => {
+    setOpen(false);
   };
 
   // 서명 필드가 변경될 때마다 페이지별로 그룹화
@@ -125,7 +136,7 @@ const applySavedSignature = (signature) => {
     console.log("🔹 서명 저장 시작:", signing);
     
     let fileName = null;
-  
+    setLoading(true);
     try {
       // ✅ 1. 서명 이미지 업로드
       const imageField = signing.signatureFields.find(field => field.type === 0 && field.image);
@@ -159,6 +170,9 @@ const applySavedSignature = (signature) => {
     } catch (error) {
       console.error("❌ 서명 처리 실패:", error);
       alert(`서명 처리 중 오류가 발생했습니다: ${error.message}`);
+    } finally {
+      setLoading(false);
+      setOpen(false);
     }
   };
 
@@ -243,12 +257,20 @@ const applySavedSignature = (signature) => {
               </DocumentContainer>
               
               <ButtonContainer>
-                <CompleteButton onClick={handleSubmitSignature}>서명 완료</CompleteButton>
+                <CompleteButton onClick={handleOpenModal}>서명 완료</CompleteButton>
               </ButtonContainer>
             </DocumentSection>
           )}
         </Container>
       </ContentWrapper>
+      <ConfirmModal
+        open={open}
+        loading={loading}
+        onClose={handleCloseModal}
+        onConfirm={handleSubmitSignature}
+        title="서명 완료"
+        message="서명을 완료하시겠습니까? 완료 후에는 수정할 수 없습니다."
+      />
     </MainContainer>
   );
 }
