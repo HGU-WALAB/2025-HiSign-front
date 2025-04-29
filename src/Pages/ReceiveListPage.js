@@ -11,11 +11,11 @@ import React, { useEffect, useState } from "react";
 import { Dropdown } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { useRecoilState } from "recoil";
+import styled from "styled-components";
 import RejectModal from "../components/ListPage/RejectModal";
 import { PageContainer } from "../components/PageContainer";
 import { loginMemberState } from "../recoil/atom/loginMemberState";
 import ApiService from "../utils/ApiService";
-import styled from "styled-components"; 
 
 const ReceivedDocuments = () => {
     const [documents, setDocuments] = useState([]);
@@ -394,6 +394,7 @@ const ReceivedDocuments = () => {
         onConfirm={handleConfirmReject}
         rejectReason={rejectReason}
         setRejectReason={setRejectReason}
+        type={"reject"}
       />
 
       <FloatingCenterLink to="/tasksetup">

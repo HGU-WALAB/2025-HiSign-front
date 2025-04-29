@@ -23,6 +23,29 @@ const CheckTaskPage = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    ApiService.fetchDocumentInfo(documentId)
+    .then(response => {
+      console.log("문서 정보:", response);
+      
+      // 🔥 여기 추가
+      if (response.data.status !== 7) {
+        setError("해당 문서는 검토가 필요한 상태가 아닙니다.");
+        return; // 나머지 코드 실행 중단
+      }
+
+      const partsTitle = response.data.requestName.split("_");
+      setUniqueId(partsTitle[3]);
+      setSigning((prevState) => ({
+        ...prevState,
+        requesterName: partsTitle[2],
+      }));
+      setSubject(partsTitle[0]);
+      setMonth(partsTitle[1]);
+    })
+    .catch(error => {
+      setError('문서 제목을 로드하는 중 오류가 발생했습니다: ' + error.message);
+    });
+
     ApiService.fetchDocument(documentId)
       .then(response => {
         const fileBlob = new Blob([response.data], { type: 'application/pdf' });
@@ -60,21 +83,6 @@ const CheckTaskPage = () => {
       .catch(error => {
         setError('서명자 정보를 로드하는 중 오류가 발생했습니다: ' + error.message);
       });
-
-      ApiService.fetchDocumentTitle(documentId)
-      .then(response => {
-        console.log("문서 제목:", response);
-        const partsTitle = response.split("_");
-        setUniqueId(partsTitle[3]);
-        setSigning((prevState) => ({
-          ...prevState,
-          requesterName: partsTitle[2],
-        }));
-        setSubject(partsTitle[0]);
-        setMonth(partsTitle[1]);
-      }).catch(error => {
-        setError('문서 제목을 로드하는 중 오류가 발생했습니다: ' + error.message);
-      });
   }, [documentId]);
 
   const handleConfirm= () => {
@@ -100,7 +108,7 @@ const CheckTaskPage = () => {
       return;
     }
 
-    ApiService.rejectDocument(signing.documentId, rejectReason, signing.token, signing.signerEmail)
+    ApiService.rejectCheck(signing.documentId, rejectReason)
       .then(() => {
         alert("요청이 반려되었습니다.");
         setShowModal(false);
@@ -112,7 +120,16 @@ const CheckTaskPage = () => {
       });
   };
 
+  if (error) {
+    return (
+      <MainContainer>
+        <ErrorMessage>{error}</ErrorMessage>
+      </MainContainer>
+    );
+  }
+
   return (
+    
     <MainContainer>
       <ContentWrapper>
         <Sidebar>
@@ -166,6 +183,7 @@ const CheckTaskPage = () => {
         onConfirm={handleConfirmReject}
         rejectReason={rejectReason}
         setRejectReason={setRejectReason}
+        type={"return"}
       />
     </MainContainer>
   );
@@ -259,4 +277,19 @@ const RejectButton = styled(ButtonBase)`
   &:hover {
     background-color: rgb(179, 0, 0);
   }
+`;
+
+const ErrorMessage = styled.p`
+  color: #ff4d4f;
+  font-size: 16px;
+  font-weight: bold;
+  background-color: #fff3f3;
+  border: 1px solid #ff4d4f;
+  padding: 10px 15px;
+  border-radius: 5px;
+  text-align: center;
+  margin: 10px auto;
+  width: 80%;
+  max-width: 500px;
+  box-shadow: 0px 2px 8px rgba(255, 77, 79, 0.2);
 `;

@@ -60,7 +60,6 @@ const ApiService = {
     throw new Error('Invalid document type specified');
   },
 
-
   // 🔐 문서별 서명자 목록 조회
   fetchSignersByDocument: async (documentId) => {
     if (!documentId) throw new Error("문서 ID가 필요합니다.");
@@ -118,15 +117,16 @@ const ApiService = {
     return apiInstance.get(`/documents/request-check/${documentId}`);
   },
 
-  fetchDocumentTitle: async (documentId) => {
-    if (!documentId) throw new Error('문서 ID가 필요합니다.');
-    return apiInstance.get(`/documents/${documentId}/title`).then(res => res.data);
-  },
-
   sendRequestMail: async (documentId, memberName) => {
     if (!documentId) throw new Error('문서 ID가 필요합니다.');
     if (!memberName) throw new Error('이름 정보가 없습니다. 다시 로그인해주세요.');
     return apiInstance.post("/signature-requests/send-mail", { documentId, memberName});
+  },
+
+  rejectCheck: async (documentId,reason) => {
+    if (!documentId) throw new Error('문서 ID가 필요합니다.');
+    if (!reason) throw new Error('거절 사유가 필요합니다.');
+    return apiInstance.put(`/documents/${documentId}/reject`, { reason });
   },
   // ===================================================
   // ✅ 서명자 상태에서도 사용 가능한 API (PublicaApiInstance)
