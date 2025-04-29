@@ -117,6 +117,15 @@ function Sidebar() {
               <NavItem to="/request" $active={currentPath === "/request"}>
                 서명자 등록하기
               </NavItem>
+
+              {loginMember.role?.trim().toUpperCase() === "ROLE_ADMIN" && (
+                  <NavItem
+                      to="/admin-document"
+                      $active={currentPath === "/admin-list"}
+                  >
+                    관리자 페이지
+                  </NavItem>
+              )}
             </Nav>
           )}
         </div>
