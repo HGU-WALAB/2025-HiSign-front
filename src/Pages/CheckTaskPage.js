@@ -140,8 +140,8 @@ const CheckTaskPage = () => {
           </InfoSection>
 
           <ButtonContainer>
-            <RejectButton onClick={handleReject}>서명 요청 반려</RejectButton>
-            <NextButton onClick={handleConfirm}>서명 요청 전달</NextButton>
+            <RejectButton onClick={handleReject}>요청 반려</RejectButton>
+            <NextButton onClick={handleConfirm}>요청 승인</NextButton>
           </ButtonContainer>
         </Sidebar>
 
