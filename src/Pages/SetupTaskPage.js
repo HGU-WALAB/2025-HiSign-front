@@ -414,16 +414,31 @@ const SetupTaskPage = () => {
           </InputRow>
         </MainArea>
       </StyledBody>
-      <ButtonContainer>
-        <GrayButton onClick={() => navigate(`/request-document`)}>
-          나가기
-        </GrayButton>
-        <NextButton onClick={handleNextStep}>다음단계</NextButton>
-      </ButtonContainer>
+      <FloatingButtonContainer>
+  <GrayButton onClick={() => navigate(`/request-document`)}>
+    나가기
+  </GrayButton>
+  <NextButton onClick={handleNextStep}>
+    다음단계
+  </NextButton>
+</FloatingButtonContainer>
+
     </Container>
   );
 };
 export default SetupTaskPage;
+
+const FloatingButtonContainer = styled.div`
+  position: fixed;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  z-index: 999;
+`;
+
 
 
 const Title = styled.h2`
