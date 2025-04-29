@@ -27,10 +27,13 @@ const RequestedDocuments = () => {
     const [signers, setSigners] = useState([]);
     const [showSignersModal, setShowSignersModal] = useState(false);
     const [viewMode, setViewMode] = useState("list");
-
     const [signerCounts, setSignerCounts] = useState({});
 
+
     const [searchQuery, setSearchQuery] = useState("");
+    const [createdSortOrder, setCreatedSortOrder] = useState('desc');
+    const [expiredSortOrder, setExpiredSortOrder] = useState(null);
+    const [statusFilter, setStatusFilter] = useState('all');
 
     useEffect(() => {
         ApiService.fetchDocuments("requested")
@@ -57,15 +60,12 @@ const RequestedDocuments = () => {
                     }
                 }));
 
-                console.log("signerCounts:", counts); // 값을 확인
-
                 setSignerCounts(counts);
             })
             .catch((error) => {
                 setError("문서를 불러오는 중 문제가 발생했습니다: " + error.message);
             });
     }, []);
-
 
     const handleCancelClick = (doc) => {
         setSelectedDocument(doc);
@@ -79,7 +79,7 @@ const RequestedDocuments = () => {
             1: "label label-success",
             2: "label label-danger",
             3: "label label-warning",
-            4: "label label-default",
+            4: "label label-default"
         };
         return statusClasses[status] || "badge bg-secondary";
     };
@@ -90,8 +90,7 @@ const RequestedDocuments = () => {
             1: "완료",
             2: "거절",
             3: "취소",
-            4: "만료",
-        };
+            4: "만료" };
         return statusLabels[status] || "알 수 없음";
     };
 
@@ -132,16 +131,27 @@ const RequestedDocuments = () => {
 
     const handleSearchChange = (event) => {
         setSearchQuery(event.target.value);
+        setCurrentPage(1);
     };
 
-    const filteredDocuments = documents.filter(doc =>
-        doc.requestName.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filteredDocuments = documents
+        .filter(doc => doc.requestName.toLowerCase().includes(searchQuery.toLowerCase()))
+        .filter(doc => {
+            if (statusFilter === 'all') return true;
+            return String(doc.status) === statusFilter;
+        })
+        .sort((a, b) => {
+            if (createdSortOrder) {
+                const result = new Date(b.createdAt) - new Date(a.createdAt);
+                return createdSortOrder === 'desc' ? result : -result;
+            } else if (expiredSortOrder) {
+                const result = new Date(b.expiredAt) - new Date(a.expiredAt);
+                return expiredSortOrder === 'desc' ? result : -result;
+            }
+            return 0;
+        });
 
-    const paginatedDocuments = filteredDocuments.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
-    );
+    const paginatedDocuments = filteredDocuments.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
     return (
         <PageContainer>
@@ -155,26 +165,101 @@ const RequestedDocuments = () => {
                 내 작업
             </h1>
 
+            {error && <p style={{color: "red", textAlign: "center"}}>{error}</p>}
 
-            <div style={{display: "flex", justifyContent: "flex-end", marginRight: "8%", marginBottom: "10px"}}>
-                {/*<TuneIcon style={{color:"gray"}}/>*/}
-                <div style={{textAlign: "center", marginTop: "0.5rem"}}>
-                    <input
-                        type="text"
-                        placeholder="작업명 검색"
-                        value={searchQuery}
-                        onChange={handleSearchChange}
-                        style={{padding: "0.1rem", width: "9rem"}}
-                    />
+            <div style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                flexWrap: "wrap",
+                maxWidth: "85%",
+                margin: "0 auto 10px auto",
+                padding: "0 8px",
+                gap: "8px"
+            }}
+            >
+                <div style={{display: "flex", alignItems: "center", gap: "6px", flex: "1 1 0"}}>
+                    <select value={createdSortOrder || ''} onChange={(e) =>
+                    { setCreatedSortOrder(e.target.value); setExpiredSortOrder(null); }}
+                            style={{
+                                padding: "4px 8px",
+                                border: "none",
+                                background: "transparent",
+                                outline: "none",
+                                fontSize: "14px",
+                                minWidth: "80px",
+                                height: "32px",
+                                cursor: "pointer",
+                    }}
+                    >
+                        <option value="">생성일</option>
+                        <option value="desc">최신순</option>
+                        <option value="asc">오래된순</option>
+                    </select>
+                    <select value={expiredSortOrder || ''} onChange={(e) =>
+                    { setExpiredSortOrder(e.target.value); setCreatedSortOrder(null); }}
+                            style={{
+                                padding: "4px 8px",
+                                border: "none",
+                                background: "transparent",
+                                outline: "none",
+                                fontSize: "14px",
+                                minWidth: "80px",
+                                height: "32px",
+                                cursor: "pointer",
+                    }}
+                    >
+                        <option value="">만료일</option>
+                        <option value="desc">최신순</option>
+                        <option value="asc">오래된순</option>
+                    </select>
+                    <select value={statusFilter} onChange={(e) =>
+                        setStatusFilter(e.target.value)}
+                            style={{
+                                padding: "4px 8px",
+                                border: "none",
+                                background: "transparent",
+                                outline: "none",
+                                fontSize: "14px",
+                                minWidth: "80px",
+                                height: "32px",
+                                cursor: "pointer",
+                    }}
+                    >
+                        <option value="all">문서 상태</option>
+                        <option value="0">서명중</option>
+                        <option value="1">완료</option>
+                        <option value="2">거절</option>
+                        <option value="3">취소</option>
+                        <option value="4">만료</option>
+                    </select>
                 </div>
-                <button onClick={() => setViewMode("list")}
-                        style={{background: "none", border: "none", cursor: "pointer"}}>
-                    <ViewListIcon color={viewMode === "list" ? "primary" : "disabled"}/>
-                </button>
-                <button onClick={() => setViewMode("grid")}
-                        style={{background: "none", border: "none", cursor: "pointer"}}>
-                    <ViewModuleIcon color={viewMode === "grid" ? "primary" : "disabled"}/>
-                </button>
+                <div style={{display: "flex", alignItems: "center", gap: "6px", flexShrink: 0}}>
+                    <input type="text" placeholder="작업명 검색" value={searchQuery} onChange={handleSearchChange}
+                           style={{
+                               padding: "0.1rem",
+                               width: "9rem"
+                    }}
+                    />
+                    <button onClick={() => setViewMode("list")}
+                            style={{
+                                background: "none",
+                                border: "none",
+                                cursor: "pointer"
+                    }}
+                    >
+                        <ViewListIcon color={viewMode === "list" ? "primary" : "disabled"}/>
+                    </button>
+                    <button onClick={() => setViewMode("grid")}
+                            style={{
+                                background: "none",
+                                border: "none",
+                                cursor: "pointer"
+                    }}
+                    >
+                        <ViewModuleIcon color={viewMode === "grid" ? "primary" : "disabled"}/>
+                    </button>
+                </div>
             </div>
 
             {error && <p style={{color: "red", textAlign: "center"}}>{error}</p>}
@@ -360,7 +445,6 @@ const RequestedDocuments = () => {
 };
 
 export default RequestedDocuments;
-
 
 const FloatingCenterLink = styled(Link)`
     position: fixed;
