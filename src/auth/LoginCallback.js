@@ -31,7 +31,7 @@ const LoginCallback = () => {
         console.log("디코딩된 페이로드:", payload);
         // 사용자 정보 상태 변경
         setloginMemberState({
-          unique_id: payload.sub,
+          uniqueId: payload.sub,
           name: payload.name,
           email: payload.email,
           level: payload.role,

@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import styled from "styled-components";
+
 import HisnetLoginButton from "../components/HisnetLoginButton";
 import { loginMemberState } from "../recoil/atom/loginMemberState";
 import { Fab } from "@mui/material";
@@ -12,6 +13,7 @@ import AddIcon from '@mui/icons-material/Add';
 
 import thum3 from "../asset/signperson.png";
 import thum4 from "../asset/main.png";
+
 
 function SideBar() {
     const loginMember = useRecoilValue(loginMemberState);
@@ -28,10 +30,12 @@ function SideBar() {
                     <StyledImage src={thum3} alt="썸네일3" />
                 </ImageContainer>
 
+
                 <MainTitle>Hi-Sign</MainTitle>
 
-                {!!loginMember.unique_id ? (
+                 {!!loginMember.uniqueId ? (
                     <CenterLink to="/tasksetup">서명 요청</CenterLink>
+
                 ) : (
                     <HisnetLoginButton>히즈넷으로 로그인</HisnetLoginButton>
                 )}

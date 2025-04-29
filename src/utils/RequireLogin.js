@@ -8,7 +8,7 @@ const RequireLogin = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!loginUser.isLoading && !loginUser?.unique_id) {
+    if (!loginUser.isLoading && !loginUser?.uniqueId) {
       alert("로그인이 필요합니다.");
       navigate("/");  // 로그인 페이지로 이동
     }
