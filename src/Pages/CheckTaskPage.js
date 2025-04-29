@@ -1,6 +1,6 @@
-// PreviewPage.js
+// CheckTaskPage.js
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import ButtonBase from "../components/ButtonBase";
@@ -10,20 +10,84 @@ import PDFViewer from "../components/SignPage/PDFViewer";
 import { signingState } from "../recoil/atom/signingState";
 import ApiService from "../utils/ApiService";
 
-const PreviewPage = () => {
-  const [signing] = useRecoilState(signingState);
+const CheckTaskPage = () => {
+  const [signing,setSigning] = useRecoilState(signingState);
+  const [uniqueId, setUniqueId] = useState("");
+  const [month,setMonth] = useState("");
+  const [subject, setSubject] = useState("");
   const [currentPage, setCurrentPage] = React.useState(1);
   const [showModal, setShowModal] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
   const navigate = useNavigate();
+  const { documentId } = useParams();
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    console.log("서명 요청 정보:", signing);
-    if (!signing.documentId) {
-      alert("유효한 문서 정보가 없습니다. 이메일을 먼저 인증해주세요.");
-      navigate("/");
-    }
-  }, [signing.documentId, navigate]);
+    ApiService.fetchDocument(documentId)
+      .then(response => {
+        const fileBlob = new Blob([response.data], { type: 'application/pdf' });
+        setSigning((prevState) => ({
+          ...prevState,
+          fileUrl: URL.createObjectURL(fileBlob),
+          documentId: documentId,
+        }));
+      })
+      .catch(error => {
+        setError('문서를 로드하는 중 오류가 발생했습니다: ' + error.message);
+      });
+  
+    ApiService.fetchSignersByDocument(documentId)
+      .then(response => {
+        console.log("서명자 정보:", response);
+        setSigning((prevState) => ({
+          ...prevState,
+          signerName: response[0]?.name || "",
+          signerEmail: response[0]?.email || "",
+        }));
+        
+        ApiService.fetchSignatureFields(documentId,response[0]?.email)
+          .then(response => {
+            console.log("서명 필드 정보:", response);
+            setSigning((prevState) => ({
+              ...prevState,
+              signatureFields: response.data,
+            }));
+          })
+          .catch(error => {
+            setError('서명 필드를 로드하는 중 오류가 발생했습니다: ' + error.message);
+          });
+      })
+      .catch(error => {
+        setError('서명자 정보를 로드하는 중 오류가 발생했습니다: ' + error.message);
+      });
+
+      ApiService.fetchDocumentTitle(documentId)
+      .then(response => {
+        console.log("문서 제목:", response);
+        const partsTitle = response.split("_");
+        setUniqueId(partsTitle[3]);
+        setSigning((prevState) => ({
+          ...prevState,
+          requesterName: partsTitle[2],
+        }));
+        setSubject(partsTitle[0]);
+        setMonth(partsTitle[1]);
+      }).catch(error => {
+        setError('문서 제목을 로드하는 중 오류가 발생했습니다: ' + error.message);
+      });
+  }, [documentId]);
+
+  const handleConfirm= () => {
+    ApiService.sendRequestMail(signing.documentId, signing.signerName)
+      .then(() => {
+        alert("서명 요청이 성공적으로 전송되었습니다.");
+        navigate("/");
+      })
+      .catch((error) => {
+        console.error("서명 요청 전송 중 오류 발생:", error);
+        alert("서명 요청 전송에 실패했습니다.");
+      });
+  };
 
   const handleReject = () => {
     setRejectReason("");
@@ -32,19 +96,19 @@ const PreviewPage = () => {
 
   const handleConfirmReject = () => {
     if (!rejectReason.trim()) {
-      alert("거절 사유를 입력해주세요.");
+      alert("반려 사유를 입력해주세요.");
       return;
     }
 
     ApiService.rejectDocument(signing.documentId, rejectReason, signing.token, signing.signerEmail)
       .then(() => {
-        alert("요청이 거절되었습니다.");
+        alert("요청이 반려되었습니다.");
         setShowModal(false);
         navigate("/");
       })
       .catch((error) => {
-        console.error("요청 거절 중 오류 발생:", error);
-        alert("요청 거절에 실패했습니다.");
+        console.error("요청 반려 중 오류 발생:", error);
+        alert("요청 반려에 실패했습니다.");
       });
   };
 
@@ -54,34 +118,30 @@ const PreviewPage = () => {
         <Sidebar>
           <InfoSection>
             <InfoItem>
-              <Label>작업 요청자:</Label>
+              <Label>TA 학번:</Label>
+              <Value>{uniqueId || "알 수 없음"}</Value>
+            </InfoItem>
+            <InfoItem>
+              <Label>TA 이름:</Label>
               <Value>{signing.requesterName || "알 수 없음"}</Value>
             </InfoItem>
             <InfoItem>
-              <Label>작업명:</Label>
-              <Value>{signing.requestName || "알 수 없음"}</Value>
+              <Label>교과목:</Label>
+              <Value>{subject || "알 수 없음"}</Value>
             </InfoItem>
             <InfoItem>
-              <Label>작업 요청 상세:</Label>
-              <Value>{signing.description || "알 수 없음"}</Value>
+              <Label>기준 월:</Label>
+              <Value>{month|| "알 수 없음"}</Value>
             </InfoItem>
             <InfoItem>
-              <Label>문서 이름:</Label>
-              <Value>{signing.documentName || "알 수 없음"}</Value>
-            </InfoItem>
-            <InfoItem>
-              <Label>서명자:</Label>
+              <Label>담당 교수:</Label>
               <Value>{signing.signerName || "알 수 없음"}</Value>
-            </InfoItem>
-            <InfoItem>
-              <Label>서명 상태:</Label>
-              <Value>{signing.isSigned ? "서명 완료" : "서명 대기중"}</Value>
             </InfoItem>
           </InfoSection>
 
           <ButtonContainer>
-            {signing.isRejectable && (<RejectButton onClick={handleReject}>거절하기</RejectButton>)}
-            <NextButton onClick={() => navigate("/sign")}>서명하기</NextButton>
+            <RejectButton onClick={handleReject}>요청 반려</RejectButton>
+            <NextButton onClick={handleConfirm}>요청 승인</NextButton>
           </ButtonContainer>
         </Sidebar>
 
@@ -111,7 +171,7 @@ const PreviewPage = () => {
   );
 };
 
-export default PreviewPage;
+export default CheckTaskPage;
 
 const MainContainer = styled.div`
   display: flex;
@@ -180,6 +240,8 @@ const LoadingMessage = styled.p`
 const ButtonContainer = styled.div`
   margin-top: 20px;
   text-align: center;
+  display: flex;
+  justify-content: center;
 `;
 
 const NextButton = styled(ButtonBase)`

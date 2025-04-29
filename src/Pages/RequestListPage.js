@@ -12,6 +12,9 @@ import ViewListIcon from "@mui/icons-material/ViewList";
 import FindInPageIcon from '@mui/icons-material/FindInPage';
 import ViewModuleIcon from "@mui/icons-material/ViewModule";
 import moment from "moment/moment";
+import styled from "styled-components"; 
+import DrawIcon from '@mui/icons-material/Draw';
+
 
 const RequestedDocuments = () => {
     const [documents, setDocuments] = useState([]);
@@ -159,7 +162,7 @@ const RequestedDocuments = () => {
                 fontWeight: "bold",
                 paddingTop: "1rem"
             }}>
-                내작업
+                내 작업
             </h1>
 
             {error && <p style={{color: "red", textAlign: "center"}}>{error}</p>}
@@ -431,8 +434,40 @@ const RequestedDocuments = () => {
                                 onChange={handlePageChange}/>
                 </div>
             )}
+
+<FloatingCenterLink to="/tasksetup">
+        <DrawIcon style={{ fontSize: "32px" }} />
+      </FloatingCenterLink>
+      
         </PageContainer>
+
     );
 };
 
 export default RequestedDocuments;
+
+const FloatingCenterLink = styled(Link)`
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    background-color: #87CEFA;
+    color: white;
+    width: 60px;
+    height: 60px;
+    border: none;
+    border-radius: 50%;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    transition: background-color 0.3s ease-in-out;
+
+    &:hover {
+        background-color: #4682B4;
+    }
+`;

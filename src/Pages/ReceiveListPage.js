@@ -1,12 +1,12 @@
-import DeleteIcon from '@mui/icons-material/Delete';
-import DoDisturbIcon from '@mui/icons-material/DoDisturb';
-import DownloadIcon from '@mui/icons-material/Download';
-import DrawIcon from '@mui/icons-material/Draw';
-import FindInPageIcon from '@mui/icons-material/FindInPage';
-import ViewListIcon from '@mui/icons-material/ViewList';
-import ViewModuleIcon from '@mui/icons-material/ViewModule';
+import DeleteIcon from "@mui/icons-material/Delete";
+import DoDisturbIcon from "@mui/icons-material/DoDisturb";
+import DownloadIcon from "@mui/icons-material/Download";
+import DrawIcon from "@mui/icons-material/Draw";
+import FindInPageIcon from "@mui/icons-material/FindInPage";
+import ViewListIcon from "@mui/icons-material/ViewList";
+import ViewModuleIcon from "@mui/icons-material/ViewModule";
 import { Pagination } from "@mui/material";
-import moment from 'moment';
+import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { Dropdown } from "react-bootstrap";
 import { Link } from "react-router-dom";
@@ -15,6 +15,7 @@ import RejectModal from "../components/ListPage/RejectModal";
 import { PageContainer } from "../components/PageContainer";
 import { loginMemberState } from "../recoil/atom/loginMemberState";
 import ApiService from "../utils/ApiService";
+import styled from "styled-components"; 
 
 const ReceivedDocuments = () => {
     const [documents, setDocuments] = useState([]);
@@ -27,8 +28,6 @@ const ReceivedDocuments = () => {
     const [viewMode, setViewMode] = useState("list");
     const [loginMember] = useRecoilState(loginMemberState);
     const [searchQuery, setSearchQuery] = useState("");
-
-
     const [createdSortOrder, setCreatedSortOrder] = useState('desc');
     const [expiredSortOrder, setExpiredSortOrder] = useState(null);
     const [statusFilter, setStatusFilter] = useState('all');
@@ -54,50 +53,55 @@ const ReceivedDocuments = () => {
             4: "label label-default"
         };
         return statusClasses[status] || "badge bg-secondary";
-    };
+  };
 
-    const getStatusLabel = (status) => {
-        const statusLabels = {
-            0: "서명중",
-            1: "완료",
-            2: "거절",
-            3: "취소",
-            4: "만료",
-        };
-        return statusLabels[status] || "알 수 없음";
+  const getStatusLabel = (status) => {
+    const statusLabels = {
+      0: "서명중",
+      1: "완료",
+      2: "거절",
+      3: "취소",
+      4: "만료",
     };
+    return statusLabels[status] || "알 수 없음";
+  };
 
-    const handleRejectClick = (doc) => {
-        setSelectedDocument(doc);
-        setRejectReason("");
-        setShowModal(true);
-    };
+  const handleRejectClick = (doc) => {
+    setSelectedDocument(doc);
+    setRejectReason("");
+    setShowModal(true);
+  };
 
-    const handleConfirmReject = () => {
-        if (!rejectReason.trim()) {
-            alert("거절 사유를 입력해주세요.");
-            return;
-        }
+  const handleConfirmReject = () => {
+    if (!rejectReason.trim()) {
+      alert("거절 사유를 입력해주세요.");
+      return;
+    }
 
-        ApiService.rejectDocument(selectedDocument.id, rejectReason, selectedDocument.token, loginMember.email)
-            .then(() => {
-                alert("요청이 거절되었습니다.");
-                setShowModal(false);
-                setDocuments((prevDocs) =>
-                    prevDocs.map((doc) =>
-                        doc.id === selectedDocument.id ? { ...doc, status: 2 } : doc
-                    )
-                );
-            })
-            .catch((error) => {
-                console.error("요청 거절 중 오류 발생:", error);
-                alert("요청 거절에 실패했습니다.");
-            });
-    };
+    ApiService.rejectDocument(
+      selectedDocument.id,
+      rejectReason,
+      selectedDocument.token,
+      loginMember.email
+    )
+      .then(() => {
+        alert("요청이 거절되었습니다.");
+        setShowModal(false);
+        setDocuments((prevDocs) =>
+          prevDocs.map((doc) =>
+            doc.id === selectedDocument.id ? { ...doc, status: 2 } : doc
+          )
+        );
+      })
+      .catch((error) => {
+        console.error("요청 거절 중 오류 발생:", error);
+        alert("요청 거절에 실패했습니다.");
+      });
+  };
 
-    const handlePageChange = (event, value) => {
-        setCurrentPage(value);
-    };
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
 
     const handleSearchChange = (event) => {
         setSearchQuery(event.target.value);
@@ -120,6 +124,7 @@ const ReceivedDocuments = () => {
             }
             return 0;
         });
+  
 
     return (
         <PageContainer>
@@ -383,16 +388,46 @@ const ReceivedDocuments = () => {
                                 onChange={handlePageChange}/>
                 </div>
             )}
+      <RejectModal
+        isVisible={showModal}
+        onClose={() => setShowModal(false)}
+        onConfirm={handleConfirmReject}
+        rejectReason={rejectReason}
+        setRejectReason={setRejectReason}
+      />
 
-            <RejectModal
-                isVisible={showModal}
-                onClose={() => setShowModal(false)}
-                onConfirm={handleConfirmReject}
-                rejectReason={rejectReason}
-                setRejectReason={setRejectReason}
-            />
-        </PageContainer>
-    );
+      <FloatingCenterLink to="/tasksetup">
+        <DrawIcon style={{ fontSize: "32px" }} />
+      </FloatingCenterLink>
+    </PageContainer>
+  );
 };
 
 export default ReceivedDocuments;
+
+const FloatingCenterLink = styled(Link)`
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  background-color: #87cefa;
+  color: white;
+  width: 60px;
+  height: 60px;
+  border: none;
+  border-radius: 50%;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  transition: background-color 0.3s ease-in-out;
+
+  &:hover {
+    background-color: #4682b4;
+  }
+`;
+

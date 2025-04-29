@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { InputRow, Label, PasswordRequiredNotice, PasswordRow, RequiredMark } from "../../styles/SetupTaskStyle";
+import { InputRow, Label } from "../../styles/CommonStyles";
+import { PasswordRequiredNotice, PasswordRow, RequiredMark } from "../../styles/SetupTaskStyle";
 import ValidatedTextField from "./ValidatedTextField";
 
 

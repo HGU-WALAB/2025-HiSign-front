@@ -17,6 +17,7 @@ const apiInstance = axios.create({
 const PublicaApiInstance = axios.create({
   baseURL: BASE_URL,
   headers: { 'Content-Type': 'application/json' },
+  withCredentials: true,
 });
 
 // 🔐 응답 시 401 처리
@@ -38,22 +39,18 @@ apiInstance.interceptors.response.use(
 // ===================================================
 
 const ApiService = {
-
   // 🔐 문서 업로드
-  uploadDocument: async (file, uniqueId, requestName, description, isRejectable, type) => {
+  fullUpload: async (file, uploadRequestDTO) => {
     if (!file) throw new Error('업로드할 파일이 없습니다.');
+    console.log("업로드할 uploadDTO:", uploadRequestDTO);
     const formData = new FormData();
-    formData.append('file', file, file.name);
-    formData.append('unique_id', uniqueId);
-    formData.append('request_name', requestName);
-    formData.append('description', description);
-    formData.append('is_rejectable', isRejectable);
-    formData.append('type', type);
-    return apiInstance.post('/files/document/upload', formData, {
+    formData.append('file', file);
+    formData.append('dto', new Blob([JSON.stringify(uploadRequestDTO)], { type: 'application/json' }));
+  
+    return apiInstance.post('/documents/full-upload', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
   },
-
   // 🔐 문서 목록 조회
   fetchDocuments: async (type) => {
     if (type === 'requested') return apiInstance.get('/documents/requested-documents');
@@ -79,32 +76,6 @@ const ApiService = {
   deleteDocument: async (documentId) => {
     if (!documentId) throw new Error('문서 ID가 필요합니다.');
     return apiInstance.delete(`/documents/${documentId}`).then(res => res.data);
-  },
-
-  // 🔐 서명 요청 전송
-  sendSignatureRequest: async (documentId, memberName, signers, password) => {
-    if (!documentId) throw new Error('문서 정보가 없습니다.');
-    if (signers.length === 0) throw new Error('서명자를 추가해주세요.');
-    if (!memberName) throw new Error('이름 정보가 없습니다. 다시 로그인해주세요.');
-
-    console.log("서명 요청 정보:", {
-      documentId,
-      memberName,
-      signers,
-      password,
-    });
-
-    try {
-      return await apiInstance.post("/signature-requests/request", {
-        documentId,
-        memberName,
-        signers,
-        password,
-      });
-    } catch (error) {
-      alert(error.response?.data?.message || "서명 요청 중 알 수 없는 오류가 발생했습니다.");
-      throw error;
-    }
   },
 
   // 🔐 서명 요청 취소
@@ -140,9 +111,24 @@ const ApiService = {
   // 문서 정보만 가져오기
   fetchDocumentInfo: async (documentId) => {
     return apiInstance.get(`/documents/info/${documentId}`);
+    
+  reqeustCheckTask: async (documentId) => {
+    if (!documentId) throw new Error('문서 ID가 필요합니다.');
+    return apiInstance.get(`/documents/request-check/${documentId}`);
+  },
+
+  fetchDocumentTitle: async (documentId) => {
+    if (!documentId) throw new Error('문서 ID가 필요합니다.');
+    return apiInstance.get(`/documents/${documentId}/title`).then(res => res.data);
+  },
+
+  sendRequestMail: async (documentId, memberName) => {
+    if (!documentId) throw new Error('문서 ID가 필요합니다.');
+    if (!memberName) throw new Error('이름 정보가 없습니다. 다시 로그인해주세요.');
+    return apiInstance.post("/signature-requests/send-mail", { documentId, memberName});
   },
   // ===================================================
-  // ✅ 비로그인 상태에서도 사용 가능한 API (PublicaApiInstance)
+  // ✅ 서명자 상태에서도 사용 가능한 API (PublicaApiInstance)
   // ===================================================
 
   // 🌐 서명 이미지 업로드
@@ -192,9 +178,9 @@ const ApiService = {
   },
 
   // 🌐 서명 요청 검증 (이메일 입력 후)
-  validateSignatureRequest: async (token, email) => {
-    if (!token || !email) throw new Error('토큰과 이메일이 필요합니다.');
-    const res = await PublicaApiInstance.post('/auth/signer/validate', { token, email });
+  validateSignatureRequest: async (token, password) => {
+    if (!token || !password) throw new Error('토큰과 이메일이 필요합니다.');
+    const res = await PublicaApiInstance.post('/auth/signer/validate', { token, password });
     return res.data;
   },
 

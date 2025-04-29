@@ -65,24 +65,14 @@ const SetupTaskPage = () => {
     setPreviewUrl(blobUrl);
     setTaskState((prev) => ({
       ...prev,
-      ownerId: member.unique_id,
+      ownerId: member.uniqueId,
       fileName: file.name,
       fileUrl: blobUrl,
     }));
   };
 
   const handleNextStep = () => {
-    // 비밀번호 확인 추가
-    if (!password || password.length !== 5 || !/^\d{5}$/.test(password)) {
-      alert("유효한 인증 비밀번호를 입력해 주세요. (숫자 5자리)");
-      return;
-    }
-    
-    if (!passwordMatch) {
-      alert("비밀번호가 일치하지 않습니다.");
-      return;
-    }
-
+  
     if (taskType === "taTask") {
       if (!selectedSubject || !selectedMonth) {
         alert("과목명과 월을 모두 선택해 주세요.");
@@ -110,6 +100,17 @@ const SetupTaskPage = () => {
       if (isRejectable === 1) {
         // 더 이상 사용자 입력을 받지 않고 자동으로 7일 후로 고정
       }
+
+      // 비밀번호 확인 추가
+    if (!password || password.length !== 5 || !/^\d{5}$/.test(password)) {
+      alert("유효한 인증 비밀번호를 입력해 주세요. (숫자 5자리)");
+      return;
+    }
+    
+    if (!passwordMatch) {
+      alert("비밀번호가 일치하지 않습니다.");
+      return;
+    }
     }
   
     const now = new Date();
@@ -118,13 +119,13 @@ const SetupTaskPage = () => {
     const formattedExpiration = isoExpiration; // 항상 7일 후로 고정
     const finalRequestName =
       taskType === "taTask"
-        ? `${selectedSubject}_${selectedMonth}_${member.name}_${member.unique_id}`
+        ? `${selectedSubject}_${selectedMonth}_${member.name}_${member.uniqueId}`
         : requestName;
-    const isRejectableFinal = taskType === "taTask" ? 0 : isRejectable;
+    const isRejectableFinal = taskType === "taTask" ? 1 : isRejectable;
     const type = taskType === "taTask" ? 1 : 0;
     const finalDescription =
       taskType === "taTask" ? `[${selectedSubject}] ${selectedMonth} TA 근무일지 입니다.` : description;
-  
+    const finalPassword = taskType === "taTask" ? "NONE" : password;
     setTaskState((prev) => ({
       ...prev,
       requestName: finalRequestName,
@@ -132,7 +133,7 @@ const SetupTaskPage = () => {
       isRejectable: isRejectableFinal,
       expirationDateTime: formattedExpiration,
       type,
-      password,
+      password: finalPassword,
     }));
   
     navigate(`/request`);
@@ -261,6 +262,7 @@ const SetupTaskPage = () => {
           )}
 
           {taskType === "basicTask" && (
+            <>
             <InputRow>
               <Label>
                 작업명 <RequiredMark>*</RequiredMark>
@@ -367,11 +369,12 @@ const SetupTaskPage = () => {
                 </DatePickerHint>
               </DatePickerContainer>
             </InputRow>
+            <PasswordInputSection onValid={(pw,match) => {
+              setPassword(pw);
+              setPasswordMatch(match);
+              }}/>
+              </>
           )}
-          <PasswordInputSection onValid={(pw,match) => {
-            setPassword(pw);
-            setPasswordMatch(match);
-            }}/>
           <InputRow>
             <Label>
               문서 선택 <RequiredMark>*</RequiredMark>
@@ -414,16 +417,31 @@ const SetupTaskPage = () => {
           </InputRow>
         </MainArea>
       </StyledBody>
-      <ButtonContainer>
-        <GrayButton onClick={() => navigate(`/request-document`)}>
-          나가기
-        </GrayButton>
-        <NextButton onClick={handleNextStep}>다음단계</NextButton>
-      </ButtonContainer>
+      <FloatingButtonContainer>
+  <GrayButton onClick={() => navigate(`/request-document`)}>
+    나가기
+  </GrayButton>
+  <NextButton onClick={handleNextStep}>
+    다음단계
+  </NextButton>
+</FloatingButtonContainer>
+
     </Container>
   );
 };
 export default SetupTaskPage;
+
+const FloatingButtonContainer = styled.div`
+  position: fixed;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  z-index: 999;
+`;
+
 
 
 const Title = styled.h2`

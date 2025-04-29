@@ -1,17 +1,17 @@
 import { Box, Button, Modal, Typography } from "@mui/material";
 import { useState } from "react";
 
-function EmailInputModal({ open, onSubmit, onClose }) {
-  const [email, setEmail] = useState("");
+function PasswordInputModal({ open, onSubmit, onClose }) {
+  const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
 
   const handleValidate = () => {
-    if (!email) {
-      setError("이메일을 입력해주세요."); // 이메일이 비어있을 경우 에러 메시지 출력
+    if (!password) {
+      setError("비밀번호를를 입력해주세요."); // 이메일이 비어있을 경우 에러 메시지 출력
       return;
     }
 
-    onSubmit(email, setError); // onSubmit에 에러 상태 업데이트를 넘김
+    onSubmit(password, setError); // onSubmit에 에러 상태 업데이트를 넘김
   };
 
   return (
@@ -41,7 +41,7 @@ function EmailInputModal({ open, onSubmit, onClose }) {
         onClick={(e) => e.stopPropagation()}
       >
         <Typography variant="h6" component="h2" sx={{ mb: 2 }}>
-          이메일 인증
+          비밀번호 인증
         </Typography>
 
         {/* 안내문 추가 */}
@@ -49,20 +49,20 @@ function EmailInputModal({ open, onSubmit, onClose }) {
           variant="body1"
           sx={{ mb: 2 }}
         >
-          <strong>서명 요청을 수신한 본인의 이메일 주소</strong>를 입력하여 주세요.
+          이메일에 첨부된 <strong>비밀번호</strong>를 입력하여 주세요.
         </Typography>
 
           <br>
           </br>
         <div style={{ width: "100%", display: "flex", justifyContent: "center", gap: "10px" }}>
           <input
-            type="email"
-            value={email}
+            type="password"
+            value={password}
             onChange={(e) => {
-              setEmail(e.target.value);
+              setPassword(e.target.value);
               setError(null); // 입력이 바뀌면 에러 초기화
             }}
-            placeholder="이메일 입력"
+            placeholder="비밀번호 입력"
             style={{
               width: "50%",
               padding: "8px",
@@ -89,4 +89,4 @@ function EmailInputModal({ open, onSubmit, onClose }) {
   );
 }
 
-export default EmailInputModal;
+export default PasswordInputModal;
