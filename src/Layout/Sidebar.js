@@ -76,7 +76,7 @@ function Sidebar() {
             />
           </LogoLink>
 
-          {!!loginMember.unique_id && (
+          {!!loginMember.uniqueId && (
             <ProfileContainer>
               {showLogout && (
                 <LogoutContainer>
@@ -90,13 +90,13 @@ function Sidebar() {
             </ProfileContainer>
           )}
 
-          {!loginMember.unique_id && (
+          {!loginMember.uniqueId && (
             <div className="mb-4">
               <HisnetLoginButton />
             </div>
           )}
 
-          {!!loginMember.unique_id && (
+          {!!loginMember.uniqueId && (
             <Nav className="nav flex-column">
               <NavItem
                 to="/request-document"

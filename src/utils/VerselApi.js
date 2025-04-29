@@ -49,7 +49,7 @@
 //     if (!file) throw new Error('업로드할 파일이 없습니다.');
 //     const formData = new FormData();
 //     formData.append('file', file, file.name);
-//     formData.append('unique_id', uniqueId);
+//     formData.append('uniqueId', uniqueId);
 
 //     return apiInstance.post('/files/document/upload', formData, {
 //       headers: { 'Content-Type': 'multipart/form-data' },

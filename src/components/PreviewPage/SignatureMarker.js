@@ -4,7 +4,9 @@ import { signingState } from "../../recoil/atom/signingState";
 
 const SignatureMarker = ({ currentPage }) => {
   const [signing] = useRecoilState(signingState);
-
+  if (!Array.isArray(signing.signatureFields)) {
+    return null;  // ✅ 필드가 배열이 아니면 아무것도 렌더링하지 않음
+  }
   return (
     <div>
       {signing.signatureFields

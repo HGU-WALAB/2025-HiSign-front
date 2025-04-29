@@ -5,7 +5,8 @@ import useRestoreLoginFromCookie from './hooks/useRestoreLoginFromCookie';
 import Sidebar from "./Layout/Sidebar";
 import AddSignerPage from "./Pages/AddSignerPage";
 import AllocatePage from "./Pages/AllocatePage";
-import CheckEmailPage from './Pages/CheckEmailPage';
+import CheckPassowrdPage from './Pages/CheckPasswordPage';
+import CheckTaskPage from './Pages/CheckTaskPage';
 import CompleteSignPage from "./Pages/CompleteSignPage";
 import DetailPage from "./Pages/DetailPage";
 import LandingPage from "./Pages/LandingPage";
@@ -23,7 +24,7 @@ function MyRoutes() {
             <Route element={<Sidebar />}>
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/login-ing" element={<LoginCallback />} />
-                <Route path="/checkEmail" element={<CheckEmailPage />} />
+                <Route path="/checkEmail" element={<CheckPassowrdPage />} />
                 <Route path="/preview" element={<PreviewTaskPage />} />
                 <Route path="/sign" element={<SignPage />} />
                 <Route path="/sign-complete" element={<CompleteSignPage />} />
@@ -46,6 +47,9 @@ function MyRoutes() {
                 } />
                 <Route path="/detail/:documentId" element={
                     <RequireLogin><DetailPage /></RequireLogin>
+                } />
+                <Route path="/check-task/:documentId" element={
+                    <RequireLogin><CheckTaskPage /></RequireLogin>
                 } />
             </Route>
         </Routes>
