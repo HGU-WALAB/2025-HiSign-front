@@ -59,7 +59,7 @@ function Sidebar() {
         </ToggleButton>
       )}
 
-      {/* 사이드바 */}
+  
       <SidebarWrapper
         className="sidebar"
         $isOpen={sidebarOpen}
@@ -91,10 +91,11 @@ function Sidebar() {
           )}
 
           {!loginMember.uniqueId && (
+
             <div className="mb-4">
               <HisnetLoginButton />
             </div>
-          )}
+          )} */}
 
           {!!loginMember.uniqueId && (
             <Nav className="nav flex-column">

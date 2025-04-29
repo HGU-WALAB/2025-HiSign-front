@@ -16,12 +16,14 @@ import RequestedDocuments from "./Pages/RequestListPage";
 import SetupTaskPage from "./Pages/SetupTaskPage";
 import SignPage from './Pages/SignPage';
 import RequireLogin from './utils/RequireLogin';
+import DashBoardPage from './Pages/DashBoardPage';
 
 function MyRoutes() {
     useRestoreLoginFromCookie();
     return (
         <Routes>
             <Route element={<Sidebar />}>
+            
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/login-ing" element={<LoginCallback />} />
                 <Route path="/checkEmail" element={<CheckPassowrdPage />} />
@@ -48,8 +50,13 @@ function MyRoutes() {
                 <Route path="/detail/:documentId" element={
                     <RequireLogin><DetailPage /></RequireLogin>
                 } />
+
+                <Route path="/dashboard" element={
+                    <RequireLogin><DashBoardPage /></RequireLogin>
+
                 <Route path="/check-task/:documentId" element={
                     <RequireLogin><CheckTaskPage /></RequireLogin>
+
                 } />
             </Route>
         </Routes>
