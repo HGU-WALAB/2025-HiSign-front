@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useSetRecoilState } from "recoil";
 import styled from "styled-components";
 import { signingState } from "../recoil/atom/signingState";
+import ApiService from "../utils/ApiService";
 
 const CompleteSignPage = () => {
   const navigate = useNavigate();
@@ -18,7 +19,14 @@ const CompleteSignPage = () => {
       fileUrl: null,
       signatureFields: []
     });
-
+    
+    ApiService.deleteSignerCookie()
+      .then(() => {
+        console.log("서명자 쿠키 삭제 성공");
+      })
+      .catch((error) => {
+        console.error("서명자 쿠키 삭제 실패:", error);
+      });
     // ✅ 3초 후 홈으로 이동 (자동 리디렉션)
     // const timer = setTimeout(() => {
     //   navigate("/");
@@ -28,10 +36,10 @@ const CompleteSignPage = () => {
   }, [navigate, resetSigningState]);
 
   return (
-    <Container> 
+    <Container>
       <h2>서명이 완료되었습니다! </h2>
       <h2>✅ </h2>
-      {/* <p>곧 메인 페이지로 이동합니다...</p> */}
+      {/* <p>서명을 요청 받은 모든 서명자가 서명을 마치면 해당 작업이 완료됩니다.</p> */}
     </Container>
   );
 };

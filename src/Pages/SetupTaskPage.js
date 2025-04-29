@@ -11,7 +11,7 @@ import Drop from "../components/Drop";
 import PasswordInputSection from "../components/SetupTask/PasswordInputSection";
 import { loginMemberState } from "../recoil/atom/loginMemberState";
 import { taskState } from "../recoil/atom/taskState";
-import { ButtonContainer, Container, GrayButton, InputRow, Label, MainArea, NextButton, StyledBody } from "../styles/CommonStyles";
+import { Container, GrayButton, InputRow, Label, MainArea, NextButton, StyledBody } from "../styles/CommonStyles";
 import { RequiredMark } from "../styles/SetupTaskStyle";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
@@ -170,6 +170,7 @@ const SetupTaskPage = () => {
 
           {taskType === "taTask" && (
             <InputRow>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
               <Label>
                 과목명 <RequiredMark>*</RequiredMark>
               </Label>
@@ -258,6 +259,7 @@ const SetupTaskPage = () => {
                   </option>
                 ))}
               </select>
+              </div>
             </InputRow>
           )}
 
