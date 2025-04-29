@@ -1,7 +1,6 @@
 import DeleteIcon from '@mui/icons-material/Delete';
 import DoDisturbIcon from '@mui/icons-material/DoDisturb';
 import DownloadIcon from '@mui/icons-material/Download';
-import DrawIcon from '@mui/icons-material/Draw';
 import FindInPageIcon from '@mui/icons-material/FindInPage';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import ViewModuleIcon from '@mui/icons-material/ViewModule';
@@ -10,31 +9,23 @@ import moment from 'moment';
 import React, { useEffect, useState } from "react";
 import { Dropdown } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import { useRecoilState } from "recoil";
-import RejectModal from "../components/ListPage/RejectModal";
 import { PageContainer } from "../components/PageContainer";
-import { loginMemberState } from "../recoil/atom/loginMemberState";
 import ApiService from "../utils/ApiService";
 
-const ReceivedDocuments = () => {
+const AdminDocuments = () => {
     const [documents, setDocuments] = useState([]);
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(10);
-    const [showModal, setShowModal] = useState(false);
-    const [selectedDocument, setSelectedDocument] = useState(null);
-    const [rejectReason, setRejectReason] = useState("");
     const [viewMode, setViewMode] = useState("list");
-    const [loginMember] = useRecoilState(loginMemberState);
     const [searchQuery, setSearchQuery] = useState("");
-
 
     const [createdSortOrder, setCreatedSortOrder] = useState('desc');
     const [expiredSortOrder, setExpiredSortOrder] = useState(null);
     const [statusFilter, setStatusFilter] = useState('all');
 
     useEffect(() => {
-        ApiService.fetchDocuments("received-with-requester")
+        ApiService.fetchDocuments("admin")
             .then((response) => {
                 const filteredDocuments = response.data.filter(doc => doc.status !== 5);
                 setDocuments(filteredDocuments);
@@ -67,41 +58,13 @@ const ReceivedDocuments = () => {
         return statusLabels[status] || "알 수 없음";
     };
 
-    const handleRejectClick = (doc) => {
-        setSelectedDocument(doc);
-        setRejectReason("");
-        setShowModal(true);
-    };
-
-    const handleConfirmReject = () => {
-        if (!rejectReason.trim()) {
-            alert("거절 사유를 입력해주세요.");
-            return;
-        }
-
-        ApiService.rejectDocument(selectedDocument.id, rejectReason, selectedDocument.token, loginMember.email)
-            .then(() => {
-                alert("요청이 거절되었습니다.");
-                setShowModal(false);
-                setDocuments((prevDocs) =>
-                    prevDocs.map((doc) =>
-                        doc.id === selectedDocument.id ? { ...doc, status: 2 } : doc
-                    )
-                );
-            })
-            .catch((error) => {
-                console.error("요청 거절 중 오류 발생:", error);
-                alert("요청 거절에 실패했습니다.");
-            });
-    };
-
     const handlePageChange = (event, value) => {
         setCurrentPage(value);
     };
 
     const handleSearchChange = (event) => {
         setSearchQuery(event.target.value);
-        setCurrentPage(1); // 검색 시 1페이지로 이동
+        setCurrentPage(1);
     };
 
     const filteredDocuments = documents
@@ -130,11 +93,10 @@ const ReceivedDocuments = () => {
                 fontWeight: "bold",
                 paddingTop: "1rem"
             }}>
-                공유 작업
+                관리자 문서
             </h1>
 
             {error && <p style={{color: "red", textAlign: "center"}}>{error}</p>}
-
 
             <div style={{
                 display: "flex",
@@ -222,101 +184,38 @@ const ReceivedDocuments = () => {
 
                 <div style={{display: "flex", alignItems: "center", gap: "6px", flexShrink: 0}}>
                     <input type="text" placeholder="작업명 검색" value={searchQuery} onChange={handleSearchChange}
-                           style={{
-                               padding: "0.1rem",
-                               width: "9rem"
-                           }}
-                    />
-                    <button onClick={() => setViewMode("list")}
-                            style={{
-                                background: "none",
-                                border: "none",
-                                cursor: "pointer"
-                            }}
-                    >
+                           style={{ padding: "0.1rem", width: "9rem" }}/>
+                    <button onClick={() => setViewMode("list")} style={{background: "none", border: "none", cursor: "pointer"}}>
                         <ViewListIcon color={viewMode === "list" ? "primary" : "disabled"}/>
                     </button>
-                    <button onClick={() => setViewMode("grid")}
-                            style={{
-                                background: "none",
-                                border: "none",
-                                cursor: "pointer"
-                            }}
-                    >
+                    <button onClick={() => setViewMode("grid")} style={{background: "none", border: "none", cursor: "pointer"}}>
                         <ViewModuleIcon color={viewMode === "grid" ? "primary" : "disabled"}/>
                     </button>
                 </div>
             </div>
 
-
             {viewMode === "list" ? (
-                <div style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "12px",
-                    maxWidth: "85%",
-                    margin: "auto",
-                    padding: "12px"
-                }}>
-                    {filteredDocuments.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((doc, index) => (
-                        <div key={doc.id} style={{
-                            border: "1px solid #ddd",
-                            borderRadius: "10px",
-                            padding: "16px",
-                            backgroundColor: "#fff",
-                            boxShadow: "0 4px 8px rgba(0,0,0,0.05)",
-                            display: "flex",
-                            flexDirection: "row",
-                            justifyContent: "space-between",
-                            alignItems: "center"
-                        }}>
+                <div style={{display: "flex", flexDirection: "column", gap: "12px", maxWidth: "85%", margin: "auto", padding: "12px"}}>
+                    {filteredDocuments.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((doc) => (
+                        <div key={doc.id} style={{border: "1px solid #ddd", borderRadius: "10px", padding: "16px", backgroundColor: "#fff", boxShadow: "0 4px 8px rgba(0,0,0,0.05)", display: "flex", justifyContent: "space-between", alignItems: "center"}}>
                             <div style={{flex: 1}}>
-                                <div style={{fontSize: "16px", fontWeight: "bold"}}>
-                                    {doc.requestName}
-                                </div>
-                                <div style={{marginTop: "6px"}}>
-                                    상태: <span className={getStatusClass(doc.status)}>{getStatusLabel(doc.status)}</span>
-                                </div>
-                                <div style={{marginTop: "4px"}}>
-                                    생성일: {moment(doc.createdAt).format('YYYY/MM/DD')}
-                                </div>
-                                <div style={{
-                                    marginTop: "4px",
-                                    color: doc.status === 0 && moment(doc.expiredAt).isSame(moment(), 'day') ? "red" : "black"
-                                }}>
+                                <div style={{fontSize: "16px", fontWeight: "bold"}}>{doc.requestName}</div>
+                                <div style={{marginTop: "6px"}}>상태: <span className={getStatusClass(doc.status)}>{getStatusLabel(doc.status)}</span></div>
+                                <div style={{marginTop: "4px"}}>생성일: {moment(doc.createdAt).format('YYYY/MM/DD')}</div>
+                                <div style={{marginTop: "4px", color: doc.status === 0 && moment(doc.expiredAt).isSame(moment(), 'day') ? "red" : "black"}}>
                                     만료일: {moment(doc.expiredAt).format('YYYY/MM/DD HH:mm')}
                                 </div>
-                                <div style={{marginTop: "4px"}}>
-                                    요청자: {doc.requesterName || "알 수 없음"}
-                                </div>
+                                <div style={{marginTop: "4px"}}>요청자: {doc.requesterName || "알 수 없음"}</div>
                             </div>
                             <div>
                                 <Dropdown>
-                                    <Dropdown.Toggle variant="light" style={{
-                                        padding: "5px 10px",
-                                        borderRadius: "5px",
-                                        fontWeight: "bold",
-                                        border: "none"
-                                    }}>
+                                    <Dropdown.Toggle variant="light" style={{padding: "5px 10px", borderRadius: "5px", fontWeight: "bold", border: "none"}}>
                                         메뉴
                                     </Dropdown.Toggle>
                                     <Dropdown.Menu>
-                                        <Dropdown.Item as={Link} to={`/detail/${doc.id}`}>
-                                            <FindInPageIcon fontSize="small" style={{marginRight: "6px"}}/>
-                                            문서 보기
-                                        </Dropdown.Item>
-                                        <Dropdown.Item disabled>
-                                            <DownloadIcon/> 다운로드
-                                        </Dropdown.Item>
-                                        <Dropdown.Item
-                                            onClick={() => handleRejectClick(doc)}
-                                            disabled={doc.status !== 0 || doc.isRejectable !== 1}
-                                        >
-                                            <DoDisturbIcon/> 요청 거절
-                                        </Dropdown.Item>
-                                        <Dropdown.Item disabled>
-                                            <DeleteIcon/> 삭제
-                                        </Dropdown.Item>
+                                        <Dropdown.Item as={Link} to={`/detail/${doc.id}`}><FindInPageIcon fontSize="small" style={{marginRight: "6px"}}/>문서 보기</Dropdown.Item>
+                                        <Dropdown.Item disabled><DownloadIcon/> 다운로드</Dropdown.Item>
+                                        <Dropdown.Item disabled><DeleteIcon/> 삭제</Dropdown.Item>
                                     </Dropdown.Menu>
                                 </Dropdown>
                             </div>
@@ -324,52 +223,16 @@ const ReceivedDocuments = () => {
                     ))}
                 </div>
             ) : (
-                <div style={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(3, 1fr)",
-                    gap: "20px",
-                    padding: "20px",
-                    maxWidth: "85%",
-                    margin: "auto"
-                }}>
+                <div style={{display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px", padding: "20px", maxWidth: "85%", margin: "auto"}}>
                     {filteredDocuments.map((doc) => (
-                        <div key={doc.id} style={{
-                            border: "1px solid #ddd",
-                            borderRadius: "8px",
-                            padding: "16px",
-                            boxShadow: "0px 4px 10px rgba(0,0,0,0.1)",
-                            backgroundColor: "#fff",
-                            display: "flex",
-                            flexDirection: "column",
-                            justifyContent: "space-between"
-                        }}>
+                        <div key={doc.id} style={{border: "1px solid #ddd", borderRadius: "8px", padding: "16px", backgroundColor: "#fff", boxShadow: "0px 4px 10px rgba(0,0,0,0.1)", display: "flex", flexDirection: "column", justifyContent: "space-between"}}>
                             <div style={{fontWeight: "bold", marginBottom: "8px"}}>{doc.requestName}</div>
-                            <embed src={doc.previewUrl || doc.fileUrl} type="application/pdf" width="100%"
-                                   height="150px"/>
+                            <embed src={doc.previewUrl || doc.fileUrl} type="application/pdf" width="100%" height="150px"/>
                             <div style={{marginTop: "8px", fontSize: "14px"}}>
                                 <span className={getStatusClass(doc.status)}>{getStatusLabel(doc.status)}</span><br/>
                                 생성일: {moment(doc.createdAt).format('YY년 MM월 DD일')}<br/>
-                                만료일: <span
-                                style={{color: moment(doc.expiredAt).isSame(moment(), 'day') ? "red" : "black"}}>
-                                    {moment(doc.expiredAt).format('YY년 MM월 DD일 HH:mm')}
-                                </span><br/>
+                                만료일: <span style={{color: moment(doc.expiredAt).isSame(moment(), 'day') ? "red" : "black"}}>{moment(doc.expiredAt).format('YY년 MM월 DD일 HH:mm')}</span><br/>
                                 요청자: {doc.requesterName || "알 수 없음"}
-                            </div>
-                            <div style={{marginTop: "10px", textAlign: "left"}}>
-                                <button
-                                    onClick={() => handleRejectClick(doc)}
-                                    disabled={doc.status !== 0 || doc.isRejectable !== 1}
-                                    style={{
-                                        backgroundColor: "#f44336",
-                                        color: "#fff",
-                                        border: "none",
-                                        padding: "6px 12px",
-                                        borderRadius: "4px",
-                                        cursor: doc.status !== 0 || doc.isRejectable !== 1 ? "not-allowed" : "pointer"
-                                    }}
-                                >
-                                    요청 거절
-                                </button>
                             </div>
                         </div>
                     ))}
@@ -378,21 +241,11 @@ const ReceivedDocuments = () => {
 
             {viewMode === "list" && (
                 <div style={{display: "flex", justifyContent: "center", marginTop: "20px"}}>
-                    <Pagination count={Math.ceil(filteredDocuments.length / itemsPerPage)} color="default"
-                                page={currentPage}
-                                onChange={handlePageChange}/>
+                    <Pagination count={Math.ceil(filteredDocuments.length / itemsPerPage)} color="default" page={currentPage} onChange={handlePageChange}/>
                 </div>
             )}
-
-            <RejectModal
-                isVisible={showModal}
-                onClose={() => setShowModal(false)}
-                onConfirm={handleConfirmReject}
-                rejectReason={rejectReason}
-                setRejectReason={setRejectReason}
-            />
         </PageContainer>
     );
 };
 
-export default ReceivedDocuments;
+export default AdminDocuments;

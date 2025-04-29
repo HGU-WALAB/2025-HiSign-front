@@ -15,6 +15,7 @@ import RequestedDocuments from "./Pages/RequestListPage";
 import SetupTaskPage from "./Pages/SetupTaskPage";
 import SignPage from './Pages/SignPage';
 import RequireLogin from './utils/RequireLogin';
+import AdminPage from './Pages/AdminListPage';
 
 function MyRoutes() {
     useRestoreLoginFromCookie();
@@ -43,6 +44,9 @@ function MyRoutes() {
                 } />
                 <Route path="/receive-document" element={
                     <RequireLogin><ReceivedDocuments /></RequireLogin>
+                } />
+                <Route path="/admin-document" element={
+                    <RequireLogin><AdminPage /></RequireLogin>
                 } />
                 <Route path="/detail/:documentId" element={
                     <RequireLogin><DetailPage /></RequireLogin>

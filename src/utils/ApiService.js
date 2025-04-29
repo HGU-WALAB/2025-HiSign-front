@@ -59,8 +59,10 @@ const ApiService = {
     if (type === 'requested') return apiInstance.get('/documents/requested-documents');
     if (type === 'received') return apiInstance.get('/documents/received-documents');
     if (type === 'received-with-requester') return apiInstance.get('/documents/received-with-requester');
+    if (type === 'admin') return apiInstance.get('/documents/admin_document');
     throw new Error('Invalid document type specified');
   },
+
 
   // 🔐 문서별 서명자 목록 조회
   fetchSignersByDocument: async (documentId) => {
@@ -133,6 +135,11 @@ const ApiService = {
   // 🔐 사용자 정보 조회
   fetchMyInfo: async () => {
     return apiInstance.get('/member/me');
+  },
+
+  // 문서 정보만 가져오기
+  fetchDocumentInfo: async (documentId) => {
+    return apiInstance.get(`/documents/info/${documentId}`);
   },
   // ===================================================
   // ✅ 비로그인 상태에서도 사용 가능한 API (PublicaApiInstance)
