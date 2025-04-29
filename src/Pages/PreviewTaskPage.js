@@ -106,6 +106,7 @@ const PreviewPage = () => {
         onConfirm={handleConfirmReject}
         rejectReason={rejectReason}
         setRejectReason={setRejectReason}
+        type={"reject"}
       />
     </MainContainer>
   );

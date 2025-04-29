@@ -1,17 +1,24 @@
 import React from "react";
 import { Modal } from "../../components/Modal";
 
+const RejectModal = ({ isVisible, onClose, onConfirm, rejectReason, setRejectReason, type }) => {
+    const actionLabel = type === "reject" ? "거절" : "반려"; // ✅ 타입에 따라 라벨 설정
 
-
-const RejectModal = ({ isVisible, onClose, onConfirm, rejectReason, setRejectReason }) => {
     return (
-        <Modal isVisible={isVisible} onClose={onClose} style={{ padding: "20p4x", width: "50%", textAlign: "center" }}>
-            <h2>거절 사유 입력</h2>
+        <Modal isVisible={isVisible} onClose={onClose} style={{ padding: "20px", width: "50%", textAlign: "center" }}>
+            <h2>{actionLabel} 사유 입력</h2> {/* ✅ 제목도 동적으로 */}
             <textarea
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}
-                style={{ width: "100%", height: "100px", marginBottom: "10px", padding: "10px", border: "1px solid #ddd", borderRadius: "4px" }}
-                placeholder="거절 사유를 입력하세요"
+                style={{
+                    width: "100%",
+                    height: "100px",
+                    marginBottom: "10px",
+                    padding: "10px",
+                    border: "1px solid #ddd",
+                    borderRadius: "4px"
+                }}
+                placeholder={`${actionLabel} 사유를 입력하세요`}
             />
             <br />
             <button
@@ -27,7 +34,7 @@ const RejectModal = ({ isVisible, onClose, onConfirm, rejectReason, setRejectRea
                     border: "none"
                 }}
             >
-                확인
+                {actionLabel}
             </button>
             <button
                 onClick={onClose}

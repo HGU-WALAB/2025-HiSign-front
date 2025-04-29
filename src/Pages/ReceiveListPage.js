@@ -11,11 +11,11 @@ import React, { useEffect, useState } from "react";
 import { Dropdown } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { useRecoilState } from "recoil";
+import styled from "styled-components";
 import RejectModal from "../components/ListPage/RejectModal";
 import { PageContainer } from "../components/PageContainer";
 import { loginMemberState } from "../recoil/atom/loginMemberState";
 import ApiService from "../utils/ApiService";
-import styled from "styled-components";
 
 const ReceivedDocuments = () => {
     const [documents, setDocuments] = useState([]);
@@ -248,6 +248,13 @@ const ReceivedDocuments = () => {
                                             <FindInPageIcon fontSize="small" style={{marginRight: "6px"}}/>
                                             문서 보기
                                         </Dropdown.Item>
+                                        <Dropdown.Item
+                                            as={Link} to={`/checkEmail?token=${doc.token}`}
+                                            disabled={doc.status !== 0}
+                                        >
+                                        <DrawIcon fontSize="small" style={{ marginRight: "6px" }} />
+                                        서명 하기
+                                        </Dropdown.Item>
                                         <Dropdown.Item disabled><DownloadIcon/> 다운로드</Dropdown.Item>
                                         <Dropdown.Item onClick={() => handleRejectClick(doc)}
                                                        disabled={doc.status !== 0 || doc.isRejectable !== 1}>
@@ -311,6 +318,7 @@ const ReceivedDocuments = () => {
                 onConfirm={handleConfirmReject}
                 rejectReason={rejectReason}
                 setRejectReason={setRejectReason}
+                type={"reject"}
             />
 
             <FloatingCenterLink to="/tasksetup">

@@ -114,9 +114,6 @@ function Sidebar() {
               <NavItem to="/tasksetup" $active={currentPath === "/tasksetup"}>
                 문서 업로드하기
               </NavItem>
-              <NavItem to="/request" $active={currentPath === "/request"}>
-                서명자 등록하기
-              </NavItem>
 
               {loginMember.role?.trim().toUpperCase() === "ROLE_ADMIN" && (
                   <NavItem
