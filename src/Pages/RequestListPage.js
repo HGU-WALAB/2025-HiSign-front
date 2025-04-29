@@ -73,26 +73,49 @@ const RequestedDocuments = () => {
         setShowModal(true);
     };
 
-    const getStatusClass = (status) => {
-        const statusClasses = {
-            0: "label label-info",
-            1: "label label-success",
-            2: "label label-danger",
-            3: "label label-warning",
-            4: "label label-default"
-        };
-        return statusClasses[status] || "badge bg-secondary";
-    };
-
     const getStatusLabel = (status) => {
         const statusLabels = {
             0: "서명중",
             1: "완료",
-            2: "거절",
+            2: "반려",
             3: "취소",
-            4: "만료" };
+            4: "만료",
+            6: "반려",
+            7: "검토중",
+        };
         return statusLabels[status] || "알 수 없음";
     };
+
+    const getStatusStyle = (status) => {
+        const statusStyles = {
+            0: { backgroundColor: "#5ec9f3", color: "#fff" },  // 서명중
+            1: { backgroundColor: "#2ecc71", color: "#fff" },  // 완료
+            2: { backgroundColor: "#f5a623", color: "#fff" },  // 반려(선생님)
+            3: { backgroundColor: "#f0625d", color: "#fff" },  // 취소
+            4: { backgroundColor: "#555555", color: "#fff" },  // 만료
+            6: { backgroundColor: "#f78b2d", color: "#fff" },  // 반려(교수님)
+            7: { backgroundColor: "#b6c3f2", color: "#fff" },  // 검토중
+        };
+        return statusStyles[status] || { backgroundColor: "#ccc", color: "#000" };
+    };
+
+    const StatusBadge = ({ status }) => {
+        const label = getStatusLabel(status);
+        const style = {
+            ...getStatusStyle(status),
+            borderRadius: "12px",
+            padding: "2px 10px",
+            fontSize: "13px",
+            fontWeight: 600,
+            display: "inline-block",
+            whiteSpace: "nowrap",
+            minWidth: "50px",
+            textAlign: "center",
+        };
+        return <span style={style}>{label}</span>;
+    };
+
+
 
     const handleConfirmCancel = () => {
         if (!cancelReason.trim()) {
@@ -136,8 +159,9 @@ const RequestedDocuments = () => {
 
     const filteredDocuments = documents
         .filter(doc => doc.requestName.toLowerCase().includes(searchQuery.toLowerCase()))
-        .filter(doc => {
-            if (statusFilter === 'all') return true;
+        .filter((doc) => {
+            if (statusFilter === "all") return true;
+            if (statusFilter === "rejected") return doc.status === 2 || doc.status === 6;
             return String(doc.status) === statusFilter;
         })
         .sort((a, b) => {
@@ -167,54 +191,31 @@ const RequestedDocuments = () => {
 
             {error && <p style={{color: "red", textAlign: "center"}}>{error}</p>}
 
+
             <div style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                flexWrap: "wrap",
-                maxWidth: "85%",
-                margin: "0 auto 10px auto",
-                padding: "0 8px",
-                gap: "8px"
-            }}
-            >
-                <div style={{display: "flex", alignItems: "center", gap: "6px", flex: "1 1 0"}}>
-                    <select value={createdSortOrder || ''} onChange={(e) =>
-                    { setCreatedSortOrder(e.target.value); setExpiredSortOrder(null); }}
-                            style={{
-                                padding: "4px 8px",
-                                border: "none",
-                                background: "transparent",
-                                outline: "none",
-                                fontSize: "14px",
-                                minWidth: "80px",
-                                height: "32px",
-                                cursor: "pointer",
-                    }}
-                    >
+                display: "flex", justifyContent: "space-between", flexWrap: "wrap",
+                maxWidth: "85%", margin: "0 auto 10px auto", padding: "0 8px", gap: "8px"
+            }}>
+                <div style={{display: "flex", gap: "6px", flex: "1 1 0"}}>
+                    <select value={createdSortOrder || ''} onChange={(e) => {
+                        setCreatedSortOrder(e.target.value);
+                        setExpiredSortOrder(null);
+                    }} style={{minWidth: "80px", height: "32px", cursor: "pointer", border: "none"}}>
                         <option value="">생성일</option>
                         <option value="desc">최신순</option>
                         <option value="asc">오래된순</option>
                     </select>
-                    <select value={expiredSortOrder || ''} onChange={(e) =>
-                    { setExpiredSortOrder(e.target.value); setCreatedSortOrder(null); }}
-                            style={{
-                                padding: "4px 8px",
-                                border: "none",
-                                background: "transparent",
-                                outline: "none",
-                                fontSize: "14px",
-                                minWidth: "80px",
-                                height: "32px",
-                                cursor: "pointer",
-                    }}
-                    >
+
+                    <select value={expiredSortOrder || ''} onChange={(e) => {
+                        setExpiredSortOrder(e.target.value);
+                        setCreatedSortOrder(null);
+                    }} style={{minWidth: "80px", height: "32px", cursor: "pointer", border: "none"}}>
                         <option value="">만료일</option>
                         <option value="desc">최신순</option>
                         <option value="asc">오래된순</option>
                     </select>
-                    <select value={statusFilter} onChange={(e) =>
-                        setStatusFilter(e.target.value)}
+
+                    <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
                             style={{
                                 padding: "4px 8px",
                                 border: "none",
@@ -224,14 +225,15 @@ const RequestedDocuments = () => {
                                 minWidth: "80px",
                                 height: "32px",
                                 cursor: "pointer",
-                    }}
+                            }}
                     >
                         <option value="all">문서 상태</option>
                         <option value="0">서명중</option>
                         <option value="1">완료</option>
-                        <option value="2">거절</option>
+                        <option value="rejected">반려</option>
                         <option value="3">취소</option>
                         <option value="4">만료</option>
+                        <option value="7">검토중</option>
                     </select>
                 </div>
                 <div style={{display: "flex", alignItems: "center", gap: "6px", flexShrink: 0}}>
@@ -239,14 +241,14 @@ const RequestedDocuments = () => {
                            style={{
                                padding: "0.1rem",
                                width: "9rem"
-                    }}
+                           }}
                     />
                     <button onClick={() => setViewMode("list")}
                             style={{
                                 background: "none",
                                 border: "none",
                                 cursor: "pointer"
-                    }}
+                            }}
                     >
                         <ViewListIcon color={viewMode === "list" ? "primary" : "disabled"}/>
                     </button>
@@ -255,7 +257,7 @@ const RequestedDocuments = () => {
                                 background: "none",
                                 border: "none",
                                 cursor: "pointer"
-                    }}
+                            }}
                     >
                         <ViewModuleIcon color={viewMode === "grid" ? "primary" : "disabled"}/>
                     </button>
@@ -286,7 +288,12 @@ const RequestedDocuments = () => {
                             alignItems: "center"
                         }}>
                             <div style={{flex: 1}}>
-                                <div style={{fontSize: "16px", fontWeight: "bold", display: "flex", alignItems: "center"}}>
+                                <div style={{
+                                    fontSize: "16px",
+                                    fontWeight: "bold",
+                                    display: "flex",
+                                    alignItems: "center"
+                                }}>
                                     {doc.requestName}
                                     <button
                                         onClick={() => handleSearchClick(doc.id)}
@@ -304,7 +311,7 @@ const RequestedDocuments = () => {
                                     </button>
                                 </div>
                                 <div style={{marginTop: "6px"}}>
-                                    상태: <span className={getStatusClass(doc.status)}>{getStatusLabel(doc.status)}</span>
+                                    상태: <StatusBadge status={doc.status}/>
                                 </div>
                                 <div style={{marginTop: "4px"}}>
                                     생성일: {moment(doc.createdAt).format('YYYY/MM/DD')}
@@ -319,7 +326,7 @@ const RequestedDocuments = () => {
 
                             <div>
                                 <Dropdown>
-                                    <Dropdown.Toggle variant="light" style={{
+                                <Dropdown.Toggle variant="light" style={{
                                         padding: "5px 10px",
                                         borderRadius: "5px",
                                         fontWeight: "bold",
@@ -329,14 +336,15 @@ const RequestedDocuments = () => {
                                     </Dropdown.Toggle>
                                     <Dropdown.Menu>
                                         <Dropdown.Item as={Link} to={`/detail/${doc.id}`}>
-                                            <FindInPageIcon fontSize="small" style={{marginRight: "6px"}} />
+                                            <FindInPageIcon fontSize="small" style={{marginRight: "6px"}}/>
                                             문서 보기
                                         </Dropdown.Item>
-                                        <Dropdown.Item disabled><DownloadIcon /> 다운로드</Dropdown.Item>
-                                        <Dropdown.Item onClick={() => handleCancelClick(doc)} disabled={doc.status !== 0}>
-                                            <CloseIcon /> 요청 취소
+                                        <Dropdown.Item disabled><DownloadIcon/> 다운로드</Dropdown.Item>
+                                        <Dropdown.Item onClick={() => handleCancelClick(doc)}
+                                                       disabled={doc.status !== 0}>
+                                            <CloseIcon/> 요청 취소
                                         </Dropdown.Item>
-                                        <Dropdown.Item disabled><DeleteIcon /> 삭제</Dropdown.Item>
+                                        <Dropdown.Item disabled><DeleteIcon/> 삭제</Dropdown.Item>
                                     </Dropdown.Menu>
                                 </Dropdown>
                             </div>
@@ -366,7 +374,8 @@ const RequestedDocuments = () => {
                         }}>
                             <div>
                                 <div style={{marginBottom: "8px", fontWeight: "bold"}}>{doc.requestName}</div>
-                                <div><span className={getStatusClass(doc.status)}>{getStatusLabel(doc.status)}</span>
+                                <div>
+                                    <StatusBadge status={doc.status}/>
                                 </div>
                                 <div style={{margin: "6px 0"}}><strong>파일명:</strong> <Link
                                     to={`/detail/${doc.id}`}>{doc.fileName}</Link></div>
@@ -430,15 +439,16 @@ const RequestedDocuments = () => {
             </Modal>
             {viewMode === "list" && (
                 <div style={{display: "flex", justifyContent: "center", marginTop: "20px"}}>
-                    <Pagination count={Math.ceil(filteredDocuments.length / itemsPerPage)} color="default" page={currentPage}
+                    <Pagination count={Math.ceil(filteredDocuments.length / itemsPerPage)} color="default"
+                                page={currentPage}
                                 onChange={handlePageChange}/>
                 </div>
             )}
 
-<FloatingCenterLink to="/tasksetup">
-        <DrawIcon style={{ fontSize: "32px" }} />
-      </FloatingCenterLink>
-      
+            <FloatingCenterLink to="/tasksetup">
+                <DrawIcon style={{fontSize: "32px"}}/>
+            </FloatingCenterLink>
+
         </PageContainer>
 
     );

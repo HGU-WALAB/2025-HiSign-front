@@ -11,7 +11,7 @@ const pdfjsWorkerUrl = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/p
 const DetailPage = () => {
     const { documentId } = useParams();
     const [fileUrl, setFileUrl] = useState(null);
-    const [documentInfo, setDocumentInfo] = useState(null); // 문서 정보 상태
+    const [documentInfo, setDocumentInfo] = useState(null);
     const [error, setError] = useState(null);
 
     const toolbar = toolbarPlugin();
@@ -81,7 +81,7 @@ const DetailPage = () => {
                         <div style={{marginTop: "6px"}}>
                             상태: <span className={getStatusClass(documentInfo.status)}>{getStatusLabel(documentInfo.status)}</span>
                         </div>
-                        <p><strong>취소/거절 사유:</strong> {documentInfo.rejectReason}</p>
+                        <p><strong>취소 사유:</strong> {documentInfo.rejectReason}</p>
                         <p><strong>서명 생성 시간:</strong> {new Date(documentInfo.createdAt).toLocaleString()}</p>
                         <p><strong>파일명:</strong> {documentInfo.fileName}</p>
                         <p><strong>작업명:</strong> {documentInfo.requestName}</p>
