@@ -18,6 +18,7 @@ const PreviewPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log("서명 요청 정보:", signing);
     if (!signing.documentId) {
       alert("유효한 문서 정보가 없습니다. 이메일을 먼저 인증해주세요.");
       navigate("/");

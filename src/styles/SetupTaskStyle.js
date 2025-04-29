@@ -1,21 +1,6 @@
 // styles/sharedStyles.js
 import styled from "styled-components";
 
-// 공통 입력행
-export const InputRow = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  margin-bottom: 20px;
-`;
-
-// 공통 라벨
-export const Label = styled.label`
-  font-size: 14px;
-  font-weight: bold;
-  color: #333;
-`;
-
 // 필수 표시
 export const RequiredMark = styled.span`
   color: #ff4d4f;

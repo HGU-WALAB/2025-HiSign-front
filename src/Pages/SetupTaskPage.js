@@ -65,7 +65,7 @@ const SetupTaskPage = () => {
     setPreviewUrl(blobUrl);
     setTaskState((prev) => ({
       ...prev,
-      ownerId: member.unique_id,
+      ownerId: member.uniqueId,
       fileName: file.name,
       fileUrl: blobUrl,
     }));
@@ -119,7 +119,7 @@ const SetupTaskPage = () => {
     const formattedExpiration = isoExpiration; // 항상 7일 후로 고정
     const finalRequestName =
       taskType === "taTask"
-        ? `${selectedSubject}_${selectedMonth}_${member.name}_${member.unique_id}`
+        ? `${selectedSubject}_${selectedMonth}_${member.name}_${member.uniqueId}`
         : requestName;
     const isRejectableFinal = taskType === "taTask" ? 1 : isRejectable;
     const type = taskType === "taTask" ? 1 : 0;

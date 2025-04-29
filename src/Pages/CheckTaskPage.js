@@ -78,7 +78,7 @@ const CheckTaskPage = () => {
   }, [documentId]);
 
   const handleConfirm= () => {
-    ApiService.sendSignatureRequest(signing.documentId, signing.requesterName, signing.signerEmail, signing.token)
+    ApiService.sendRequestMail(signing.documentId, signing.signerName)
       .then(() => {
         alert("서명 요청이 성공적으로 전송되었습니다.");
         navigate("/");

@@ -2,10 +2,10 @@ import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import styled from "styled-components";
-import HisnetLoginButton from "../components/HisnetLoginButton";
-import { loginMemberState } from "../recoil/atom/loginMemberState";
 import thum1 from "../asset/thum1.png";
 import thum2 from "../asset/thum2.png";
+import HisnetLoginButton from "../components/HisnetLoginButton";
+import { loginMemberState } from "../recoil/atom/loginMemberState";
 
 function SideBar() {
     const loginMember = useRecoilValue(loginMemberState);
@@ -25,7 +25,7 @@ function SideBar() {
                 <h1>Hi-Sign</h1>
                 <br />
                 
-                {!!loginMember.unique_id ? (
+                {!!loginMember.uniqueId ? (
                     <CenterLink to="/tasksetup">서명 요청 시작하기</CenterLink>
                 ) : (
                     <HisnetLoginButton>히즈넷으로 로그인</HisnetLoginButton>

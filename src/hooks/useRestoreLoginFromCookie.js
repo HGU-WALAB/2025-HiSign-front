@@ -15,7 +15,7 @@ const useRestoreLoginFromCookie = () => {
         //console.log("✅ 로그인 정보 복원 성공:", user);
 
         setLoginState({
-          unique_id: user.uniqueId,
+          uniqueId: user.uniqueId,
           name: user.name,
           email: user.email,
           role: user.level === 0? "ROLE_USER" : user.level === 1? "ROLE_ADMIN" : "ROLE_ADMIN",

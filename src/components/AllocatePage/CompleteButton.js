@@ -27,47 +27,35 @@ const CompleteButton = () => {
   };
 
   const handleConfirm = async () => {
-    setLoading(true); // 로딩 시작
+    setLoading(true);
     try {
       if (!document.fileUrl) {
         alert("업로드할 파일을 선택해주세요.");
         return;
       }
-
+  
+      // 파일을 불러오기
       const response = await fetch(document.fileUrl);
       const blob = await response.blob();
       const file = new File([blob], document.fileName, { type: blob.type });
-
-      const uploadResponse = await ApiService.uploadDocument(
-        file,
-        document.ownerId,
-        document.requestName,
-        document.description,
-        document.isRejectable,
-        document.type
-      );
-
-      if (uploadResponse.status !== 200) {
-        throw new Error("문서 업로드에 실패했습니다.");
-      }
-
-      const documentId = uploadResponse.data.documentId;
-
-      let signatureResponse;
-      try {
-        if (document.type === 1) {
-          await ApiService.reqeustCheckTask(documentId);
-          signatureResponse = await ApiService.storeSignatureRequest(documentId, member.name, signers, document.password);
-        } else {
-          signatureResponse = await ApiService.sendSignatureRequest(documentId, member.name, signers, document.password);
-        }
-      } catch (error) {
-        console.error("서명 요청 처리 중 오류:", error);
-        alert(error.response?.data?.message || "서명 요청 중 오류가 발생했습니다.");
-      }
-
-      if (signatureResponse.status === 200) {
-        alert("성공적으로 요청청되었습니다.");
+  
+      // UploadRequestDTO 준비
+      const uploadRequestDTO = {
+        uniqueId: member.uniqueId,    // ✅ 업로더 고유 ID
+        requestName: document.requestName,
+        description: document.description,
+        isRejectable: document.isRejectable,
+        type: document.type,
+        password: document.password,
+        memberName: member.name,
+        signers: signers
+      };
+  
+      // ✅ fullUpload 호출
+      const uploadResponse = await ApiService.fullUpload(file, uploadRequestDTO);
+  
+      if (uploadResponse.status === 200) {
+        alert("성공적으로 요청되었습니다.");
         setDocument({
           requestName: "",
           description: "",
@@ -81,15 +69,15 @@ const CompleteButton = () => {
         setSigners([]);
         navigate("/request-document");
       } else {
-        console.error("요청 실패:", signatureResponse);
+        console.error("요청 실패:", uploadResponse);
         alert("요청 중 오류가 발생했습니다.");
       }
     } catch (error) {
       console.error("요청 처리 중 오류 발생:", error);
       alert("요청 처리 중 오류가 발생했습니다.");
     } finally {
-      setLoading(false); // ✅ 로딩 끝
-      setOpen(false); // 모달 닫기
+      setLoading(false);
+      setOpen(false);
     }
   };
 
