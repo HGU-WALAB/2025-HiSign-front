@@ -51,7 +51,7 @@ const ReceivedDocuments = () => {
             1: "label label-success",
             2: "label label-danger",
             3: "label label-warning",
-            4: "label label-default",
+            4: "label label-default"
         };
         return statusClasses[status] || "badge bg-secondary";
     };
