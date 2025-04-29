@@ -111,6 +111,7 @@ const ApiService = {
   // 문서 정보만 가져오기
   fetchDocumentInfo: async (documentId) => {
     return apiInstance.get(`/documents/info/${documentId}`);
+  },
     
   reqeustCheckTask: async (documentId) => {
     if (!documentId) throw new Error('문서 ID가 필요합니다.');

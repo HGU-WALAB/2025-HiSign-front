@@ -57,7 +57,7 @@ function MyRoutes() {
 
                 <Route path="/dashboard" element={
                     <RequireLogin><DashBoardPage /></RequireLogin>
-
+                } />
                 <Route path="/check-task/:documentId" element={
                     <RequireLogin><CheckTaskPage /></RequireLogin>
 
