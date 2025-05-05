@@ -59,7 +59,7 @@ function Sidebar() {
         </ToggleButton>
       )}
 
-  
+
       <SidebarWrapper
         className="sidebar"
         $isOpen={sidebarOpen}
@@ -84,6 +84,10 @@ function Sidebar() {
                 </LogoutContainer>
               )}
               <div className="fw-bold text-dark">{fullName + "님"}</div>
+
+              {loginMember.role?.trim().toUpperCase() === "ROLE_ADMIN" && (
+                  <div className="fw-bold text-dark">{"(관리자)"}</div>
+              )}
               <ProfileCircle onClick={handleProfileClick}>
                 {firstChar}
               </ProfileCircle>
