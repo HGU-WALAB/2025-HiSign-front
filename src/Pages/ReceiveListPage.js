@@ -17,6 +17,7 @@ import { PageContainer } from "../components/PageContainer";
 import { loginMemberState } from "../recoil/atom/loginMemberState";
 import ApiService from "../utils/ApiService";
 
+
 const ReceivedDocuments = () => {
     const [documents, setDocuments] = useState([]);
     const [error, setError] = useState(null);
@@ -31,6 +32,15 @@ const ReceivedDocuments = () => {
     const [createdSortOrder, setCreatedSortOrder] = useState("desc");
     const [expiredSortOrder, setExpiredSortOrder] = useState(null);
     const [statusFilter, setStatusFilter] = useState("all");
+    const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 1024);
+
+
+    //드롭다운 메뉴 반응형
+    useEffect(() => {
+        const handleResize = () => setIsMobileView(window.innerWidth <= 1200);
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
 
     useEffect(() => {
         ApiService.fetchDocuments("received-with-requester")
@@ -45,6 +55,7 @@ const ReceivedDocuments = () => {
                 setError("문서를 불러오는 중 문제가 발생했습니다: " + error.message);
             });
     }, []);
+
 
     const getStatusLabel = (status) => {
         const statusLabels = {
@@ -66,7 +77,7 @@ const ReceivedDocuments = () => {
             2: { backgroundColor: "#f5a623", color: "#fff" },  // 반려(선생님)
             3: { backgroundColor: "#f0625d", color: "#fff" },  // 취소
             4: { backgroundColor: "#555555", color: "#fff" },  // 만료
-            6: { backgroundColor: "#f78b2d", color: "#fff" },  // 반려(교수님)
+            6: { backgroundColor: "#f5a623", color: "#fff" },  // 반려(교수님)
             7: { backgroundColor: "#b6c3f2", color: "#fff" },  // 검토중
         };
         return statusStyles[status] || { backgroundColor: "#ccc", color: "#000" };
@@ -152,6 +163,7 @@ const ReceivedDocuments = () => {
             return 0;
         });
 
+
     return (
         <PageContainer>
             <h1 style={{ textAlign: "center", fontSize: "24px", fontWeight: "bold", paddingTop: "1rem" }}>
@@ -219,8 +231,15 @@ const ReceivedDocuments = () => {
                 <div style={{ display: "flex", flexDirection: "column", gap: "12px", maxWidth: "85%", margin: "auto" }}>
                     {filteredDocuments.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((doc) => (
                         <div key={doc.id} style={{
-                            border: "1px solid #ddd", borderRadius: "10px", padding: "16px", backgroundColor: "#fff",
-                            boxShadow: "0 4px 8px rgba(0,0,0,0.05)", display: "flex", justifyContent: "space-between"
+                            border: "1px solid #ddd",
+                            borderRadius: "10px",
+                            padding: "16px",
+                            backgroundColor: "#fff",
+                            boxShadow: "0 4px 8px rgba(0,0,0,0.05)",
+                            display: "flex",
+                            flexDirection: "column",
+                            position: "relative",
+                            minHeight: "8rem"
                         }}>
                             <div style={{flex: 1}}>
                                 <div style={{fontWeight: "bold"}}>{doc.requestName}</div>
@@ -235,34 +254,144 @@ const ReceivedDocuments = () => {
                                 <div style={{marginTop: "4px"}}>요청자: {doc.requesterName || "알 수 없음"}</div>
                             </div>
                             <div style={{display: "flex", alignItems: "center"}}>
-                                <Dropdown>
-                                    <Dropdown.Toggle variant="light" style={{
-                                        padding: "5px 10px",
-                                        borderRadius: "5px",
-                                        fontWeight: "bold",
-                                        border: "none"
-                                    }}> 메뉴
-                                    </Dropdown.Toggle>
-                                    <Dropdown.Menu>
-                                        <Dropdown.Item as={Link} to={`/detail/${doc.id}`}>
-                                            <FindInPageIcon fontSize="small" style={{marginRight: "6px"}}/>
-                                            문서 보기
-                                        </Dropdown.Item>
-                                        <Dropdown.Item
-                                            as={Link} to={`/checkEmail?token=${doc.token}`}
-                                            disabled={doc.status !== 0}
+                                {isMobileView ? (
+                                    <Dropdown style={{
+                                        position: "absolute",
+                                        bottom: "12px",
+                                        right: "12px"
+                                    }}>
+                                        <Dropdown.Toggle
+                                            variant="dark"
+                                            style={{
+                                                padding: "6px 12px",
+                                                borderRadius: "6px",
+                                                fontWeight: "bold",
+                                                border: "none",
+                                                boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+                                                display: "flex",
+                                                alignItems: "center",
+                                                gap: "6px",
+                                                cursor: "pointer"
+                                            }}
+                                        > 메뉴
+                                        </Dropdown.Toggle>
+                                        <Dropdown.Menu>
+                                            <Dropdown.Item as={Link} to={`/detail/${doc.id}`}>
+                                                <FindInPageIcon fontSize="small" style={{marginRight: "6px"}}/>
+                                                문서 보기
+                                            </Dropdown.Item>
+                                            <Dropdown.Item as={Link} to={`/checkEmail?token=${doc.token}`}
+                                                           disabled={doc.status !== 0}>
+                                                <DrawIcon fontSize="small" style={{marginRight: "6px"}}/>
+                                                서명 하기
+                                            </Dropdown.Item>
+                                            <Dropdown.Item disabled>
+                                                <DownloadIcon fontSize="small" style={{marginRight: "6px"}}/>
+                                                다운로드
+                                            </Dropdown.Item>
+                                            <Dropdown.Item onClick={() => handleRejectClick(doc)}
+                                                           disabled={doc.status !== 0 || doc.isRejectable !== 1}>
+                                                <DoDisturbIcon fontSize="small" style={{marginRight: "6px"}}/>
+                                                요청 거절
+                                            </Dropdown.Item>
+                                            <Dropdown.Item
+                                                onClick={() => {
+                                                    if (window.confirm("정말 이 문서를 삭제하시겠습니까?")) {
+                                                        ApiService.deleteDocument(doc.id)
+                                                            .then(() => {
+                                                                alert("문서가 삭제되었습니다.");
+                                                                setDocuments(prevDocs => prevDocs.filter(d => d.id !== doc.id));
+                                                            })
+                                                            .catch((err) => {
+                                                                console.error("문서 삭제 실패:", err);
+                                                                alert("문서 삭제에 실패했습니다.");
+                                                            });
+                                                    }
+                                                }}
+                                            >
+                                                <DeleteIcon fontSize="small" style={{marginRight: "6px"}}/>
+                                                삭제
+                                            </Dropdown.Item>
+                                        </Dropdown.Menu>
+                                    </Dropdown>
+                                ) : (
+                                    <div style={{
+                                        display: "flex",
+                                        flexWrap: "wrap",
+                                        gap: "6px",
+                                        position: "absolute",
+                                        bottom: "12px",
+                                        right: "12px"
+                                    }}><Link to={`/detail/${doc.id}`} style={{
+                                        display: "flex", alignItems: "center", padding: "5px 10px",
+                                        border: "1px solid #ccc", borderRadius: "5px",
+                                        textDecoration: "none", color: "black"
+                                    }}>
+                                        <FindInPageIcon fontSize="small" style={{marginRight: "6px"}}/>
+                                        문서 보기
+                                    </Link>
+                                        <Link to={`/checkEmail?token=${doc.token}`} style={{
+                                            display: "flex", alignItems: "center", padding: "5px 10px",
+                                            border: "1px solid #ccc", borderRadius: "5px",
+                                            textDecoration: "none",
+                                            color: doc.status !== 0 ? "#aaa" : "#007bff",
+                                            pointerEvents: doc.status !== 0 ? "none" : "auto"
+                                        }}>
+                                            <DrawIcon fontSize="small" style={{marginRight: "6px"}}/>
+                                            서명 하기
+                                        </Link>
+                                        <button disabled style={{
+                                            display: "flex", alignItems: "center", padding: "5px 10px",
+                                            border: "1px solid #ccc", borderRadius: "5px",
+                                            backgroundColor: "transparent", color: "#aaa"
+                                        }}>
+                                            <DownloadIcon fontSize="small" style={{marginRight: "6px"}}/>
+                                            다운로드
+                                        </button>
+                                        <button
+                                            onClick={() => handleRejectClick(doc)}
+                                            disabled={doc.status !== 0 || doc.isRejectable !== 1}
+                                            style={{
+                                                display: "flex", alignItems: "center", padding: "5px 10px",
+                                                border: "1px solid #ccc", borderRadius: "5px",
+                                                backgroundColor: "transparent",
+                                                color: doc.status !== 0 || doc.isRejectable !== 1 ? "#aaa" : "#000000",
+                                                pointerEvents: doc.status !== 0 || doc.isRejectable !== 1 ? "none" : "auto"
+                                            }}
                                         >
-                                        <DrawIcon fontSize="small" style={{ marginRight: "6px" }} />
-                                        서명 하기
-                                        </Dropdown.Item>
-                                        <Dropdown.Item disabled><DownloadIcon/> 다운로드</Dropdown.Item>
-                                        <Dropdown.Item onClick={() => handleRejectClick(doc)}
-                                                       disabled={doc.status !== 0 || doc.isRejectable !== 1}>
-                                            <DoDisturbIcon/> 요청 거절
-                                        </Dropdown.Item>
-                                        <Dropdown.Item disabled><DeleteIcon/> 삭제</Dropdown.Item>
-                                    </Dropdown.Menu>
-                                </Dropdown>
+                                            <DoDisturbIcon fontSize="small" style={{marginRight: "6px"}}/>
+                                            요청 거절
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                if (window.confirm("정말 이 문서를 삭제하시겠습니까?")) {
+                                                    ApiService.deleteDocument(doc.id)
+                                                        .then(() => {
+                                                            alert("문서가 삭제되었습니다.");
+                                                            setDocuments(prevDocs => prevDocs.filter(d => d.id !== doc.id));
+                                                        })
+                                                        .catch((err) => {
+                                                            console.error("문서 삭제 실패:", err);
+                                                            alert("문서 삭제에 실패했습니다.");
+                                                        });
+                                                }
+                                            }}
+                                            style={{
+                                                display: "flex",
+                                                alignItems: "center",
+                                                padding: "5px 10px",
+                                                border: "1px solid #ccc",
+                                                borderRadius: "5px",
+                                                backgroundColor: "transparent",
+                                                color: "#dc3545",
+                                                cursor: "pointer"
+                                            }}
+                                        >
+                                            <DeleteIcon fontSize="small" style={{marginRight: "6px"}}/>
+                                            삭제
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     ))}
@@ -272,22 +401,23 @@ const ReceivedDocuments = () => {
                     display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
                     gap: "20px", maxWidth: "85%", margin: "auto", padding: "20px"
                 }}>
-                    {filteredDocuments.map((doc) => (
+                {filteredDocuments.map((doc) => (
                         <div key={doc.id} style={{
                             border: "1px solid #ddd", borderRadius: "8px", padding: "16px",
                             boxShadow: "0px 4px 10px rgba(0,0,0,0.1)", backgroundColor: "#fff"
                         }}>
-                            <div style={{ fontWeight: "bold", marginBottom: "8px" }}>{doc.requestName}</div>
-                            <embed src={doc.previewUrl || doc.fileUrl} type="application/pdf" width="100%" height="150px" />
-                            <div style={{ marginTop: "8px", fontSize: "14px" }}>
-                                <StatusBadge status={doc.status} /><br />
-                                생성일: {moment(doc.createdAt).format("YY년 MM월 DD일")}<br />
+                            <div style={{fontWeight: "bold", marginBottom: "8px"}}>{doc.requestName}</div>
+                            <embed src={doc.previewUrl || doc.fileUrl} type="application/pdf" width="100%"
+                                   height="150px"/>
+                            <div style={{marginTop: "8px", fontSize: "14px"}}>
+                                <StatusBadge status={doc.status}/><br/>
+                                생성일: {moment(doc.createdAt).format("YY년 MM월 DD일")}<br/>
                                 만료일: <span style={{
                                 color: moment(doc.expiredAt).isSame(moment(), "day") ? "red" : "black"
-                            }}>{moment(doc.expiredAt).format("YY년 MM월 DD일 HH:mm")}</span><br />
+                            }}>{moment(doc.expiredAt).format("YY년 MM월 DD일 HH:mm")}</span><br/>
                                 요청자: {doc.requesterName || "알 수 없음"}
                             </div>
-                            <div style={{ marginTop: "10px", textAlign: "left" }}>
+                            <div style={{marginTop: "10px", textAlign: "left"}}>
                                 <button
                                     onClick={() => handleRejectClick(doc)}
                                     disabled={doc.status !== 0 || doc.isRejectable !== 1}
@@ -306,9 +436,9 @@ const ReceivedDocuments = () => {
             )}
 
             {viewMode === "list" && (
-                <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
+                <div style={{display: "flex", justifyContent: "center", marginTop: "20px"}}>
                     <Pagination count={Math.ceil(filteredDocuments.length / itemsPerPage)} color="default"
-                                page={currentPage} onChange={handlePageChange} />
+                                page={currentPage} onChange={handlePageChange}/>
                 </div>
             )}
 
@@ -322,7 +452,7 @@ const ReceivedDocuments = () => {
             />
 
             <FloatingCenterLink to="/tasksetup">
-                <DrawIcon style={{ fontSize: "32px" }} />
+                <DrawIcon style={{fontSize: "32px"}}/>
             </FloatingCenterLink>
         </PageContainer>
     );
@@ -355,3 +485,17 @@ const FloatingCenterLink = styled(Link)`
         background-color: #4682b4;
     }
 `;
+
+const iconButtonStyle = {
+    display: "flex",
+    alignItems: "center",
+    gap: "4px",
+    padding: "6px 10px",
+    borderRadius: "6px",
+    backgroundColor: "#f4f4f4",
+    border: "1px solid #ccc",
+    cursor: "pointer",
+    fontSize: "13px",
+    textDecoration: "none",
+    color: "#333"
+};
