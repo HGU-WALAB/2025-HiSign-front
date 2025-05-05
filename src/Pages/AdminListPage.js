@@ -159,6 +159,16 @@ const AdminDocuments = () => {
         requesterName: doc.requesterName || "알 수 없음"
     }));
 
+    const areAllSelected = selectedDocs.length === filteredDocuments.length && filteredDocuments.length > 0;
+    //전체 문서 멀티 박스 선택 로직
+    const toggleSelectAllDocs = () => {
+        if (areAllSelected) {
+            setSelectedDocs([]);
+        } else {
+            setSelectedDocs(filteredDocuments);
+        }
+    };
+
     return (
         <PageContainer>
             <h1 style={{
@@ -171,7 +181,7 @@ const AdminDocuments = () => {
                 관리자 문서
             </h1>
 
-            {error && <p style={{ color: "red", textAlign: "center" }}>{error}</p>}
+            {error && <p style={{color: "red", textAlign: "center"}}>{error}</p>}
 
             <div style={{
                 display: "flex",
@@ -279,9 +289,24 @@ const AdminDocuments = () => {
                         <ViewListIcon color={viewMode === "list" ? "primary" : "disabled"}/>
                     </button>
                     <button onClick={() => setViewMode("grid")}
-                            style={{background: "none", border: "none", cursor: "pointer" }}>
-                        <ViewModuleIcon color={viewMode === "grid" ? "primary" : "disabled"} />
+                            style={{background: "none", border: "none", cursor: "pointer"}}>
+                        <ViewModuleIcon color={viewMode === "grid" ? "primary" : "disabled"}/>
                     </button>
+                </div>
+            </div>
+            <div style={{
+                maxWidth: "85%",
+                margin: "0 auto",
+                padding: "0 11px",
+            }}>
+                <div style={{display: "flex", alignItems: "center", gap: "8px", paddingLeft: "15px", marginTop: "4px"}}>
+                    <input
+                        type="checkbox"
+                        checked={areAllSelected}
+                        onChange={toggleSelectAllDocs}
+                        style={{transform: "scale(1.2)"}}
+                    />
+                    <label style={{fontSize: "0.9rem"}}>전체 선택</label>
                 </div>
             </div>
 
@@ -353,7 +378,7 @@ const AdminDocuments = () => {
                                         cursor: doc.status === 7 ? "pointer" : "not-allowed"
                                     }}
                                 >
-                                    <SearchIcon fontSize="small" style={{marginRight: "4px"}} />
+                                    <SearchIcon fontSize="small" style={{marginRight: "4px"}}/>
                                     검토
                                 </button>
                                 {window.innerWidth <= 1200 ? (
