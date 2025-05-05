@@ -6,7 +6,6 @@ import styled from "styled-components";
 import ButtonBase from "../components/ButtonBase";
 import ConfirmModal from "../components/ConfirmModal";
 import RejectModal from "../components/ListPage/RejectModal";
-import SignatureMarker from "../components/PreviewPage/SignatureMarker";
 import PDFViewer from "../components/SignPage/PDFViewer";
 import { signingState } from "../recoil/atom/signingState";
 import ApiService from "../utils/ApiService";
@@ -24,6 +23,7 @@ const CheckTaskPage = () => {
   const [error, setError] = useState(null);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [pdfScale, setPdfScale] = useState(1);
 
   useEffect(() => {
     ApiService.fetchDocumentInfo(documentId)
@@ -182,8 +182,9 @@ const CheckTaskPage = () => {
               <PDFViewer
                 pdfUrl={signing.fileUrl}
                 setCurrentPage={setCurrentPage}
+                onScaleChange={setPdfScale}
+                type={"check"}
               />
-              <SignatureMarker currentPage={currentPage} />
             </DocumentContainer>
           ) : (
             <LoadingMessage>문서 및 서명 정보를 불러오는 중...</LoadingMessage>
@@ -268,7 +269,8 @@ const Value = styled.span`
 `;
 
 const DocumentContainer = styled.div`
-  max-width: 800px;
+  max-width: 70vw;
+  width: 100%;
   background-color: #f5f5f5;
   position: relative;
 `;
