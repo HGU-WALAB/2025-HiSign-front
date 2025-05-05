@@ -7,6 +7,7 @@ import CompleteModal from "../components/AllocatePage/CompleteModal";
 import ButtonBase from "../components/ButtonBase";
 import RejectModal from "../components/ListPage/RejectModal";
 import PDFViewer from "../components/SignPage/PDFViewer";
+import SignatureOverlay from "../components/SignPage/SignatureOverlay";
 import SignaturePopup from "../components/SignPage/SignaturePopup";
 import { signingState } from "../recoil/atom/signingState";
 import ApiService from "../utils/ApiService";
@@ -19,6 +20,7 @@ const PreviewPage = () => {
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
+  const [pdfScale, setPdfScale] = useState(1);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -120,34 +122,8 @@ const PreviewPage = () => {
         <PDFWrapper>
           {signing.fileUrl && signing.signatureFields ? (
             <DocumentContainer>
-              <PDFViewer pdfUrl={signing.fileUrl} setCurrentPage={setCurrentPage} />
-              {signing.signatureFields
-                .filter((field) => field.position.pageNumber === currentPage)
-                .map((field, index) => (
-                  <div
-                    key={index}
-                    style={{
-                      position: "absolute",
-                      left: field.position.x,
-                      top: field.position.y,
-                      width: field.width,
-                      height: field.height,
-                      border: field.image ? "none" : "2px dashed black",
-                      backgroundColor: field.image ? "transparent" : "#f8f9fa50",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    {field.image && (
-                      <img
-                        src={field.image}
-                        alt="서명"
-                        style={{ width: "100%", height: "100%", objectFit: "contain", border: "2px solid black" }}
-                      />
-                    )}
-                  </div>
-              ))}
+              <PDFViewer pdfUrl={signing.fileUrl} setCurrentPage={setCurrentPage} onScaleChange={setPdfScale} />
+              <SignatureOverlay currentPage={currentPage} scale={pdfScale} />
             </DocumentContainer>
           ) : (
             <LoadingMessage>문서 및 서명 정보를 불러오는 중...</LoadingMessage>
@@ -241,9 +217,10 @@ const Value = styled.span`
 `;
 
 const DocumentContainer = styled.div`
-  max-width: 800px;
+  max-width: 70vw;
   background-color: #f5f5f5;
   position: relative;
+  width: 100%;
 `;
 
 const LoadingMessage = styled.p`
