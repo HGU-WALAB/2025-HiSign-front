@@ -56,7 +56,7 @@ function PDFViewer({ pdfUrl, setCurrentPage, onScaleChange, currentPage, type}) 
 
         {/* ✅ 동적으로 Overlay 또는 Marker 렌더링 */}
         {type === "sign" && <SignatureOverlay currentPage={pageNum} scale={scale} />}
-        {type === "check" && <SignatureMarker currentPage={pageNum} />}
+        {type === "check" && <SignatureMarker currentPage={pageNum} scale={scale}/>}
       </div>
 
       <PagingControl pageNum={pageNum} setPageNum={handlePageChange} totalPages={totalPages} />

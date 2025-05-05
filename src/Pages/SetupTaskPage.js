@@ -32,8 +32,23 @@ const SetupTaskPage = () => {
   const [selectedMonth, setSelectedMonth] = useState("");
   const [password, setPassword] = useState("");
   const [passwordMatch, setPasswordMatch] = useState(false);
-  
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (document) {
+      setSelectedSubject(document.selectedSubject || "");
+      setSelectedMonth(document.selectedMonth || "");
+      setRequestName(document.requestName || "");
+      setDescription(document.description || "");
+      setIsRejectable(document.isRejectable ?? 0);
+  
+      if (document.expirationDateTime) {
+        const [datePart, timePart] = document.expirationDateTime.split("T");
+        setExpirationDate(datePart);
+        setExpirationTime(timePart?.slice(0, 5) || "23:59");
+      }
+    }
+  }, []);
 
   const today = new Date().toISOString().split("T")[0];
 
@@ -114,9 +129,20 @@ const SetupTaskPage = () => {
     }
   
     const now = new Date();
-    const sevenDaysLater = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-    const isoExpiration = sevenDaysLater.toISOString().slice(0, 19);
-    const formattedExpiration = isoExpiration; // 항상 7일 후로 고정
+    let expiration = new Date();
+
+    if (taskType === "taTask") {
+      const day = now.getDay(); // 0 (일) ~ 6 (토)
+      const daysToFriday = (5 - day + 7) % 7;
+      expiration.setDate(now.getDate() + daysToFriday);
+      expiration.setHours(12, 0, 0, 0); // 12:00:00
+    } else {
+      // basicTask인 경우, 사용자가 지정한 날짜 + 시간 사용
+      const [year, month, day] = expirationDate.split("-").map(Number);
+      const [hour, minute] = expirationTime.split(":").map(Number);
+      expiration = new Date(year, month - 1, day, hour, minute);
+    }
+    const formattedExpiration = expiration.toISOString().slice(0, 19);
     const finalRequestName =
       taskType === "taTask"
         ? `${selectedSubject}_${selectedMonth}_${member.name}_${member.uniqueId}`
@@ -134,6 +160,8 @@ const SetupTaskPage = () => {
       expirationDateTime: formattedExpiration,
       type,
       password: finalPassword,
+      selectedSubject,
+      selectedMonth,
     }));
   
     navigate(`/request`);

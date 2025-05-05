@@ -1,5 +1,5 @@
 // AllocatePage.js
-import { Drawer, Typography, Menu, MenuItem, Card, CardContent, CardActionArea } from '@mui/material';
+import { Card, CardActionArea, CardContent, Drawer, Menu, MenuItem, Typography } from '@mui/material';
 import { useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import { Rnd } from "react-rnd";
@@ -113,7 +113,7 @@ const AllocatePage = () => {
                         onMouseLeave={() => setHoveredField(null)}
                       >
                         <SignatureBoxContainer color={signer.color || defaultColors[index % defaultColors.length]}>
-                          {signer.name}의 서명
+                          {signer.name}
                           {hoveredField === box.id && (
                             <DeleteButton onClick={(e) => {
                               e.stopPropagation();
