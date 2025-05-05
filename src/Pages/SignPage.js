@@ -6,7 +6,6 @@ import styled from "styled-components";
 import ButtonBase from "../components/ButtonBase";
 import ConfirmModal from "../components/ConfirmModal";
 import PDFViewer from "../components/SignPage/PDFViewer";
-import SignatureOverlay from "../components/SignPage/SignatureOverlay";
 import { signingState } from "../recoil/atom/signingState";
 import ApiService from "../utils/ApiService";
 
@@ -21,7 +20,8 @@ function SignPage() {
   const [signaturesByPage, setSignaturesByPage] = useState({});
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-
+  const [pdfScale, setPdfScale] = useState(1);
+  
   // 특정 페이지로 이동하는 함수
   const navigateToPage = (pageNumber) => {
   setCurrentPage(pageNumber);
@@ -249,11 +249,12 @@ const applySavedSignature = (signature) => {
           {signing.documentId && signing.fileUrl && (
             <DocumentSection>
               <DocumentContainer>
-                <PDFViewer
-                  pdfUrl={signing.fileUrl}
-                  setCurrentPage={setCurrentPage}
-                />
-                <SignatureOverlay currentPage={currentPage} />
+              <PDFViewer
+                pdfUrl={signing.fileUrl}
+                setCurrentPage={setCurrentPage}
+                onScaleChange={setPdfScale}
+                type="sign"
+              />
               </DocumentContainer>
               
               <ButtonContainer>

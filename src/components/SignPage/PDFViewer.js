@@ -1,15 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import PagingControl from "../PagingControl";
+import SignatureMarker from "../PreviewPage/SignatureMarker";
+import SignatureOverlay from "./SignatureOverlay";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
-function PDFViewer({ pdfUrl, setCurrentPage, onScaleChange }) {
+function PDFViewer({ pdfUrl, setCurrentPage, onScaleChange, currentPage, type}) {
   const containerRef = useRef(null);
   const [pageNum, setPageNum] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [scale, setScale] = useState(1);
-  const [containerWidth, setContainerWidth] = useState(800); // ✅ 실제 PDF 표시 너비 상태
+  const [containerWidth, setContainerWidth] = useState(800);
 
   useEffect(() => {
     const updateDimensions = (width) => {
@@ -28,7 +30,7 @@ function PDFViewer({ pdfUrl, setCurrentPage, onScaleChange }) {
       observer.observe(containerRef.current);
       updateDimensions(containerRef.current.offsetWidth);
     }
-  
+
     return () => observer.disconnect();
   }, [onScaleChange]);
 
@@ -43,19 +45,20 @@ function PDFViewer({ pdfUrl, setCurrentPage, onScaleChange }) {
         ref={containerRef}
         style={{
           width: "100%",
+          maxWidth: "800px",
           margin: "0 auto",
           position: "relative",
         }}
       >
-        <Document
-          file={pdfUrl}
-          onLoadSuccess={(pdf) => {
-            setTotalPages(pdf.numPages);
-          }}
-        >
+        <Document file={pdfUrl} onLoadSuccess={(pdf) => setTotalPages(pdf.numPages)}>
           <Page pageNumber={pageNum} width={containerWidth} />
         </Document>
+
+        {/* ✅ 동적으로 Overlay 또는 Marker 렌더링 */}
+        {type === "sign" && <SignatureOverlay currentPage={pageNum} scale={scale} />}
+        {type === "check" && <SignatureMarker currentPage={pageNum} />}
       </div>
+
       <PagingControl pageNum={pageNum} setPageNum={handlePageChange} totalPages={totalPages} />
     </>
   );

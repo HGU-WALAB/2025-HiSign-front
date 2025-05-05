@@ -7,7 +7,6 @@ import CompleteModal from "../components/AllocatePage/CompleteModal";
 import ButtonBase from "../components/ButtonBase";
 import RejectModal from "../components/ListPage/RejectModal";
 import PDFViewer from "../components/SignPage/PDFViewer";
-import SignatureOverlay from "../components/SignPage/SignatureOverlay";
 import SignaturePopup from "../components/SignPage/SignaturePopup";
 import { signingState } from "../recoil/atom/signingState";
 import ApiService from "../utils/ApiService";
@@ -122,8 +121,12 @@ const PreviewPage = () => {
         <PDFWrapper>
           {signing.fileUrl && signing.signatureFields ? (
             <DocumentContainer>
-              <PDFViewer pdfUrl={signing.fileUrl} setCurrentPage={setCurrentPage} onScaleChange={setPdfScale} />
-              <SignatureOverlay currentPage={currentPage} scale={pdfScale} />
+              <PDFViewer
+                pdfUrl={signing.fileUrl}
+                setCurrentPage={setCurrentPage}
+                onScaleChange={setPdfScale}
+                type="sign"
+              />
             </DocumentContainer>
           ) : (
             <LoadingMessage>문서 및 서명 정보를 불러오는 중...</LoadingMessage>
