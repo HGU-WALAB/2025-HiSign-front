@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { useRecoilValue } from "recoil";
-import styled from "styled-components";
-import HisnetLoginButton from "../components/HisnetLoginButton";
 import HisnetLogoutButton from "../components/HisnetLogoutButton";
 import { loginMemberState } from "../recoil/atom/loginMemberState";
 
@@ -136,7 +134,9 @@ function Sidebar() {
                 </div>
               )}
               <div className="fw-bold text-dark">{fullName + "님"}</div>
-
+              {loginMember.role?.trim().toUpperCase() === "ROLE_ADMIN" && (
+                  <div className="fw-bold text-dark">{"(관리자)"}</div>
+              )}
               <div
                 onClick={handleProfileClick}
                 style={{
@@ -153,10 +153,6 @@ function Sidebar() {
                   transition: "background-color 0.2s",
                 }}
               >
-              {loginMember.role?.trim().toUpperCase() === "ROLE_ADMIN" && (
-                  <div className="fw-bold text-dark">{"(관리자)"}</div>
-              )}
-              <ProfileCircle onClick={handleProfileClick}>
                 {firstChar}
               </div>
             </div>
@@ -174,7 +170,13 @@ function Sidebar() {
                 active={currentPath === "/receive-document"}
                 label="[ 공유 작업 ] "
               />
-
+              {loginMember.role?.trim().toUpperCase() === "ROLE_ADMIN" && (
+                <LinkItem
+                  to="/admin-document"
+                  active={currentPath === "/admin-document"}
+                  label="[ 근무일지 관리 ] "
+                />
+              )}
               {/* ✅ 실선 Divider */}
               <hr
                 style={{
@@ -189,17 +191,7 @@ function Sidebar() {
                 active={currentPath === "/tasksetup"}
                 label = " + 문서 생성하기"
               />
-              
             </nav>
-              {loginMember.role?.trim().toUpperCase() === "ROLE_ADMIN" && (
-                  <NavItem
-                      to="/admin-document"
-                      $active={currentPath === "/admin-list"}
-                  >
-                    관리자 페이지
-                  </NavItem>
-              )}
-            </Nav>
           )}
         </div>
 
