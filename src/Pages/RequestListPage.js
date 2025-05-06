@@ -408,11 +408,30 @@ const RequestedDocuments = () => {
                                             <FindInPageIcon fontSize="small" style={{marginRight: "6px"}}/>
                                             문서 보기
                                         </Link>
-                                        <button disabled style={{
-                                            display: "flex", alignItems: "center", padding: "5px 10px",
-                                            border: "1px solid #ccc", borderRadius: "5px",
-                                            backgroundColor: "transparent", color: "#aaa"
-                                        }}>
+                                        <button
+                                            onClick={() => downloadPDF(doc.id)}
+                                            disabled={doc.status !== 1}
+                                            style={{
+                                                display: "flex",
+                                                alignItems: "center",
+                                                padding: "5px 10px",
+                                                border: "1px solid #ccc",
+                                                borderRadius: "5px",
+                                                textDecoration: "none",
+                                                backgroundColor:
+                                                (doc.status !== 1)
+                                                    ? "transparent"
+                                                    : "white",
+                                                color:
+                                                (doc.status !== 1)
+                                                    ? "#aaa"
+                                                    : "black",
+                                                cursor:
+                                                (doc.status !== 1)
+                                                    ? "not-allowed"
+                                                    : "pointer"
+                                            }}
+                                            >
                                             <DownloadIcon fontSize="small" style={{marginRight: "6px"}}/>
                                             다운로드
                                         </button>

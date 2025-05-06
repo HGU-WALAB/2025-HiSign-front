@@ -4,10 +4,12 @@ import LoginCallback from "./auth/LoginCallback";
 import useRestoreLoginFromCookie from './hooks/useRestoreLoginFromCookie';
 import Sidebar from "./Layout/Sidebar";
 import AddSignerPage from "./Pages/AddSignerPage";
+import AdminPage from './Pages/AdminListPage';
 import AllocatePage from "./Pages/AllocatePage";
 import CheckPassowrdPage from './Pages/CheckPasswordPage';
 import CheckTaskPage from './Pages/CheckTaskPage';
 import CompleteSignPage from "./Pages/CompleteSignPage";
+import DashBoardPage from './Pages/DashBoardPage';
 import DetailPage from "./Pages/DetailPage";
 import LandingPage from "./Pages/LandingPage";
 import PreviewTaskPage from './Pages/PreviewTaskPage';
@@ -16,8 +18,6 @@ import RequestedDocuments from "./Pages/RequestListPage";
 import SetupTaskPage from "./Pages/SetupTaskPage";
 import SignPage from './Pages/SignPage';
 import RequireLogin from './utils/RequireLogin';
-import AdminPage from './Pages/AdminListPage';
-import DashBoardPage from './Pages/DashBoardPage';
 
 
 function MyRoutes() {
@@ -37,12 +37,9 @@ function MyRoutes() {
                 <Route path="/dashboard" element={
                     <RequireLogin><DashBoardPage /></RequireLogin>
                 } />
-            
-
                 <Route path="/tasksetup" element={
                     <RequireLogin><SetupTaskPage /></RequireLogin>
                 } />
-
                 <Route path="/request" element={
                     <RequireLogin><AddSignerPage /></RequireLogin>
                 } />

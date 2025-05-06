@@ -1,17 +1,25 @@
 import { Box, Button, Modal, Typography } from "@mui/material";
 import { useState } from "react";
+import "../../styles/animations.css";
 
 function PasswordInputModal({ open, onSubmit, onClose }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
+  const [shake, setShake] = useState(false);
+
+  const triggerShake = () => {
+    setShake(true);
+    setTimeout(() => setShake(false), 500);
+  };
 
   const handleValidate = () => {
     if (!password) {
       setError("비밀번호를를 입력해주세요."); // 이메일이 비어있을 경우 에러 메시지 출력
+      triggerShake(); // 애니메이션 트리거
       return;
     }
 
-    onSubmit(password, setError); // onSubmit에 에러 상태 업데이트를 넘김
+    onSubmit(password, setError, triggerShake); // onSubmit에 에러 상태 업데이트를 넘김
   };
 
   return (
@@ -40,6 +48,7 @@ function PasswordInputModal({ open, onSubmit, onClose }) {
         }}
         onClick={(e) => e.stopPropagation()}
       >
+        <div className={shake ? "shake-horizontal" : ""}>
         <Typography variant="h6" component="h2" sx={{ mb: 2 }}>
           비밀번호 인증
         </Typography>
@@ -84,6 +93,7 @@ function PasswordInputModal({ open, onSubmit, onClose }) {
         </div>
 
         {error && <p style={{ color: "red", marginTop: "10px" }}>{error}</p>}
+        </div>
       </Box>
     </Modal>
   );

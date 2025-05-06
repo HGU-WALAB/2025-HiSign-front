@@ -3,7 +3,7 @@ import ApiService from '../../utils/ApiService'; // 실제 경로에 맞게 조�
 
 const CancelButton = ({ documentId, backgroundColor = '#ff4d4f', refreshDocuments, setDocuments }) => {
     const handleCancel = async () => {
-        console.log("취소 요청할 문서 ID:", documentId); // 추가된 로그
+        //console.log("취소 요청할 문서 ID:", documentId); // 추가된 로그
 
         if (!documentId) {
             alert("문서 ID가 유효하지 않습니다.");
@@ -15,7 +15,7 @@ const CancelButton = ({ documentId, backgroundColor = '#ff4d4f', refreshDocument
 
         try {
             const response = await ApiService.cancelSignatureRequest(documentId);
-            console.log("API 응답:", response);
+            //console.log("API 응답:", response);
 
             // API 응답에서 message가 존재하는지 확인 후 alert 표시
             const successMessage = response.data?.message || "서명 요청이 취소되었습니다.";

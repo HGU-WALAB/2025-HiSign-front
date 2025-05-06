@@ -24,7 +24,7 @@ const useRestoreLoginFromCookie = () => {
 
         //console.log("✅ 로그인 정보 복원 성공:", user);
       } catch (error) {
-        console.log("🚫 로그인 정보 복원 실패 (비로그인 상태일 수 있음):", error);
+        //console.log("🚫 로그인 정보 복원 실패 (비로그인 상태일 수 있음):", error);
         setLoginState(prev => ({
           ...prev,
           isLoading: false, // 🔽 로그인 복원 실패이더라도 로딩 완료 처리

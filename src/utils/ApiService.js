@@ -35,7 +35,7 @@ const ApiService = {
   // 🔐 문서 업로드
   fullUpload: async (file, uploadRequestDTO) => {
     if (!file) throw new Error('업로드할 파일이 없습니다.');
-    console.log("업로드할 uploadDTO:", uploadRequestDTO);
+    //console.log("업로드할 uploadDTO:", uploadRequestDTO);
     const formData = new FormData();
     formData.append('file', file);
     formData.append('dto', new Blob([JSON.stringify(uploadRequestDTO)], { type: 'application/json' }));

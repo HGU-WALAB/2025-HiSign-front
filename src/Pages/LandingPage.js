@@ -10,7 +10,7 @@
 //   const loginMember = useRecoilValue(loginMemberState);
 
 //   useEffect(() => {
-//     console.log("loginMember", loginMember);
+//     //console.log("loginMember", loginMember);
 //   }, [loginMember]);
 
 //   return (
@@ -138,15 +138,15 @@ import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import styled from "styled-components";
+import landingpic from "../asset/landingpic.png"; // 이미지 import
 import HisnetLoginButton from "../components/HisnetLoginButton";
 import { loginMemberState } from "../recoil/atom/loginMemberState";
-import landingpic from "../asset/landingpic.png"; // 이미지 import
 
 function SideBar() {
   const loginMember = useRecoilValue(loginMemberState);
 
   useEffect(() => {
-    console.log("loginMember", loginMember);
+    //console.log("loginMember", loginMember);
   }, [loginMember]);
 
   return (
