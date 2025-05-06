@@ -28,7 +28,7 @@ const CheckTaskPage = () => {
   useEffect(() => {
     ApiService.fetchDocumentInfo(documentId)
     .then(response => {
-      console.log("문서 정보:", response);
+      //console.log("문서 정보:", response);
       
       // 🔥 여기 추가
       if (response.data.status !== 7) {
@@ -64,7 +64,7 @@ const CheckTaskPage = () => {
   
     ApiService.fetchSignersByDocument(documentId)
       .then(response => {
-        console.log("서명자 정보:", response);
+        //console.log("서명자 정보:", response);
         setSigning((prevState) => ({
           ...prevState,
           signerName: response[0]?.name || "",
@@ -73,7 +73,7 @@ const CheckTaskPage = () => {
         
         ApiService.fetchSignatureFields(documentId,response[0]?.email)
           .then(response => {
-            console.log("서명 필드 정보:", response);
+            //console.log("서명 필드 정보:", response);
             setSigning((prevState) => ({
               ...prevState,
               signatureFields: response.data,
@@ -101,7 +101,7 @@ const CheckTaskPage = () => {
     try {
       await ApiService.sendRequestMail(signing.documentId, signing.signerName);
       alert("서명 요청이 성공적으로 전송되었습니다.");
-      navigate("/");
+      navigate("/admin-document");
     } catch (error) {
       console.error(error);
       alert("서명 요청 전송에 실패했습니다.");

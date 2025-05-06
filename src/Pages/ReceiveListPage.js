@@ -287,7 +287,7 @@ const ReceivedDocuments = () => {
                                                 서명 하기
                                             </Dropdown.Item>
                                             <Dropdown.Item onClick={() => downloadPDF(doc.id)}
-                                                           disabled={doc.status == 2 || doc.status == 6 || doc.status == 3 || doc.status == 4}>
+                                                           disabled={doc.status !== 1}>
                                                 <DownloadIcon fontSize="small" style={{marginRight: "6px"}}/>
                                                 다운로드
                                             </Dropdown.Item>

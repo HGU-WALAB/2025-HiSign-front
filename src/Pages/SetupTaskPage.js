@@ -11,7 +11,7 @@ import Drop from "../components/Drop";
 import PasswordInputSection from "../components/SetupTask/PasswordInputSection";
 import { loginMemberState } from "../recoil/atom/loginMemberState";
 import { taskState } from "../recoil/atom/taskState";
-import { ButtonContainer, GrayButton, InputRow, Label, NextButton, StyledBody } from "../styles/CommonStyles";
+import { GrayButton, Label, NextButton, StyledBody } from "../styles/CommonStyles";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 

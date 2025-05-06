@@ -22,7 +22,7 @@ const CompleteSignPage = () => {
     
     ApiService.deleteSignerCookie()
       .then(() => {
-        console.log("서명자 쿠키 삭제 성공");
+        //console.log("서명자 쿠키 삭제 성공");
       })
       .catch((error) => {
         console.error("서명자 쿠키 삭제 실패:", error);

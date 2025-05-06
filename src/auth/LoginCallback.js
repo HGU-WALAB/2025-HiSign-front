@@ -25,10 +25,10 @@ const LoginCallback = () => {
         const response = await ApiService.login(token);
         
         // 토큰 정보 디코딩
-        console.log("로그인 성공:", response);
+        //console.log("로그인 성공:", response);
         // 토큰 정보 디코
         const payload = jwtDecode(response.data.token);
-        console.log("디코딩된 페이로드:", payload);
+        //console.log("디코딩된 페이로드:", payload);
         // 사용자 정보 상태 변경
         setloginMemberState({
           uniqueId: payload.sub,

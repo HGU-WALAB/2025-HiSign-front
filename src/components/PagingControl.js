@@ -23,7 +23,9 @@ export default function PagingControl({totalPages, pageNum, setPageNum}) {
       <div style={styles.inlineFlex}>
         <BigButton
           title={"<"}
-          onClick={() => {setPageNum(pageNum - 1); console.log("paging control:", pageNum-1);}}
+          onClick={() => {setPageNum(pageNum - 1); 
+            //console.log("paging control:", pageNum-1);
+          }}
           disabled={pageNum <= 1}
         />
         <div style={styles.pageInfo}>
@@ -31,7 +33,9 @@ export default function PagingControl({totalPages, pageNum, setPageNum}) {
         </div>
         <BigButton
           title={">"}
-          onClick={() => {setPageNum(pageNum + 1); console.log("paging control:", pageNum+1);}}
+          onClick={() => {setPageNum(pageNum + 1); 
+            //console.log("paging control:", pageNum+1);
+          }}
           disabled={pageNum >= totalPages}
         />
       </div>

@@ -161,6 +161,19 @@ function Sidebar() {
           {loginMember.uniqueId && (
             <nav style={{ marginTop: "1rem" }}>
               <LinkItem
+                to="/tasksetup"
+                active={currentPath === "/tasksetup"}
+                label = " + 작업 생성하기"
+              />
+              {/* ✅ 실선 Divider */}
+              <hr
+                style={{
+                  border: "none",
+                  borderTop: "1px solid #ccc",
+                  margin: "12px 0",
+                }}
+              />
+              <LinkItem
                 to="/request-document"
                 active={currentPath === "/request-document"}
                 label="[ 내 작업 ] "
@@ -177,20 +190,6 @@ function Sidebar() {
                   label="[ 근무일지 관리 ] "
                 />
               )}
-              {/* ✅ 실선 Divider */}
-              <hr
-                style={{
-                  border: "none",
-                  borderTop: "1px solid #ccc",
-                  margin: "12px 0",
-                }}
-              />
-
-              <LinkItem
-                to="/tasksetup"
-                active={currentPath === "/tasksetup"}
-                label = " + 문서 생성하기"
-              />
             </nav>
           )}
         </div>
