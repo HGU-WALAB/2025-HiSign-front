@@ -6,8 +6,13 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import styled from "styled-components";
 import { signerState } from "../recoil/atom/signerState";
 import { taskState } from "../recoil/atom/taskState";
-import { ButtonContainer, Container, GrayButton, MainArea, NextButton, StyledBody } from "../styles/CommonStyles";
+import { ButtonContainer, Container as BaseContainer, GrayButton, MainArea, NextButton, StyledBody } from "../styles/CommonStyles";
 import ApiService from "../utils/ApiService";
+
+// BaseContainer를 흰 배경으로 덮는 새로운 Container
+const Container = styled(BaseContainer)`
+  background-color: #fff;
+`;
 
 const AddSignerPage = () => {
   const navigate = useNavigate();
@@ -19,11 +24,10 @@ const AddSignerPage = () => {
   const [newEmailDomain, setNewEmailDomain] = useState("@handong.ac.kr");
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const [activeList, setActiveList] = useState(false);
-  const [focusTarget, setFocusTarget] = useState("name"); // "name" or "email"
-
+  const [focusTarget, setFocusTarget] = useState("name");
   const autocompleteRef = useRef(null);
 
-  // 디바운싱된 쿼리
+  // 디바운싱
   const [debouncedName, setDebouncedName] = useState("");
   const [debouncedEmail, setDebouncedEmail] = useState("");
 
@@ -37,7 +41,7 @@ const AddSignerPage = () => {
     return () => clearTimeout(handler);
   }, [newEmailPrefix]);
 
-  // 이름 검색용
+  // 쿼리 설정
   const { data: nameSearchResponse } = useQuery({
     queryKey: ["signers", "name", debouncedName],
     queryFn: () => ApiService.searchSignersByName(debouncedName),
@@ -46,7 +50,6 @@ const AddSignerPage = () => {
   });
   const nameResults = nameSearchResponse?.data || [];
 
-  // 이메일 검색용
   const { data: emailSearchResponse } = useQuery({
     queryKey: ["signers", "email", debouncedEmail],
     queryFn: () => ApiService.searchSignersByEmail(debouncedEmail),
@@ -55,12 +58,17 @@ const AddSignerPage = () => {
   });
   const emailResults = emailSearchResponse?.data || [];
 
+  const activeResults = focusTarget === "name" ? nameResults : emailResults;
+
   const toggleSigner = (signer) => {
     const exists = signers.some((s) => s.email === signer.email);
     if (exists) {
       setSigners(signers.filter((s) => s.email !== signer.email));
     } else {
-      setSigners([...signers,{ name: signer.name, email: signer.email, signatureFields: [] }]);
+      setSigners([
+        ...signers,
+        { name: signer.name, email: signer.email, signatureFields: [] },
+      ]);
     }
   };
 
@@ -92,7 +100,10 @@ const AddSignerPage = () => {
   const handleAddSigner = () => {
     const newEmail = newEmailPrefix + newEmailDomain;
     if (!signers.some((s) => s.email === newEmail)) {
-      setSigners([...signers, { name: newName, email: newEmail, signatureFields: [] }]);
+      setSigners([
+        ...signers,
+        { name: newName, email: newEmail, signatureFields: [] },
+      ]);
       setNewName("");
       setNewEmailPrefix("");
       setNewEmailDomain("@handong.ac.kr");
@@ -104,8 +115,6 @@ const AddSignerPage = () => {
   };
 
   const handleNextStep = () => navigate("/align");
-
-  const activeResults = focusTarget === "name" ? nameResults : emailResults;
 
   return (
     <Container>
@@ -198,6 +207,7 @@ const AddSignerPage = () => {
 
 export default AddSignerPage;
 
+// 스타일 컴포넌트
 const RequestName = styled.h2`
   font-size: 20px;
   font-weight: bold;
@@ -314,7 +324,6 @@ const SearchItem = styled.li`
     background-color: #dff1f1;
   }
 `;
-
 const AddButtonContainer = styled.div`
   display: flex;
   justify-content: end;

@@ -12,7 +12,7 @@ import ApiService from "../utils/ApiService";
 
 const PreviewPage = () => {
   const [signing] = useRecoilState(signingState);
-  const [currentPage, setCurrentPage] = React.useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
   const [showModal, setShowModal] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
   const navigate = useNavigate();
@@ -80,7 +80,7 @@ const PreviewPage = () => {
           </InfoSection>
 
           <ButtonContainer>
-            {signing.isRejectable && (<RejectButton onClick={handleReject}>거절하기</RejectButton>)}
+            {signing.isRejectable && <RejectButton onClick={handleReject}>거절하기</RejectButton>}
             <NextButton onClick={() => navigate("/sign")}>서명하기</NextButton>
           </ButtonContainer>
         </Sidebar>
@@ -88,10 +88,7 @@ const PreviewPage = () => {
         <PDFWrapper>
           {signing.fileUrl && signing.signatureFields ? (
             <DocumentContainer>
-              <PDFViewer
-                pdfUrl={signing.fileUrl}
-                setCurrentPage={setCurrentPage}
-              />
+              <PDFViewer pdfUrl={signing.fileUrl} setCurrentPage={setCurrentPage} />
               <SignatureMarker currentPage={currentPage} />
             </DocumentContainer>
           ) : (
@@ -113,18 +110,24 @@ const PreviewPage = () => {
 
 export default PreviewPage;
 
+// Styled Components
+
 const MainContainer = styled.div`
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   background-color: #f5f5f5;
-  padding-top: 80px;
+  padding-top: 0; /* 상단 마진 제거 */
 `;
 
 const ContentWrapper = styled.div`
   display: flex;
   flex: 1;
   width: 100%;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
 `;
 
 const Sidebar = styled.div`
@@ -133,6 +136,13 @@ const Sidebar = styled.div`
   background-color: white;
   border-right: 1px solid #ddd;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+
+  @media (max-width: 768px) {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #ddd;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  }
 `;
 
 const PDFWrapper = styled.div`
@@ -141,6 +151,10 @@ const PDFWrapper = styled.div`
   justify-content: center;
   align-items: flex-start;
   padding: 20px;
+
+  @media (max-width: 768px) {
+    padding: 10px;
+  }
 `;
 
 const InfoSection = styled.div`
@@ -180,12 +194,20 @@ const LoadingMessage = styled.p`
 const ButtonContainer = styled.div`
   margin-top: 20px;
   text-align: center;
+  display: flex;
+  justify-content: center;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 10px;
+  }
 `;
 
 const NextButton = styled(ButtonBase)`
-  background-color: #03A3FF;
+  background-color: #03a3ff;
   color: white;
   margin-left: 10px;
+
   &:hover {
     background-color: rgba(3, 163, 255, 0.66);
   }
@@ -194,6 +216,7 @@ const NextButton = styled(ButtonBase)`
 const RejectButton = styled(ButtonBase)`
   background-color: rgb(255, 0, 0);
   color: white;
+
   &:hover {
     background-color: rgb(179, 0, 0);
   }

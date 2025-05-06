@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import moment from "moment";
-import ApiService from "../utils/ApiService"; 
+import ApiService from "../utils/ApiService";
+import DrawIcon from "@mui/icons-material/Draw";
 
-const DashBoardPage = () => {
+function DashBoardPage() {
   const [recentDocuments, setRecentDocuments] = useState([]);
 
   useEffect(() => {
@@ -33,7 +34,7 @@ const DashBoardPage = () => {
 
   return (
     <Container>
-      <Title>Hi-Sign 대시보드</Title>
+      <Title>대시 보드</Title>
 
       <Section>
         <SectionTitle>최근 문서</SectionTitle>
@@ -42,7 +43,7 @@ const DashBoardPage = () => {
             <DocumentCard key={doc.id}>
               <DocTitle>{doc.requestName}</DocTitle>
               <DocInfo>상태: {getStatusLabel(doc.status)}</DocInfo>
-              <DocInfo>생성일: {moment(doc.createdAt).format('YYYY/MM/DD')}</DocInfo>
+              <DocInfo>생성일: {moment(doc.createdAt).format("YYYY/MM/DD")}</DocInfo>
               <DetailLink to={`/detail/${doc.id}`}>자세히 보기</DetailLink>
             </DocumentCard>
           ))}
@@ -51,27 +52,52 @@ const DashBoardPage = () => {
 
       <Section>
         <SectionTitle>사용 방법</SectionTitle>
-        <ProcessList>
-          <ProcessItem>1. 서명 요청: 문서를 업로드하고 요청을 만듭니다.</ProcessItem>
-          <ProcessItem>2. 문서 공유: 상대방에게 문서를 전달합니다.</ProcessItem>
-          <ProcessItem>3. 서명 진행: 상대방이 서명 또는 거절합니다.</ProcessItem>
-          <ProcessItem>4. 완료 확인: 완료된 문서를 확인하거나 다운로드합니다.</ProcessItem>
-        </ProcessList>
+        <GuideContainer>
+          <StepCard>
+            <StepNumber>1</StepNumber>
+            <StepTitle>서명 요청</StepTitle>
+            <StepDesc>문서를 업로드하고 서명 요청을 생성합니다.</StepDesc>
+          </StepCard>
+          <Arrow>→</Arrow>
+          <StepCard>
+            <StepNumber>2</StepNumber>
+            <StepTitle>문서 공유</StepTitle>
+            <StepDesc>상대방에게 링크로 문서를 전달합니다.</StepDesc>
+          </StepCard>
+          <Arrow>→</Arrow>
+          <StepCard>
+            <StepNumber>3</StepNumber>
+            <StepTitle>서명 진행</StepTitle>
+            <StepDesc>상대방이 서명하거나 거절합니다.</StepDesc>
+          </StepCard>
+          <Arrow>→</Arrow>
+          <StepCard>
+            <StepNumber>4</StepNumber>
+            <StepTitle>완료 확인</StepTitle>
+            <StepDesc>완료된 문서를 확인하거나 다운로드합니다.</StepDesc>
+          </StepCard>
+        </GuideContainer>
       </Section>
 
       <InquirySection>
-        <p>도움이 필요하신가요?</p>
-        <Link to="/contact">
-          <InquiryButton>문의하기</InquiryButton>
-        </Link>
-      </InquirySection>
+  <p>도움이 필요하신가요?</p>
+  <a href="http://pf.kakao.com/_xcmKXn" target="_blank" rel="noopener noreferrer">
+    <InquiryButton>문의하기</InquiryButton>
+  </a>
+</InquirySection>
+
+
+      <FloatingCenterLink to="/tasksetup">
+        <DrawIcon style={{ fontSize: "32px" }} />
+      </FloatingCenterLink>
     </Container>
   );
-};
+}
 
 export default DashBoardPage;
 
-// ------------------ Styled Components ------------------
+// === Styled Components ===
+
 const Container = styled.div`
   padding: 40px;
   max-width: 1200px;
@@ -151,20 +177,43 @@ const DetailLink = styled(Link)`
   }
 `;
 
-const ProcessList = styled.ul`
-  list-style: none;
-  padding: 0;
+const GuideContainer = styled.div`
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  align-items: center;
   gap: 12px;
+  justify-content: center;
 `;
 
-const ProcessItem = styled.li`
-  font-size: 1rem;
-  color: #555;
+const StepCard = styled.div`
   background: #eef4ff;
-  padding: 10px 15px;
-  border-radius: 8px;
+  border-radius: 12px;
+  padding: 20px;
+  width: 220px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+`;
+
+const StepNumber = styled.div`
+  font-size: 2rem;
+  font-weight: bold;
+  color: #1976d2;
+`;
+
+const StepTitle = styled.h3`
+  font-size: 1.2rem;
+  margin: 10px 0 5px;
+`;
+
+const StepDesc = styled.p`
+  font-size: 0.95rem;
+  color: #444;
+`;
+
+const Arrow = styled.div`
+  font-size: 1.5rem;
+  color: #999;
+  font-weight: bold;
 `;
 
 const InquirySection = styled.div`
@@ -183,5 +232,31 @@ const InquiryButton = styled.button`
   margin-top: 10px;
   &:hover {
     background-color: #115293;
+  }
+`;
+
+const FloatingCenterLink = styled(Link)`
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  background-color: #87cefa;
+  color: white;
+  width: 60px;
+  height: 60px;
+  border: none;
+  border-radius: 50%;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  transition: background-color 0.3s ease-in-out;
+
+  &:hover {
+    background-color: #4682b4;
   }
 `;

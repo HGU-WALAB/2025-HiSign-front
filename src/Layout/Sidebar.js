@@ -18,7 +18,6 @@ function Sidebar() {
   const handleProfileClick = () => setShowLogout((prev) => !prev);
   const handleToggleSidebar = () => setSidebarOpen((prev) => !prev);
 
-  // 사이드바 외부 클릭 시 닫히는 기능 추가
   const handleClickOutside = (e) => {
     if (
       isMobile &&
@@ -51,246 +50,223 @@ function Sidebar() {
   }, [isMobile, sidebarOpen]);
 
   return (
-    <Container>
-      {/* 햄버거 버튼 (모바일) */}
+    <div style={{ display: "flex", minHeight: "100vh", position: "relative" }}>
       {isMobile && (
-        <ToggleButton onClick={handleToggleSidebar} className="toggle-btn">
+        <button
+          onClick={handleToggleSidebar}
+          className="toggle-btn"
+          style={{
+            position: "fixed",
+            top: 10,
+            left: 10,
+            zIndex: 1001,
+            background: "#343a40",
+            color: "#fff",
+            border: "none",
+            padding: "8px 12px",
+            borderRadius: 4,
+            cursor: "pointer",
+            transition: "all 0.3s ease",
+          }}
+        >
           ☰
-        </ToggleButton>
+        </button>
       )}
 
-  
-      <SidebarWrapper
+      <aside
         className="sidebar"
-        $isOpen={sidebarOpen}
-        $isMobile={isMobile}
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          padding: "1rem",
+          width: 250,
+          backgroundColor: "#f8f9fa",
+          borderRight: "1px solid #ddd",
+          position: "fixed",
+          top: 0,
+          left: 0,
+          bottom: 0,
+          zIndex: 1000,
+          transition: "transform 0.3s ease-in-out",
+          transform: sidebarOpen ? "translateX(0)" : "translateX(-100%)",
+          boxShadow:
+            sidebarOpen && isMobile ? "0 0 10px rgba(0,0,0,0.1)" : "none",
+          overflowY: "auto",
+        }}
       >
         <div>
-          <LogoLink
-            to="/"
-            className="text-decoration-none text-dark fs-4 mb-4 d-block"
+          <Link
+            to={loginMember.uniqueId ? "/dashboard" : "/"}
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              marginBottom: "1.5rem",
+            }}
           >
-            <LogoImage
+            <img
               src={`${process.env.PUBLIC_URL}/hisignlogo_resized.png`}
               alt="HI-Sign 로고"
+              style={{ height: 120, maxWidth: "100%" }}
             />
-          </LogoLink>
+          </Link>
 
-          {!!loginMember.uniqueId && (
-            <ProfileContainer>
+          {loginMember.uniqueId && (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                marginBottom: "1.5rem",
+                paddingLeft: "0.25rem",
+                position: "relative",
+              }}
+            >
               {showLogout && (
-                <LogoutContainer>
+                <div
+                  style={{
+                    position: "absolute",
+                    right: 0,
+                    bottom: 50,
+                    borderRadius: 10,
+                    padding: 1,
+                    zIndex: 999,
+                  }}
+                >
                   <HisnetLogoutButton />
-                </LogoutContainer>
+                </div>
               )}
               <div className="fw-bold text-dark">{fullName + "님"}</div>
-              <ProfileCircle onClick={handleProfileClick}>
+              <div
+                onClick={handleProfileClick}
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: "50%",
+                  backgroundColor: "#343a40",
+                  color: "#fff",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  userSelect: "none",
+                  transition: "background-color 0.2s",
+                }}
+              >
                 {firstChar}
-              </ProfileCircle>
-            </ProfileContainer>
+              </div>
+            </div>
           )}
 
-          {!loginMember.uniqueId && (
-
-            <div className="mb-4">
-              <HisnetLoginButton />
-            </div>
-          )} */}
-
-          {!!loginMember.uniqueId && (
-            <Nav className="nav flex-column">
-              <NavItem
+          {loginMember.uniqueId && (
+            <nav style={{ marginTop: "1rem" }}>
+              <LinkItem
                 to="/request-document"
-                $active={currentPath === "/request-document"}
-              >
-                내 작업
-              </NavItem>
-              <NavItem
+                active={currentPath === "/request-document"}
+                label="[ 내 작업 ] "
+              />
+              <LinkItem
                 to="/receive-document"
-                $active={currentPath === "/receive-document"}
-              >
-                공유 작업
-              </NavItem>
-              <NavItem to="/tasksetup" $active={currentPath === "/tasksetup"}>
-                문서 업로드하기
-              </NavItem>
-              <NavItem to="/request" $active={currentPath === "/request"}>
-                서명자 등록하기
-              </NavItem>
-            </Nav>
+                active={currentPath === "/receive-document"}
+                label="[ 공유 작업 ] "
+              />
+
+              {/* ✅ 실선 Divider */}
+              <hr
+                style={{
+                  border: "none",
+                  borderTop: "1px solid #ccc",
+                  margin: "12px 0",
+                }}
+              />
+
+              <LinkItem
+                to="/tasksetup"
+                active={currentPath === "/tasksetup"}
+                label = " + 문서 생성하기"
+              />
+              
+            </nav>
           )}
         </div>
 
-        <Copyright>
+        <div
+          style={{
+            marginTop: "auto",
+            fontSize: 12,
+            color: "#888",
+            textAlign: "center",
+            paddingTop: "1rem",
+          }}
+        >
           Copyright © WALAB. HiSign 2025
           <br />
           김솔미 김홍찬 류찬미
-        </Copyright>
-      </SidebarWrapper>
+        </div>
+      </aside>
 
-      {isMobile && sidebarOpen && <Overlay onClick={handleToggleSidebar} />}
+      {isMobile && sidebarOpen && (
+        <div
+          onClick={handleToggleSidebar}
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            zIndex: 999,
+          }}
+        />
+      )}
 
-      {/* Main Content */}
-      <MainContent $sidebarOpen={sidebarOpen} $isMobile={isMobile}>
+      <div
+        style={{
+          flexGrow: 1,
+          marginLeft: sidebarOpen && !isMobile ? 250 : 0,
+          width: "100%",
+          transition: "margin-left 0.3s ease-in-out",
+          paddingTop: isMobile ? "60px" : 0,
+        }}
+      >
         <Outlet />
-      </MainContent>
-    </Container>
+      </div>
+    </div>
   );
 }
 
+// 하위 NavItem 컴포넌트 정의
+const LinkItem = ({ to, active, label }) => (
+  <Link
+    to={to}
+    style={{
+      position: "relative",
+      padding: "12px 16px",
+      borderRadius: 8,
+      backgroundColor: active ? "#e9ecef" : "#f4f4f4",
+      marginBottom: 8,
+      textDecoration: "none",
+      color: "#212529",
+      display: "block",
+      fontWeight: active ? "bold" : "normal",
+      transition: "all 0.2s",
+    }}
+  >
+    {label}
+    <span
+      style={{
+        content: '""',
+        position: "absolute",
+        bottom: 0,
+        left: 12,
+        right: 12,
+        height: 3,
+        backgroundColor: active ? "#1a73e8" : "transparent",
+        borderRadius: 2,
+        transition: "background-color 0.3s",
+      }}
+    ></span>
+  </Link>
+);
+
 export default Sidebar;
-
-// 스타일드 컴포넌트 정의
-const Container = styled.div`
-  display: flex;
-  min-height: 100vh;
-  position: relative;
-`;
-
-const ToggleButton = styled.button`
-  position: fixed;
-  top: 10px;
-  left: 10px;
-  z-index: 1001;
-  background: #343a40;
-  color: #fff;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: #495057;
-  }
-`;
-
-const SidebarWrapper = styled.aside`
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 1rem;
-  width: 250px;
-  background-color: #f8f9fa;
-  border-right: 1px solid #ddd;
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  z-index: 1000;
-  transition: transform 0.3s ease-in-out;
-  transform: translateX(${(props) => (props.$isOpen ? "0" : "-100%")});
-  box-shadow: ${(props) =>
-    props.$isOpen && props.$isMobile ? "0 0 10px rgba(0,0,0,0.1)" : "none"};
-  overflow-y: auto;
-`;
-
-const Overlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 999;
-`;
-
-const LogoLink = styled(Link)`
-  display: flex;
-  justify-content: center;
-  margin-bottom: 1.5rem;
-`;
-
-const LogoImage = styled.img`
-  height: 120px;
-  max-width: 100%;
-`;
-
-const ProfileContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1.5rem;
-  padding-left: 0.25rem;
-  position: relative;
-`;
-
-const ProfileCircle = styled.div`
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: #343a40;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  user-select: none;
-  transition: background-color 0.2s;
-
-  &:hover {
-    background-color: #495057;
-  }
-`;
-
-const LogoutContainer = styled.div`
-  position: absolute;
-  right: 0;
-  bottom: 50px;
-  border-radius: 10px;
-  padding: 1px;
-  z-index: 999;
-  /* background-color: white; */
-  //box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-`;
-
-const Nav = styled.nav`
-  margin-top: 1rem;
-`;
-
-const NavItem = styled(Link)`
-  position: relative;
-  padding: 12px 16px;
-  border-radius: 8px;
-  background-color: ${({ $active }) => ($active ? "#e9ecef" : "#f4f4f4")};
-  margin-bottom: 8px;
-  text-decoration: none;
-  color: #212529;
-  display: block;
-  transition: all 0.2s;
-  font-weight: ${({ $active }) => ($active ? "bold" : "normal")};
-
-  &:hover {
-    background-color: #e9ecef;
-    transform: translateY(-2px);
-  }
-
-  &::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 12px;
-    right: 12px;
-    height: 3px;
-    background-color: ${({ $active }) => ($active ? "#1a73e8" : "transparent")};
-    border-radius: 2px;
-    transition: background-color 0.3s;
-  }
-`;
-
-const Copyright = styled.div`
-  margin-top: auto;
-  font-size: 12px;
-  color: #888;
-  text-align: center;
-  padding-top: 1rem;
-`;
-
-const MainContent = styled.div`
-  flex-grow: 1;
-  margin-left: ${(props) =>
-    props.$sidebarOpen && !props.$isMobile ? "250px" : "0"};
-  width: 100%;
-  transition: margin-left 0.3s ease-in-out;
-  padding-top: ${(props) => (props.$isMobile ? "60px" : "0")};
-`;

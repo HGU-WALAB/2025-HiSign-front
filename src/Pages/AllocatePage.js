@@ -1,6 +1,6 @@
 // AllocatePage.js
-import { Drawer, Typography, Menu, MenuItem, Card, CardContent, CardActionArea } from '@mui/material';
-import { useState } from "react";
+import { Typography, Menu, MenuItem, Card, CardContent, CardActionArea, IconButton } from '@mui/material';
+import { useState, useEffect } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import { Rnd } from "react-rnd";
 import { useRecoilState, useRecoilValue } from "recoil";
@@ -10,6 +10,8 @@ import PagingControl from "../components/PagingControl";
 import { signerState } from "../recoil/atom/signerState";
 import { taskState } from "../recoil/atom/taskState";
 import SignatureService from "../utils/SignatureService";
+import { useNavigate } from "react-router-dom";
+import MenuIcon from '@mui/icons-material/Menu';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
@@ -23,6 +25,7 @@ const AllocatePage = () => {
   const [pageNum, setPageNum] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [hoveredField, setHoveredField] = useState(null);
+  const navigate = useNavigate();
 
   const handleMenuClick = (event, signer) => {
     setMenuAnchor(event.currentTarget);
@@ -44,17 +47,20 @@ const AllocatePage = () => {
     <MainContainer>
       <ContentWrapper>
         <Container>
-          <StyledDrawer variant="permanent" anchor="left">
-            <DrawerHeader>
-              <StyledTitle variant="h6">서명 인원</StyledTitle>
-              <Divider />
-              <StyledServTitle variant="h7">대상을 선택 후 위치를 지정하세요</StyledServTitle>
-              <Divider />
-            </DrawerHeader>
+          <DocumentHeader>
+            <Typography variant="h6">{document.title || '문서 제목'}</Typography>
+            <Typography variant="body2" color="textSecondary">{document.fileName || '파일명 없음'}</Typography>
+          </DocumentHeader>
+
+          <SignerList>
+            <Typography variant="h6">서명 인원</Typography>
+            <Typography variant="body2" color="textSecondary" style={{ marginBottom: '12px' }}>
+              대상을 선택 후 위치를 지정하세요
+            </Typography>
             {signers.map((signer, index) => (
               <Card
                 key={signer.email}
-                sx={{ margin: '10px', cursor: 'pointer', borderLeft: `6px solid ${signer.color || defaultColors[index % defaultColors.length]}` }}
+                sx={{ marginBottom: '10px', cursor: 'pointer', borderLeft: `6px solid ${signer.color || defaultColors[index % defaultColors.length]}` }}
                 onClick={(e) => handleMenuClick(e, signer)}
               >
                 <CardActionArea>
@@ -78,7 +84,7 @@ const AllocatePage = () => {
                 </CardActionArea>
               </Card>
             ))}
-          </StyledDrawer>
+          </SignerList>
 
           <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={handleMenuClose}>
             <MenuItem onClick={addSignatureBox}>서명 추가</MenuItem>
@@ -113,7 +119,7 @@ const AllocatePage = () => {
                         onMouseLeave={() => setHoveredField(null)}
                       >
                         <SignatureBoxContainer color={signer.color || defaultColors[index % defaultColors.length]}>
-                          {signer.name}의 서명
+                          {signer.name} 서명
                           {hoveredField === box.id && (
                             <DeleteButton onClick={(e) => {
                               e.stopPropagation();
@@ -130,27 +136,30 @@ const AllocatePage = () => {
             )}
 
             <PagingControl pageNum={pageNum} setPageNum={setPageNum} totalPages={totalPages} />
-            <ButtonContainer>
-              <CompleteButton />
-            </ButtonContainer>
           </DocumentSection>
+
+          {/* ✅ 버튼 영역 이동 */}
+          <FloatingButtonContainer>
+            <FloatingGrayButton onClick={() => navigate("/request")}>이전으로</FloatingGrayButton>
+            <CompleteButton />
+          </FloatingButtonContainer>
         </Container>
       </ContentWrapper>
     </MainContainer>
   );
 };
 
-// 스타일 컴포넌트
+// 스타일 정의
 const MainContainer = styled.div`
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  min-height: 50vh;
   background-color: #f5f5f5;
 `;
 
 const ContentWrapper = styled.div`
   flex: 1;
-  margin-top: 80px;
+  /* margin-top: 80px; */
 `;
 
 const Container = styled.div`
@@ -159,8 +168,28 @@ const Container = styled.div`
   position: relative;
 `;
 
+const DocumentHeader = styled.div`
+  background-color: white;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+`;
+
+const SignerList = styled.div`
+  background-color: white;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+`;
+
 const DocumentSection = styled.div`
-  margin-left: 250px;
   padding: 20px;
 `;
 
@@ -171,16 +200,7 @@ const DocumentContainer = styled.div`
   position: relative;
   background-color: white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-`;
-
-const DrawerHeader = styled.div`
-  padding: 16px;
-`;
-
-const Divider = styled.hr`
-  margin: 10px 0;
-  border: none;
-  border-top: 1px solid #e0e0e0;
+  width: 100%;
 `;
 
 const SignatureBoxContainer = styled.div`
@@ -210,43 +230,33 @@ const DeleteButton = styled.button`
   z-index: 10;
 `;
 
-const StyledDrawer = styled(Drawer)`
-  && {
-    width: 300px;
-    flex-shrink: 0;
-
-    .MuiDrawer-paper {
-      width: 250px;
-      top: 80px;
-      height: calc(100% - 80px);
-      background-color: white;
-      border-right: 1px solid #e0e0e0;
-      padding: 10px;
-    }
-  }
-`;
-
-const StyledTitle = styled(Typography)`
-  font-weight: bold;
-  margin-bottom: 8px;
-`;
-
-const StyledServTitle = styled(Typography)`
-  color: #666;
-  font-size: 0.9rem;
-  margin: 8px 0;
-`;
-
 const LoadingMessage = styled.p`
   text-align: center;
   padding: 20px;
   color: #666;
 `;
 
-const ButtonContainer = styled.div`
-  text-align: center;
-  margin: 20px 0;
-  padding: 20px;
+const FloatingButtonContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 24px;
+`;
+
+const FloatingGrayButton = styled.button`
+  background-color: #ccc;
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+  padding: 12px 24px;
+  border-radius: 24px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+
+  &:hover {
+    background-color: #bbb;
+  }
 `;
 
 export default AllocatePage;

@@ -82,25 +82,48 @@ const CompleteButton = () => {
   };
 
   return (
-    <>
-      <BigButton variant="contained" color="primary" onClick={handleOpenModal}>
-        완료
-      </BigButton>
+   <>
+  <FloatingCompleteButton onClick={handleOpenModal} disabled={loading}>
+    완료
+  </FloatingCompleteButton>
 
-      <CompleteModal
-        open={open}
-        onClose={handleCloseModal}
-        onConfirm={handleConfirm}
-        loading={loading} // ✅ 로딩 상태 전달
-      />
-    </>
+  <CompleteModal
+    open={open}
+    onClose={handleCloseModal}
+    onConfirm={handleConfirm}
+    loading={loading}
+  />
+</>
+
   );
+  
 };
 
 export default CompleteButton;
 
-const BigButton = styled(ButtonBase)`
+// const BigButton = styled(ButtonBase)`
+//   background-color: ${({ disabled }) => (disabled ? "#ccc" : "#03A3FF")};
+//   font-size: 1rem;
+//   font-weight: bold;
+// `;
+
+
+const FloatingCompleteButton = styled(ButtonBase)`
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  z-index: 1000;
+
   background-color: ${({ disabled }) => (disabled ? "#ccc" : "#03A3FF")};
+  color: white;
   font-size: 1rem;
   font-weight: bold;
+  padding: 12px 24px;
+  border-radius: 24px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+  border: none;
+
+  
 `;
+
+
