@@ -1,19 +1,20 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { Dropdown } from "react-bootstrap";
-import { Modal, Box, Typography, Button, Pagination } from "@mui/material";
-import { PageContainer } from "../components/PageContainer";
-import CancelModal from "../components/ListPage/CancelModal";
-import ApiService from "../utils/ApiService";
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DownloadIcon from '@mui/icons-material/Download';
-import ViewListIcon from "@mui/icons-material/ViewList";
-import FindInPageIcon from '@mui/icons-material/FindInPage';
-import ViewModuleIcon from "@mui/icons-material/ViewModule";
-import moment from "moment/moment";
-import styled from "styled-components"; 
 import DrawIcon from '@mui/icons-material/Draw';
+import FindInPageIcon from '@mui/icons-material/FindInPage';
+import ViewListIcon from "@mui/icons-material/ViewList";
+import ViewModuleIcon from "@mui/icons-material/ViewModule";
+import { Box, Button, Modal, Pagination, Typography } from "@mui/material";
+import moment from "moment/moment";
+import React, { useEffect, useState } from "react";
+import { Dropdown } from "react-bootstrap";
+import { Link } from "react-router-dom";
+import styled from "styled-components";
+import CancelModal from "../components/ListPage/CancelModal";
+import { PageContainer } from "../components/PageContainer";
+import ApiService from "../utils/ApiService";
+import { downloadPDF } from "../utils/DownloadUtils";
 
 
 const RequestedDocuments = () => {
@@ -339,7 +340,8 @@ const RequestedDocuments = () => {
                                             <FindInPageIcon fontSize="small" style={{marginRight: "6px"}}/>
                                             문서 보기
                                         </Dropdown.Item>
-                                        <Dropdown.Item disabled><DownloadIcon/> 다운로드</Dropdown.Item>
+                                        <Dropdown.Item onClick={() => downloadPDF(doc.id)}
+                                                       disabled={doc.status !== 1}><DownloadIcon/> 다운로드</Dropdown.Item>
                                         <Dropdown.Item onClick={() => handleCancelClick(doc)}
                                                        disabled={doc.status !== 0}>
                                             <CloseIcon/> 요청 취소
@@ -395,7 +397,7 @@ const RequestedDocuments = () => {
             )}
 
             <CancelModal isVisible={showModal} onClose={() => setShowModal(false)} onConfirm={handleConfirmCancel}
-                         cancelReason={cancelReason} setCancelReason={setCancelReason}/>
+                        cancelReason={cancelReason} setCancelReason={setCancelReason}/>
 
             <Modal open={showSignersModal} onClose={() => setShowSignersModal(false)}>
 
