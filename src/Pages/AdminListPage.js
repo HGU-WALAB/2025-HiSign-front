@@ -1,20 +1,20 @@
 import DeleteIcon from '@mui/icons-material/Delete';
 import DownloadIcon from '@mui/icons-material/Download';
 import FindInPageIcon from '@mui/icons-material/FindInPage';
+import SearchIcon from '@mui/icons-material/Search';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import ViewModuleIcon from '@mui/icons-material/ViewModule';
 import { Pagination } from "@mui/material";
 import moment from 'moment';
 import React, { useEffect, useState } from "react";
 import { Dropdown } from "react-bootstrap";
+import { CSVLink } from "react-csv";
 import { Link, useNavigate } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { PageContainer } from "../components/PageContainer";
 import { loginMemberState } from "../recoil/atom/loginMemberState";
 import ApiService from "../utils/ApiService";
-import { CSVLink } from "react-csv";
-import SearchIcon from '@mui/icons-material/Search';
-
+import { downloadPDF, downloadZip } from "../utils/DownloadUtils";
 
 const AdminDocuments = () => {
     const loginMember = useRecoilValue(loginMemberState);
@@ -168,6 +168,8 @@ const AdminDocuments = () => {
             setSelectedDocs(filteredDocuments);
         }
     };
+    //다운로드 버튼 비활성화 로직
+    const isDownloadable = selectedDocs.length > 0 && selectedDocs.every(doc => doc.status === 1);
 
     return (
         <PageContainer>
@@ -269,17 +271,41 @@ const AdminDocuments = () => {
                     data={csvData}
                     headers={csvHeaders}
                     filename="Ta근무일지.csv"
+                    onClick={(e) => {
+                        if (selectedDocs.length === 0) {
+                        e.preventDefault(); // ✅ 클릭 무시
+                        }
+                    }}
                     style={{
                         padding: "6px 10px",
-                        backgroundColor: "#007bff",
+                        backgroundColor: selectedDocs.length === 0 ? "#ccc" : "#007bff",
                         color: "#fff",
                         borderRadius: "4px",
                         textDecoration: "none",
-                        fontSize: "14px"
+                        fontSize: "14px",
+                        pointerEvents: selectedDocs.length === 0 ? "none" : "auto", // ✅ 클릭 막기
+                        cursor: selectedDocs.length === 0 ? "not-allowed" : "pointer",
                     }}
-                >
+                    >
                     CSV 다운로드
                 </CSVLink>
+                
+                <button
+                    onClick={() => downloadZip(selectedDocs.map(doc => doc.id))}
+                    disabled={!isDownloadable}
+                    style={{
+                        padding: "6px 10px",
+                        backgroundColor: !isDownloadable ? "#ccc" : "#28a745",
+                        color: "#fff",
+                        borderRadius: "4px",
+                        border: "none",
+                        fontSize: "14px",
+                        cursor: !isDownloadable ? "not-allowed" : "pointer",
+                        marginLeft: "8px"
+                    }}
+                >
+                    일괄 다운로드
+                </button>
 
                 <div style={{display: "flex", alignItems: "center", gap: "6px", flexShrink: 0}}>
                     <input type="text" placeholder="작업명 검색" value={searchQuery} onChange={handleSearchChange}
@@ -403,7 +429,8 @@ const AdminDocuments = () => {
                                             <Dropdown.Item as={Link} to={`/detail/${doc.id}`}>
                                                 <FindInPageIcon fontSize="small" style={{marginRight: "6px"}}/>문서 보기
                                             </Dropdown.Item>
-                                            <Dropdown.Item disabled><DownloadIcon/> 다운로드</Dropdown.Item>
+                                            <Dropdown.Item onClick={() => downloadPDF(doc.id)}
+                                                           disabled={doc.status !== 1}><DownloadIcon/> 다운로드</Dropdown.Item>
                                             <Dropdown.Item disabled><DeleteIcon/> 삭제</Dropdown.Item>
                                         </Dropdown.Menu>
                                     </Dropdown>
@@ -417,11 +444,30 @@ const AdminDocuments = () => {
                                             <FindInPageIcon fontSize="small" style={{marginRight: "6px"}}/>
                                             문서 보기
                                         </Link>
-                                        <button disabled style={{
-                                            display: "flex", alignItems: "center", padding: "5px 10px",
-                                            border: "1px solid #ccc", borderRadius: "5px",
-                                            backgroundColor: "transparent", color: "#aaa"
-                                        }}>
+                                        <button
+                                            onClick={() => downloadPDF(doc.id)}
+                                            disabled={doc.status !== 1}
+                                            style={{
+                                                display: "flex",
+                                                alignItems: "center",
+                                                padding: "5px 10px",
+                                                border: "1px solid #ccc",
+                                                borderRadius: "5px",
+                                                textDecoration: "none",
+                                                backgroundColor:
+                                                (doc.status !== 1)
+                                                    ? "transparent"
+                                                    : "white",
+                                                color:
+                                                (doc.status !== 1)
+                                                    ? "#aaa"
+                                                    : "black",
+                                                cursor:
+                                                (doc.status !== 1)
+                                                    ? "not-allowed"
+                                                    : "pointer"
+                                            }}
+                                            >
                                             <DownloadIcon fontSize="small" style={{marginRight: "6px"}}/>
                                             다운로드
                                         </button>

@@ -16,6 +16,7 @@ import RejectModal from "../components/ListPage/RejectModal";
 import { PageContainer } from "../components/PageContainer";
 import { loginMemberState } from "../recoil/atom/loginMemberState";
 import ApiService from "../utils/ApiService";
+import { downloadPDF } from "../utils/DownloadUtils";
 
 
 const ReceivedDocuments = () => {
@@ -281,11 +282,12 @@ const ReceivedDocuments = () => {
                                                 문서 보기
                                             </Dropdown.Item>
                                             <Dropdown.Item as={Link} to={`/checkEmail?token=${doc.token}`}
-                                                           disabled={doc.status !== 0}>
+                                                            disabled={doc.status !== 0}>
                                                 <DrawIcon fontSize="small" style={{marginRight: "6px"}}/>
                                                 서명 하기
                                             </Dropdown.Item>
-                                            <Dropdown.Item disabled>
+                                            <Dropdown.Item onClick={() => downloadPDF(doc.id)}
+                                                           disabled={doc.status == 2 || doc.status == 6 || doc.status == 3 || doc.status == 4}>
                                                 <DownloadIcon fontSize="small" style={{marginRight: "6px"}}/>
                                                 다운로드
                                             </Dropdown.Item>
@@ -340,11 +342,30 @@ const ReceivedDocuments = () => {
                                             <DrawIcon fontSize="small" style={{marginRight: "6px"}}/>
                                             서명 하기
                                         </Link>
-                                        <button disabled style={{
-                                            display: "flex", alignItems: "center", padding: "5px 10px",
-                                            border: "1px solid #ccc", borderRadius: "5px",
-                                            backgroundColor: "transparent", color: "#aaa"
-                                        }}>
+                                        <button
+                                                onClick={() => downloadPDF(doc.id)}
+                                                disabled={doc.status !== 1}
+                                                style={{
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    padding: "5px 10px",
+                                                    border: "1px solid #ccc",
+                                                    borderRadius: "5px",
+                                                    textDecoration: "none",
+                                                    backgroundColor:
+                                                    (doc.status !== 1)
+                                                        ? "transparent"
+                                                        : "white",
+                                                    color:
+                                                    (doc.status !== 1)
+                                                        ? "#aaa"
+                                                        : "black",
+                                                    cursor:
+                                                    (doc.status !== 1)
+                                                        ? "not-allowed"
+                                                        : "pointer"
+                                                }}
+                                                >
                                             <DownloadIcon fontSize="small" style={{marginRight: "6px"}}/>
                                             다운로드
                                         </button>

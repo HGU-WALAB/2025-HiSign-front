@@ -122,6 +122,17 @@ const ApiService = {
     return apiInstance.put(`/documents/${documentId}/reject`, { reason });
   },
 
+  downloadSingleDocument: async (documentId) => {
+    return apiInstance.get(`/documents/${documentId}/download`, {
+      responseType: "arraybuffer", // ✅ 바이너리 데이터 수신
+    });
+  },
+  
+  downloadDocumentsAsZip: async (documentIds) => {
+    return apiInstance.post("/documents/download/zip", documentIds, {
+      responseType: "arraybuffer",
+    });
+  },
   // =================================
   // ✅ 서명자 상태에서도 사용 가능한 API
   // =================================
