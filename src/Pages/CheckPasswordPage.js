@@ -14,6 +14,7 @@ const CheckPasswordPage = () => {
   const [error, setError] = useState(null);
   const [isValid, setIsValid] = useState(null); // 토큰 자체 유효성
   const [requiresPassword, setRequiresPassword] = useState(null); // 비밀번호 필요 여부
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
   const navigate = useNavigate();
   const member = useRecoilValue(loginMemberState); // 로그인 정보
 
@@ -42,12 +43,15 @@ const CheckPasswordPage = () => {
         } else if (res.requiresPassword === false) {
           // ✅ 비밀번호 필요 없으면 바로 문서 가져오기
           fetchDocumentAndFields(res.signerEmail);
+        } else {
+          setShowPasswordModal(true);
         }
       })
       .catch((err) => {
         setIsValid(false);
         const errorMessage = err.message || "⚠️ 서명 요청 검증에 실패했습니다.";
         setError(errorMessage);
+        setShowPasswordModal(true); // ⛔ 닫지 않음
         alert(errorMessage);
       });
 
@@ -98,7 +102,7 @@ const CheckPasswordPage = () => {
   };
 
   // 비밀번호 입력 후 제출 (모달에서 사용)
-  const handlePasswordSubmit = (password, setModalError) => {
+  const handlePasswordSubmit = (password, setModalError, triggerShake) => {
     ApiService.validateSignatureRequest(token, password)
       .then((response) => {
         //console.log("서명 요청 검증 결과:", response);
@@ -137,7 +141,8 @@ const CheckPasswordPage = () => {
         console.error("서명 요청 검증 실패:", err);
         const errorMessage = err.response?.data?.message || "비밀번호 인증에 실패했습니다. 다시 시도해주세요.";
         setModalError(errorMessage);
-        alert(errorMessage);
+        setShowPasswordModal(true);
+        triggerShake(); // 모달 흔들기 효과
       });
   };
 
@@ -145,7 +150,7 @@ const CheckPasswordPage = () => {
     <MainContainer>
       {error && <ErrorMessage>{error}</ErrorMessage>}
       {isValid === null && <LoadingMessage>로딩 중...</LoadingMessage>}
-      {isValid && requiresPassword === true && !signing.documentId && (
+      {isValid && requiresPassword === true && showPasswordModal &&  (
         <PasswardInputModal
           open={true}
           onSubmit={handlePasswordSubmit}
