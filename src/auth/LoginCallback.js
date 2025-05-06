@@ -38,7 +38,7 @@ const LoginCallback = () => {
         });
         
         // 페이지 이동
-        navigate('/');
+        navigate('/dashboard');
       } catch (error) {
         console.error("토큰 넘기는 과정에서 오류 발생:", error);
       }

@@ -1,123 +1,270 @@
+// import React, { useEffect } from "react";
+// import { Link } from "react-router-dom";
+// import { useRecoilValue } from "recoil";
+// import styled from "styled-components";
+// import HisnetLoginButton from "../components/HisnetLoginButton";
+// import { loginMemberState } from "../recoil/atom/loginMemberState";
+// import landingpic from "../asset/landingpic.png"; // 이미지 import
+
+// function SideBar() {
+//   const loginMember = useRecoilValue(loginMemberState);
+
+//   useEffect(() => {
+//     console.log("loginMember", loginMember);
+//   }, [loginMember]);
+
+//   return (
+//     <PageContainer>
+//       <LeftPane>
+//         <Logo>HiSign</Logo>
+//         <Title>
+//           쉽고 빠르게
+//           <br />안전한 전자서명 솔루션
+//         </Title>
+//         {loginMember.unique_id ? (
+//           <ActionButton to="/tasksetup">서명 요청</ActionButton>
+//         ) : (
+//           <HisnetLoginButtonStyled>히즈넷으로 로그인</HisnetLoginButtonStyled>
+//         )}
+//       </LeftPane>
+//       <RightPane>
+//         <ImageContainer>
+//           <StyledImage src={landingpic} alt="랜딩페이지 사진" />
+//         </ImageContainer>
+//       </RightPane>
+//     </PageContainer>
+//   );
+// }
+
+// export default SideBar;
+
+
+// // Styled Components
+
+
+// const PageContainer = styled.div`
+//   display: flex;
+//   min-height: 100vh;
+//   @media (max-width: 768px) {
+//     flex-direction: column;
+//   }
+// `;
+
+// const LeftPane = styled.div`
+//   flex: 1;
+//   padding: 60px;
+//   display: flex;
+//   flex-direction: column;
+//   justify-content: center;
+//   gap: 24px;
+//   @media (max-width: 768px) {
+//     padding: 40px 20px;
+//     align-items: center;
+//     text-align: center;
+//   }
+// `;
+
+
+
+// const Logo = styled.h2`
+//   font-size: 1rem;
+//   letter-spacing: 2px;
+//   color: #888;
+//   margin: 0;
+// `;
+
+// const Title = styled.h1`
+//   font-size: 3rem;
+//   line-height: 1.2;
+//   margin: 0;
+//   @media (max-width: 768px) {
+//     font-size: 2rem;
+//   }
+// `;
+
+// const ActionButton = styled(Link)`
+//   display: inline-block;
+//   margin-top: 16px;
+//   padding: 10px 24px;
+//   background-color: #000;
+//   color: #fff;
+//   text-decoration: none;
+//   font-weight: 500;
+//   border-radius: 4px;
+//   font-size: 0.95rem;
+// `;
+
+
+// const HisnetLoginButtonStyled = styled(HisnetLoginButton)`
+// padding: 10px 24px;
+// font-size: 0.95rem;
+// border-radius: 6px;
+// font-weight: 500;
+// `;
+
+
+
+
+// const RightPane = styled.div`
+//   flex: 1;
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+//   background: #f0f0f0;
+//   padding: 0;
+
+//   @media (max-width: 768px) {
+//     height: 250px; /* 모바일에서는 높이 고정 */
+//   }
+// `;
+
+// const ImageContainer = styled.div`
+//   width: 100%;
+//   height: 100%;
+// `;
+
+// const StyledImage = styled.img`
+//   width: 100%;
+//   height: 100%;
+//   object-fit: cover;
+
+//   @media (max-width: 768px) {
+//     object-fit: contain;
+//   }
+// `;
 
 
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import styled from "styled-components";
-
 import HisnetLoginButton from "../components/HisnetLoginButton";
 import { loginMemberState } from "../recoil/atom/loginMemberState";
-import { Fab } from "@mui/material";
-import AddIcon from '@mui/icons-material/Add';
-
-
-import thum3 from "../asset/signperson.png";
-import thum4 from "../asset/main.png";
-
+import landingpic from "../asset/landingpic.png"; // 이미지 import
 
 function SideBar() {
-    const loginMember = useRecoilValue(loginMemberState);
+  const loginMember = useRecoilValue(loginMemberState);
 
-    useEffect(() => {
-        console.log("loginMember", loginMember);
-    }, [loginMember]);
+  useEffect(() => {
+    console.log("loginMember", loginMember);
+  }, [loginMember]);
 
-    return (
-        <PageContainer>
-            <CenterContainer>
-                <ImageContainer>
-                    <StyledImage src={thum4} alt="썸네일4" />
-                    <StyledImage src={thum3} alt="썸네일3" />
-                </ImageContainer>
-
-
-                <MainTitle>Hi-Sign</MainTitle>
-
-                 {!!loginMember.uniqueId ? (
-                    <CenterLink to="/tasksetup">서명 요청</CenterLink>
-
-                ) : (
-                    <HisnetLoginButton>히즈넷으로 로그인</HisnetLoginButton>
-                )}
-            </CenterContainer>
-        </PageContainer>
-    );
+  return (
+    <PageContainer>
+      <LeftPane>
+        <Logo>HiSign</Logo>
+        <Title>
+          쉽고 빠르게
+          <br />안전한 전자서명 솔루션
+        </Title>
+        {loginMember.unique_id ? (
+          <ActionButton to="/tasksetup">서명 요청</ActionButton>
+        ) : (
+          <HisnetLoginButtonWrapper>
+            <HisnetLoginButton>히즈넷으로 로그인</HisnetLoginButton>
+          </HisnetLoginButtonWrapper>
+        )}
+      </LeftPane>
+      <RightPane>
+        <ImageContainer>
+          <StyledImage src={landingpic} alt="랜딩페이지 사진" />
+        </ImageContainer>
+      </RightPane>
+    </PageContainer>
+  );
 }
 
 export default SideBar;
 
-// ==========================
-// Styled Components
-// ==========================
 
 const PageContainer = styled.div`
-    min-height: 100vh;
-    padding: 20px 20px 60px 20px;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
+  display: flex;
+  min-height: 100vh;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
 `;
 
-const CenterContainer = styled.div`
-    display: flex;
-    flex-direction: column;
+const LeftPane = styled.div`
+  flex: 1;
+  padding: 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 24px;
+
+  @media (max-width: 768px) {
+    padding: 40px 20px;
     align-items: center;
-    gap: 20px;
     text-align: center;
-    width: 100%;
-    max-width: 800px;
-    margin-top: 40px;
+  }
+`;
+
+const Logo = styled.h2`
+  font-size: 1rem;
+  letter-spacing: 2px;
+  color: #888;
+  margin: 0;
+`;
+
+const Title = styled.h1`
+  font-size: 3rem;
+  line-height: 1.2;
+  margin: 0;
+
+  @media (max-width: 768px) {
+    font-size: 2rem;
+  }
+`;
+
+const ActionButton = styled(Link)`
+  display: inline-block;
+  margin-top: 16px;
+  padding: 10px 24px;
+  background-color: #000;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  border-radius: 4px;
+  font-size: 0.95rem;
+`;
+
+const HisnetLoginButtonWrapper = styled.div`
+  button {
+    padding: 10px 24px !important;
+    font-size: 0.95rem !important;
+    border-radius: 6px !important;
+    font-weight: 500 !important;
+    min-width: auto !important;
+    width: auto !important;
+  }
+`;
+
+const RightPane = styled.div`
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f0f0f0;
+  padding: 0;
+
+  @media (max-width: 768px) {
+    height: 250px;
+  }
 `;
 
 const ImageContainer = styled.div`
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-    flex-wrap: wrap; 
-    overflow-x: hidden; 
+  width: 100%;
+  height: 100%;
 `;
 
 const StyledImage = styled.img`
-    width: 45%; 
-    height: auto;
-    flex-shrink: 0; 
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 
-    @media (max-width: 768px) {
-        width: 80%;
-    }
-`;
-
-
-const MainTitle = styled.h1`
-    font-size: 2.5rem;
-    margin-top: 20px;
-
-    @media (max-width: 768px) {
-        font-size: 2rem;
-    }
-`;
-
-const CenterLink = styled(Link)`
-    margin-top: 20px;
-    background-color: #87CEFA;
-    color: white;
-    padding: 15px 30px;
-    border: none;
-    border-radius: 5px;
-    font-size: 18px;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease-in-out;
-    text-decoration: none;
-
-    &:hover {
-        background-color: #4682B4;
-    }
-
-    @media (max-width: 768px) {
-        padding: 12px 24px;
-        font-size: 16px;
-    }
+  @media (max-width: 768px) {
+    object-fit: contain;
+  }
 `;

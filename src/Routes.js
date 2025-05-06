@@ -19,6 +19,7 @@ import RequireLogin from './utils/RequireLogin';
 import AdminPage from './Pages/AdminListPage';
 import DashBoardPage from './Pages/DashBoardPage';
 
+
 function MyRoutes() {
     useRestoreLoginFromCookie();
     return (
@@ -33,9 +34,15 @@ function MyRoutes() {
                 <Route path="/sign-complete" element={<CompleteSignPage />} />
     
                 {/* Login-required routes */}
+                <Route path="/dashboard" element={
+                    <RequireLogin><DashBoardPage /></RequireLogin>
+                } />
+            
+
                 <Route path="/tasksetup" element={
                     <RequireLogin><SetupTaskPage /></RequireLogin>
                 } />
+
                 <Route path="/request" element={
                     <RequireLogin><AddSignerPage /></RequireLogin>
                 } />
@@ -57,7 +64,8 @@ function MyRoutes() {
 
                 <Route path="/dashboard" element={
                     <RequireLogin><DashBoardPage /></RequireLogin>
-                } />
+                 } />
+
                 <Route path="/check-task/:documentId" element={
                     <RequireLogin><CheckTaskPage /></RequireLogin>
 
