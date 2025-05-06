@@ -310,8 +310,9 @@ const ReceivedDocuments = () => {
                                                             });
                                                     }
                                                 }}
+                                                style={{ color: "#000000", display: "flex", alignItems: "center" }}
                                             >
-                                                <DeleteIcon fontSize="small" style={{marginRight: "6px"}}/>
+                                                <DeleteIcon fontSize="small" style={{ marginRight: "6px" }} />
                                                 삭제
                                             </Dropdown.Item>
                                         </Dropdown.Menu>
@@ -324,7 +325,8 @@ const ReceivedDocuments = () => {
                                         position: "absolute",
                                         bottom: "12px",
                                         right: "12px"
-                                    }}><Link to={`/detail/${doc.id}`} style={{
+                                    }}>
+                                        <Link to={`/detail/${doc.id}`} style={{
                                         display: "flex", alignItems: "center", padding: "5px 10px",
                                         border: "1px solid #ccc", borderRadius: "5px",
                                         textDecoration: "none", color: "black"

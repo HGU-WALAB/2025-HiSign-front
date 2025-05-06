@@ -8,12 +8,13 @@ import { Pagination } from "@mui/material";
 import moment from 'moment';
 import React, { useEffect, useState } from "react";
 import { Dropdown } from "react-bootstrap";
-import { CSVLink } from "react-csv";
 import { Link, useNavigate } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { PageContainer } from "../components/PageContainer";
 import { loginMemberState } from "../recoil/atom/loginMemberState";
 import ApiService from "../utils/ApiService";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 import { downloadPDF, downloadZip } from "../utils/DownloadUtils";
 
 const AdminDocuments = () => {
@@ -32,14 +33,12 @@ const AdminDocuments = () => {
     const [selectedDocs, setSelectedDocs] = useState([]);
     const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 1024);
 
-
     useEffect(() => {
         const handleResize = () => setIsMobileView(window.innerWidth <= 1200);
         window.addEventListener("resize", handleResize);
         return () => window.removeEventListener("resize", handleResize);
     }, []);
 
-    //권한 체크 및 리디렉션
     useEffect(() => {
         if (!loginMember) return;
 
@@ -50,7 +49,6 @@ const AdminDocuments = () => {
         }
     }, [loginMember, navigate]);
 
-    //문서 불러오기
     useEffect(() => {
         if (!loginMember || loginMember.role?.trim().toUpperCase() !== "ROLE_ADMIN") return;
 
@@ -80,13 +78,13 @@ const AdminDocuments = () => {
 
     const getStatusStyle = (status) => {
         const statusStyles = {
-            0: { backgroundColor: "#5ec9f3", color: "#fff" },  // 서명중
-            1: { backgroundColor: "#2ecc71", color: "#fff" },  // 완료
-            2: { backgroundColor: "#f5a623", color: "#fff" },  // 반려(선생님)
-            3: { backgroundColor: "#f0625d", color: "#fff" },  // 취소
-            4: { backgroundColor: "#555555", color: "#fff" },  // 만료
-            6: { backgroundColor: "#f78b2d", color: "#fff" },  // 반려(교수님)
-            7: { backgroundColor: "#b6c3f2", color: "#fff" },  // 검토중
+            0: { backgroundColor: "#5ec9f3", color: "#fff" },
+            1: { backgroundColor: "#2ecc71", color: "#fff" },
+            2: { backgroundColor: "#f5a623", color: "#fff" },
+            3: { backgroundColor: "#f0625d", color: "#fff" },
+            4: { backgroundColor: "#555555", color: "#fff" },
+            6: { backgroundColor: "#f78b2d", color: "#fff" },
+            7: { backgroundColor: "#b6c3f2", color: "#fff" },
         };
         return statusStyles[status] || { backgroundColor: "#ccc", color: "#000" };
     };
@@ -134,7 +132,6 @@ const AdminDocuments = () => {
             return 0;
         });
 
-    // 체크박스
     const toggleSelectDoc = (doc) => {
         setSelectedDocs(prev =>
             prev.some(d => d.id === doc.id)
@@ -142,25 +139,8 @@ const AdminDocuments = () => {
                 : [...prev, doc]
         );
     };
-// csv 저장 장보
-    const csvHeaders = [
-        { label: "문서명", key: "requestName" },
-        { label: "상태", key: "status" },
-        { label: "생성일", key: "createdAt" },
-        { label: "만료일", key: "expiredAt" },
-        { label: "요청자", key: "requesterName" }
-    ];
-
-    const csvData = selectedDocs.map(doc => ({
-        requestName: doc.requestName,
-        status: getStatusLabel(doc.status),
-        createdAt: moment(doc.createdAt).format("YYYY-MM-DD HH:mm"),
-        expiredAt: moment(doc.expiredAt).format("YYYY-MM-DD HH:mm"),
-        requesterName: doc.requesterName || "알 수 없음"
-    }));
 
     const areAllSelected = selectedDocs.length === filteredDocuments.length && filteredDocuments.length > 0;
-    //전체 문서 멀티 박스 선택 로직
     const toggleSelectAllDocs = () => {
         if (areAllSelected) {
             setSelectedDocs([]);
@@ -168,8 +148,26 @@ const AdminDocuments = () => {
             setSelectedDocs(filteredDocuments);
         }
     };
-    //다운로드 버튼 비활성화 로직
+
     const isDownloadable = selectedDocs.length > 0 && selectedDocs.every(doc => doc.status === 1);
+
+    const handleExcelDownload = () => {
+        const worksheetData = selectedDocs.map(doc => ({
+            문서명: doc.requestName,
+            상태: getStatusLabel(doc.status),
+            요청생성일: moment(doc.createdAt).format("YYYY-MM-DD HH:mm"),
+            요청만료일: moment(doc.expiredAt).format("YYYY-MM-DD HH:mm"),
+            요청자: doc.requesterName || "알 수 없음"
+        }));
+
+        const worksheet = XLSX.utils.json_to_sheet(worksheetData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "문서 목록");
+
+        const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+        const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
+        saveAs(blob, "Ta근무일지.xlsx");
+    };
 
     return (
         <PageContainer>
@@ -267,29 +265,22 @@ const AdminDocuments = () => {
                         <option value="7">검토중</option>
                     </select>
                 </div>
-                <CSVLink
-                    data={csvData}
-                    headers={csvHeaders}
-                    filename="Ta근무일지.csv"
-                    onClick={(e) => {
-                        if (selectedDocs.length === 0) {
-                        e.preventDefault(); // ✅ 클릭 무시
-                        }
-                    }}
+
+                <button
+                    onClick={handleExcelDownload}
                     style={{
                         padding: "6px 10px",
-                        backgroundColor: selectedDocs.length === 0 ? "#ccc" : "#007bff",
+                        backgroundColor: "#28a745",
                         color: "#fff",
                         borderRadius: "4px",
-                        textDecoration: "none",
-                        fontSize: "14px",
-                        pointerEvents: selectedDocs.length === 0 ? "none" : "auto", // ✅ 클릭 막기
-                        cursor: selectedDocs.length === 0 ? "not-allowed" : "pointer",
+                        border: "none",
+                        fontSize: "13px",
+                        cursor: "pointer"
                     }}
-                    >
-                    CSV 다운로드
-                </CSVLink>
-                
+                >
+                    엑셀 다운로드
+                </button>
+
                 <button
                     onClick={() => downloadZip(selectedDocs.map(doc => doc.id))}
                     disabled={!isDownloadable}
@@ -320,6 +311,7 @@ const AdminDocuments = () => {
                     </button>
                 </div>
             </div>
+
             <div style={{
                 maxWidth: "85%",
                 margin: "0 auto",
@@ -379,6 +371,7 @@ const AdminDocuments = () => {
                                 <div style={{marginTop: "4px"}}>요청자: {doc.requesterName || "알 수 없음"}</div>
                             </div>
 
+
                             <div style={{
                                 display: 'flex',
                                 flexDirection: 'column',
@@ -387,26 +380,35 @@ const AdminDocuments = () => {
                                 bottom: '12px',
                                 right: '12px'
                             }}>
-                                <button
-                                    onClick={() => navigate(`/check-task/${doc.id}`)}
-                                    disabled={doc.status !== 7}
-                                    style={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        gap: "6px",
-                                        padding: "5px 10px",
-                                        border: "1px solid #ccc",
-                                        borderRadius: "5px",
-                                        backgroundColor: "transparent",
-                                        color: doc.status === 7 ? "#007bff" : "#aaa",
-                                        fontSize: "13px",
-                                        fontWeight: 500,
-                                        cursor: doc.status === 7 ? "pointer" : "not-allowed"
-                                    }}
-                                >
-                                    <SearchIcon fontSize="small" style={{marginRight: "4px"}}/>
-                                    검토
-                                </button>
+                                <div style={{
+                                    display: "flex",
+                                    justifyContent: "flex-end",
+                                    marginTop: "8px",
+                                    gap: "6px"
+                                }}>
+                                    <button
+                                        onClick={() => navigate(`/check-task/${doc.id}`)}
+                                        disabled={doc.status !== 7}
+                                        style={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            gap: "4px",
+                                            padding: "4px 8px",
+                                            border: "1px solid #ccc",
+                                            borderRadius: "4px",
+                                            backgroundColor: doc.status === 7 ? "#007bff" : "transparent",
+                                            color: doc.status === 7 ? "#fff" : "#aaa",
+                                            fontSize: "14.5px",
+                                            fontWeight: "bold",
+                                            cursor: doc.status === 7 ? "pointer" : "not-allowed",
+                                            minWidth: "60px",
+                                            maxWidth: "80px"
+                                        }}
+                                    >
+                                        <SearchIcon fontSize="small"/>
+                                        검토
+                                    </button>
+                                </div>
                                 {window.innerWidth <= 1200 ? (
                                     <Dropdown>
                                         <Dropdown.Toggle
@@ -427,11 +429,31 @@ const AdminDocuments = () => {
                                         </Dropdown.Toggle>
                                         <Dropdown.Menu>
                                             <Dropdown.Item as={Link} to={`/detail/${doc.id}`}>
-                                                <FindInPageIcon fontSize="small" style={{marginRight: "6px"}}/>문서 보기
+                                                <FindInPageIcon fontSize="small"
+                                                                style={{marginRight: "6px", color: "#000000"}}/>문서 보기
                                             </Dropdown.Item>
                                             <Dropdown.Item onClick={() => downloadPDF(doc.id)}
-                                                           disabled={doc.status !== 1}><DownloadIcon/> 다운로드</Dropdown.Item>
-                                            <Dropdown.Item disabled><DeleteIcon/> 삭제</Dropdown.Item>
+                                                           disabled={doc.status !== 1}><DownloadIcon/> 다운로드
+                                            </Dropdown.Item>
+                                            <Dropdown.Item
+                                                onClick={() => {
+                                                    if (window.confirm("정말 이 문서를 삭제하시겠습니까?")) {
+                                                        ApiService.deleteDocument(doc.id)
+                                                            .then(() => {
+                                                                alert("문서가 삭제되었습니다.");
+                                                                setDocuments(prevDocs => prevDocs.filter(d => d.id !== doc.id));
+                                                            })
+                                                            .catch((err) => {
+                                                                console.error("문서 삭제 실패:", err);
+                                                                alert("문서 삭제에 실패했습니다.");
+                                                            });
+                                                    }
+                                                }}
+                                                style={{color: "#000000", display: "flex", alignItems: "center"}}
+                                            >
+                                                <DeleteIcon fontSize="small" style={{marginRight: "6px"}}/>
+                                                삭제
+                                            </Dropdown.Item>
                                         </Dropdown.Menu>
                                     </Dropdown>
                                 ) : (
@@ -455,27 +477,47 @@ const AdminDocuments = () => {
                                                 borderRadius: "5px",
                                                 textDecoration: "none",
                                                 backgroundColor:
-                                                (doc.status !== 1)
-                                                    ? "transparent"
-                                                    : "white",
+                                                    (doc.status !== 1)
+                                                        ? "transparent"
+                                                        : "white",
                                                 color:
-                                                (doc.status !== 1)
-                                                    ? "#aaa"
-                                                    : "black",
+                                                    (doc.status !== 1)
+                                                        ? "#aaa"
+                                                        : "black",
                                                 cursor:
-                                                (doc.status !== 1)
-                                                    ? "not-allowed"
-                                                    : "pointer"
+                                                    (doc.status !== 1)
+                                                        ? "not-allowed"
+                                                        : "pointer"
                                             }}
-                                            >
+                                        >
                                             <DownloadIcon fontSize="small" style={{marginRight: "6px"}}/>
                                             다운로드
                                         </button>
-                                        <button disabled style={{
-                                            display: "flex", alignItems: "center", padding: "5px 10px",
-                                            border: "1px solid #ccc", borderRadius: "5px",
-                                            backgroundColor: "transparent", color: "#aaa"
-                                        }}>
+                                        <button
+                                            onClick={() => {
+                                                if (window.confirm("정말 이 문서를 삭제하시겠습니까?")) {
+                                                    ApiService.deleteDocument(doc.id)
+                                                        .then(() => {
+                                                            alert("문서가 삭제되었습니다.");
+                                                            setDocuments(prevDocs => prevDocs.filter(d => d.id !== doc.id));
+                                                        })
+                                                        .catch((err) => {
+                                                            console.error("문서 삭제 실패:", err);
+                                                            alert("문서 삭제에 실패했습니다.");
+                                                        });
+                                                }
+                                            }}
+                                            style={{
+                                                display: "flex",
+                                                alignItems: "center",
+                                                padding: "5px 10px",
+                                                border: "1px solid #ccc",
+                                                borderRadius: "5px",
+                                                backgroundColor: "transparent",
+                                                color: "#dc3545",
+                                                cursor: "pointer"
+                                            }}
+                                        >
                                             <DeleteIcon fontSize="small" style={{marginRight: "6px"}}/>
                                             삭제
                                         </button>
@@ -531,3 +573,5 @@ const AdminDocuments = () => {
 };
 
 export default AdminDocuments;
+
+
