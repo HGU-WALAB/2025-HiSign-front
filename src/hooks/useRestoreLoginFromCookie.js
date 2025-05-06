@@ -12,7 +12,7 @@ const useRestoreLoginFromCookie = () => {
       try {
         const response = await ApiService.fetchMyInfo(); // 예: GET /auth/me
         const user = response.data;
-        ////console.log("✅ 로그인 정보 복원 성공:", user);
+        //console.log("✅ 로그인 정보 복원 성공:", user);
 
         setLoginState({
           uniqueId: user.uniqueId,
@@ -22,7 +22,7 @@ const useRestoreLoginFromCookie = () => {
           isLoading: false, // 🔽 복원 완료
         });
 
-        ////console.log("✅ 로그인 정보 복원 성공:", user);
+        //console.log("✅ 로그인 정보 복원 성공:", user);
       } catch (error) {
         //console.log("🚫 로그인 정보 복원 실패 (비로그인 상태일 수 있음):", error);
         setLoginState(prev => ({
