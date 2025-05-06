@@ -5,12 +5,24 @@ import { BeatLoader } from "react-spinners";
 import { useRecoilValue } from 'recoil';
 import { taskState } from '../../recoil/atom/taskState';
 
-const CompleteModal = ({ open, onClose, onConfirm, loading }) => {
+const CompleteModal = ({ open, onClose, onConfirm, loading, type}) => {
   const document = useRecoilValue(taskState);
 
   const handleConfirm = async () => {
     await onConfirm(); // 상위에서 비동기 처리, 로딩은 상위가 관리
   };
+
+  const confirmMessage =
+    type === "sign"
+      ? "서명을 완료하시겠습니까?"
+      : document.type === 1
+        ? "검토 요청을 보내시겠습니까?"
+        : "요청을 완료하시겠습니까?";
+
+  const warningText =
+    type === "sign"
+      ? "*서명을 완료하시면 취소는 불가합니다."
+      : "*요청을 보내시면 수정이 불가합니다.";
 
   return (
     <>
@@ -33,7 +45,7 @@ const CompleteModal = ({ open, onClose, onConfirm, loading }) => {
           }}
         >
           {/* 근무일지 안내 (type 1일 때) */}
-          {document.type === 1 && (
+          {document.type === 1 && type !== "complete" && (
             <>
               <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 'bold' }}>
                 📝 근무일지 작성 시 확인사항
@@ -47,14 +59,14 @@ const CompleteModal = ({ open, onClose, onConfirm, loading }) => {
             </>
           )}
 
-          {/* 공통 경고 문구 */}
-          <Typography variant="caption" sx={{ color: 'red', display: 'block', mb: 1 }}>
-            *요청을 보내시면 수정이 불가합니다.
-          </Typography>
-
           {/* 확인 질문 */}
           <Typography variant="h6" component="h2" sx={{ mb: 2 }}>
-            {document.type === 1 ? "검토 요청을 보내시겠습니까?" : "요청을 완료하시겠습니까?"}
+            {confirmMessage}
+          </Typography>
+
+          {/* 공통 경고 문구 */}
+          <Typography variant="caption" sx={{ color: 'red', display: 'block', mb: 1 }}>
+            {warningText}
           </Typography>
 
           {/* 버튼 */}

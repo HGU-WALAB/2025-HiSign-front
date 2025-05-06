@@ -4,8 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import ButtonBase from "../components/ButtonBase";
+import ConfirmModal from "../components/ConfirmModal";
 import PDFViewer from "../components/SignPage/PDFViewer";
-import SignatureOverlay from "../components/SignPage/SignatureOverlay";
 import { signingState } from "../recoil/atom/signingState";
 import ApiService from "../utils/ApiService";
 
@@ -15,9 +15,24 @@ function SignPage() {
   const navigate = useNavigate();
   const [selectedSavedSignature, setSelectedSavedSignature] = useState(null);
   const [signaturesByPage, setSignaturesByPage] = useState({});
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [pdfScale, setPdfScale] = useState(1);
+  
+  // 특정 페이지로 이동하는 함수
+  const navigateToPage = (pageNumber) => {
+  setCurrentPage(pageNumber);
+  };
 
-  const navigateToPage = (pageNumber) => setCurrentPage(pageNumber);
+  const handleOpenModal = () => {
+    setOpen(true);
+  };
+  
+  const handleCloseModal = () => {
+    setOpen(false);
+  };
 
+  // 서명 필드가 변경될 때마다 페이지별로 그룹화
   useEffect(() => {
     if (signing.signatureFields?.length) {
       const grouped = {};
@@ -65,6 +80,8 @@ function SignPage() {
     }
 
     let fileName = null;
+    setLoading(true);
+
     try {
       const imageField = signing.signatureFields.find(f => f.type === 0 && f.image);
       if (imageField) {
@@ -86,11 +103,15 @@ function SignPage() {
         })),
       });
 
-      alert("서명이 완료되었습니다!");
-      navigate("/sign-complete");
-    } catch (err) {
-      console.error("서명 오류:", err);
-      alert(`서명 중 오류 발생: ${err.message}`);
+    alert("서명이 성공적으로 완료되었습니다!");
+
+    navigate("/sign-complete");
+    } catch (error) {
+      console.error("❌ 서명 처리 실패:", error);
+      alert(`서명 처리 중 오류가 발생했습니다: ${error.message}`);
+    } finally {
+      setLoading(false);
+      setOpen(false);
     }
   };
 
@@ -146,11 +167,23 @@ function SignPage() {
       <RightContainer>
         <DocumentSection>
           <DocumentContainer>
-            <PDFViewer pdfUrl={signing.fileUrl} setCurrentPage={setCurrentPage} />
-            <SignatureOverlay currentPage={currentPage} />
+            <PDFViewer
+                pdfUrl={signing.fileUrl}
+                setCurrentPage={setCurrentPage}
+                onScaleChange={setPdfScale}
+                type="sign"
+              />
           </DocumentContainer>
         </DocumentSection>
       </RightContainer>
+      <ConfirmModal
+        open={open}
+        loading={loading}
+        onClose={handleCloseModal}
+        onConfirm={handleSubmitSignature}
+        title="서명 완료"
+        message="서명을 완료하시겠습니까? 완료 후에는 수정할 수 없습니다."
+      />
     </MainContainer>
   );
 }

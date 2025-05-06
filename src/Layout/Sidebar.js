@@ -72,7 +72,6 @@ function Sidebar() {
           ☰
         </button>
       )}
-
       <aside
         className="sidebar"
         style={{
@@ -137,6 +136,7 @@ function Sidebar() {
                 </div>
               )}
               <div className="fw-bold text-dark">{fullName + "님"}</div>
+
               <div
                 onClick={handleProfileClick}
                 style={{
@@ -153,6 +153,10 @@ function Sidebar() {
                   transition: "background-color 0.2s",
                 }}
               >
+              {loginMember.role?.trim().toUpperCase() === "ROLE_ADMIN" && (
+                  <div className="fw-bold text-dark">{"(관리자)"}</div>
+              )}
+              <ProfileCircle onClick={handleProfileClick}>
                 {firstChar}
               </div>
             </div>
@@ -187,6 +191,15 @@ function Sidebar() {
               />
               
             </nav>
+              {loginMember.role?.trim().toUpperCase() === "ROLE_ADMIN" && (
+                  <NavItem
+                      to="/admin-document"
+                      $active={currentPath === "/admin-list"}
+                  >
+                    관리자 페이지
+                  </NavItem>
+              )}
+            </Nav>
           )}
         </div>
 

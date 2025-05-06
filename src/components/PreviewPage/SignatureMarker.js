@@ -2,7 +2,7 @@
 import { useRecoilState } from "recoil";
 import { signingState } from "../../recoil/atom/signingState";
 
-const SignatureMarker = ({ currentPage }) => {
+const SignatureMarker = ({ currentPage,scale }) => {
   const [signing] = useRecoilState(signingState);
   if (!Array.isArray(signing.signatureFields)) {
     return null;  // ✅ 필드가 배열이 아니면 아무것도 렌더링하지 않음
@@ -16,10 +16,10 @@ const SignatureMarker = ({ currentPage }) => {
             key={index}
             style={{
               position: "absolute",
-              left: field.position.x,
-              top: field.position.y,
-              width: field.width,
-              height: field.height,
+              left: field.position.x* scale,
+              top: field.position.y* scale,
+              width: field.width* scale,
+              height: field.height* scale,
               border: "2px dashed rgba(236, 36, 36, 0.8)", // ✅ 부드러운 점선 테두리
               borderRadius: "8px", // ✅ 둥근 모서리 적용
               backgroundColor: "rgba(201, 106, 106, 0.3)", // ✅ 투명한 회색 배경

@@ -1,19 +1,20 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { Dropdown } from "react-bootstrap";
-import { Modal, Box, Typography, Button, Pagination } from "@mui/material";
-import { PageContainer } from "../components/PageContainer";
-import CancelModal from "../components/ListPage/CancelModal";
-import ApiService from "../utils/ApiService";
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DownloadIcon from '@mui/icons-material/Download';
-import ViewListIcon from "@mui/icons-material/ViewList";
-import FindInPageIcon from '@mui/icons-material/FindInPage';
-import ViewModuleIcon from "@mui/icons-material/ViewModule";
-import moment from "moment/moment";
-import styled from "styled-components"; 
 import DrawIcon from '@mui/icons-material/Draw';
+import FindInPageIcon from '@mui/icons-material/FindInPage';
+import ViewListIcon from "@mui/icons-material/ViewList";
+import ViewModuleIcon from "@mui/icons-material/ViewModule";
+import { Box, Button, Modal, Pagination, Typography } from "@mui/material";
+import moment from "moment/moment";
+import React, { useEffect, useState } from "react";
+import { Dropdown } from "react-bootstrap";
+import { Link } from "react-router-dom";
+import styled from "styled-components";
+import CancelModal from "../components/ListPage/CancelModal";
+import { PageContainer } from "../components/PageContainer";
+import ApiService from "../utils/ApiService";
+import { downloadPDF } from "../utils/DownloadUtils";
 
 
 const RequestedDocuments = () => {
@@ -27,10 +28,13 @@ const RequestedDocuments = () => {
     const [signers, setSigners] = useState([]);
     const [showSignersModal, setShowSignersModal] = useState(false);
     const [viewMode, setViewMode] = useState("list");
-
     const [signerCounts, setSignerCounts] = useState({});
 
+
     const [searchQuery, setSearchQuery] = useState("");
+    const [createdSortOrder, setCreatedSortOrder] = useState('desc');
+    const [expiredSortOrder, setExpiredSortOrder] = useState(null);
+    const [statusFilter, setStatusFilter] = useState('all');
 
     useEffect(() => {
         ApiService.fetchDocuments("requested")
@@ -57,8 +61,6 @@ const RequestedDocuments = () => {
                     }
                 }));
 
-                console.log("signerCounts:", counts); // 값을 확인
-
                 setSignerCounts(counts);
             })
             .catch((error) => {
@@ -66,34 +68,55 @@ const RequestedDocuments = () => {
             });
     }, []);
 
-
     const handleCancelClick = (doc) => {
         setSelectedDocument(doc);
         setCancelReason("");
         setShowModal(true);
     };
 
-    const getStatusClass = (status) => {
-        const statusClasses = {
-            0: "label label-info",
-            1: "label label-success",
-            2: "label label-danger",
-            3: "label label-warning",
-            4: "label label-default",
-        };
-        return statusClasses[status] || "badge bg-secondary";
-    };
-
     const getStatusLabel = (status) => {
         const statusLabels = {
             0: "서명중",
             1: "완료",
-            2: "거절",
+            2: "반려",
             3: "취소",
             4: "만료",
+            6: "반려",
+            7: "검토중",
         };
         return statusLabels[status] || "알 수 없음";
     };
+
+    const getStatusStyle = (status) => {
+        const statusStyles = {
+            0: { backgroundColor: "#5ec9f3", color: "#fff" },  // 서명중
+            1: { backgroundColor: "#2ecc71", color: "#fff" },  // 완료
+            2: { backgroundColor: "#f5a623", color: "#fff" },  // 반려(선생님)
+            3: { backgroundColor: "#f0625d", color: "#fff" },  // 취소
+            4: { backgroundColor: "#555555", color: "#fff" },  // 만료
+            6: { backgroundColor: "#f78b2d", color: "#fff" },  // 반려(교수님)
+            7: { backgroundColor: "#b6c3f2", color: "#fff" },  // 검토중
+        };
+        return statusStyles[status] || { backgroundColor: "#ccc", color: "#000" };
+    };
+
+    const StatusBadge = ({ status }) => {
+        const label = getStatusLabel(status);
+        const style = {
+            ...getStatusStyle(status),
+            borderRadius: "12px",
+            padding: "2px 10px",
+            fontSize: "13px",
+            fontWeight: 600,
+            display: "inline-block",
+            whiteSpace: "nowrap",
+            minWidth: "50px",
+            textAlign: "center",
+        };
+        return <span style={style}>{label}</span>;
+    };
+
+
 
     const handleConfirmCancel = () => {
         if (!cancelReason.trim()) {
@@ -132,16 +155,28 @@ const RequestedDocuments = () => {
 
     const handleSearchChange = (event) => {
         setSearchQuery(event.target.value);
+        setCurrentPage(1);
     };
 
-    const filteredDocuments = documents.filter(doc =>
-        doc.requestName.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filteredDocuments = documents
+        .filter(doc => doc.requestName.toLowerCase().includes(searchQuery.toLowerCase()))
+        .filter((doc) => {
+            if (statusFilter === "all") return true;
+            if (statusFilter === "rejected") return doc.status === 2 || doc.status === 6;
+            return String(doc.status) === statusFilter;
+        })
+        .sort((a, b) => {
+            if (createdSortOrder) {
+                const result = new Date(b.createdAt) - new Date(a.createdAt);
+                return createdSortOrder === 'desc' ? result : -result;
+            } else if (expiredSortOrder) {
+                const result = new Date(b.expiredAt) - new Date(a.expiredAt);
+                return expiredSortOrder === 'desc' ? result : -result;
+            }
+            return 0;
+        });
 
-    const paginatedDocuments = filteredDocuments.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
-    );
+    const paginatedDocuments = filteredDocuments.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
     return (
         <PageContainer>
@@ -155,26 +190,79 @@ const RequestedDocuments = () => {
                 내 작업
             </h1>
 
+            {error && <p style={{color: "red", textAlign: "center"}}>{error}</p>}
 
-            <div style={{display: "flex", justifyContent: "flex-end", marginRight: "8%", marginBottom: "10px"}}>
-                {/*<TuneIcon style={{color:"gray"}}/>*/}
-                <div style={{textAlign: "center", marginTop: "0.5rem"}}>
-                    <input
-                        type="text"
-                        placeholder="작업명 검색"
-                        value={searchQuery}
-                        onChange={handleSearchChange}
-                        style={{padding: "0.1rem", width: "9rem"}}
-                    />
+
+            <div style={{
+                display: "flex", justifyContent: "space-between", flexWrap: "wrap",
+                maxWidth: "85%", margin: "0 auto 10px auto", padding: "0 8px", gap: "8px"
+            }}>
+                <div style={{display: "flex", gap: "6px", flex: "1 1 0"}}>
+                    <select value={createdSortOrder || ''} onChange={(e) => {
+                        setCreatedSortOrder(e.target.value);
+                        setExpiredSortOrder(null);
+                    }} style={{minWidth: "80px", height: "32px", cursor: "pointer", border: "none"}}>
+                        <option value="">생성일</option>
+                        <option value="desc">최신순</option>
+                        <option value="asc">오래된순</option>
+                    </select>
+
+                    <select value={expiredSortOrder || ''} onChange={(e) => {
+                        setExpiredSortOrder(e.target.value);
+                        setCreatedSortOrder(null);
+                    }} style={{minWidth: "80px", height: "32px", cursor: "pointer", border: "none"}}>
+                        <option value="">만료일</option>
+                        <option value="desc">최신순</option>
+                        <option value="asc">오래된순</option>
+                    </select>
+
+                    <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
+                            style={{
+                                padding: "4px 8px",
+                                border: "none",
+                                background: "transparent",
+                                outline: "none",
+                                fontSize: "14px",
+                                minWidth: "80px",
+                                height: "32px",
+                                cursor: "pointer",
+                            }}
+                    >
+                        <option value="all">문서 상태</option>
+                        <option value="0">서명중</option>
+                        <option value="1">완료</option>
+                        <option value="rejected">반려</option>
+                        <option value="3">취소</option>
+                        <option value="4">만료</option>
+                        <option value="7">검토중</option>
+                    </select>
                 </div>
-                <button onClick={() => setViewMode("list")}
-                        style={{background: "none", border: "none", cursor: "pointer"}}>
-                    <ViewListIcon color={viewMode === "list" ? "primary" : "disabled"}/>
-                </button>
-                <button onClick={() => setViewMode("grid")}
-                        style={{background: "none", border: "none", cursor: "pointer"}}>
-                    <ViewModuleIcon color={viewMode === "grid" ? "primary" : "disabled"}/>
-                </button>
+                <div style={{display: "flex", alignItems: "center", gap: "6px", flexShrink: 0}}>
+                    <input type="text" placeholder="작업명 검색" value={searchQuery} onChange={handleSearchChange}
+                           style={{
+                               padding: "0.1rem",
+                               width: "9rem"
+                           }}
+                    />
+                    <button onClick={() => setViewMode("list")}
+                            style={{
+                                background: "none",
+                                border: "none",
+                                cursor: "pointer"
+                            }}
+                    >
+                        <ViewListIcon color={viewMode === "list" ? "primary" : "disabled"}/>
+                    </button>
+                    <button onClick={() => setViewMode("grid")}
+                            style={{
+                                background: "none",
+                                border: "none",
+                                cursor: "pointer"
+                            }}
+                    >
+                        <ViewModuleIcon color={viewMode === "grid" ? "primary" : "disabled"}/>
+                    </button>
+                </div>
             </div>
 
             {error && <p style={{color: "red", textAlign: "center"}}>{error}</p>}
@@ -201,7 +289,12 @@ const RequestedDocuments = () => {
                             alignItems: "center"
                         }}>
                             <div style={{flex: 1}}>
-                                <div style={{fontSize: "16px", fontWeight: "bold", display: "flex", alignItems: "center"}}>
+                                <div style={{
+                                    fontSize: "16px",
+                                    fontWeight: "bold",
+                                    display: "flex",
+                                    alignItems: "center"
+                                }}>
                                     {doc.requestName}
                                     <button
                                         onClick={() => handleSearchClick(doc.id)}
@@ -219,7 +312,7 @@ const RequestedDocuments = () => {
                                     </button>
                                 </div>
                                 <div style={{marginTop: "6px"}}>
-                                    상태: <span className={getStatusClass(doc.status)}>{getStatusLabel(doc.status)}</span>
+                                    상태: <StatusBadge status={doc.status}/>
                                 </div>
                                 <div style={{marginTop: "4px"}}>
                                     생성일: {moment(doc.createdAt).format('YYYY/MM/DD')}
@@ -234,7 +327,7 @@ const RequestedDocuments = () => {
 
                             <div>
                                 <Dropdown>
-                                    <Dropdown.Toggle variant="light" style={{
+                                <Dropdown.Toggle variant="light" style={{
                                         padding: "5px 10px",
                                         borderRadius: "5px",
                                         fontWeight: "bold",
@@ -244,14 +337,16 @@ const RequestedDocuments = () => {
                                     </Dropdown.Toggle>
                                     <Dropdown.Menu>
                                         <Dropdown.Item as={Link} to={`/detail/${doc.id}`}>
-                                            <FindInPageIcon fontSize="small" style={{marginRight: "6px"}} />
+                                            <FindInPageIcon fontSize="small" style={{marginRight: "6px"}}/>
                                             문서 보기
                                         </Dropdown.Item>
-                                        <Dropdown.Item disabled><DownloadIcon /> 다운로드</Dropdown.Item>
-                                        <Dropdown.Item onClick={() => handleCancelClick(doc)} disabled={doc.status !== 0}>
-                                            <CloseIcon /> 요청 취소
+                                        <Dropdown.Item onClick={() => downloadPDF(doc.id)}
+                                                       disabled={doc.status !== 1}><DownloadIcon/> 다운로드</Dropdown.Item>
+                                        <Dropdown.Item onClick={() => handleCancelClick(doc)}
+                                                       disabled={doc.status !== 0}>
+                                            <CloseIcon/> 요청 취소
                                         </Dropdown.Item>
-                                        <Dropdown.Item disabled><DeleteIcon /> 삭제</Dropdown.Item>
+                                        <Dropdown.Item disabled><DeleteIcon/> 삭제</Dropdown.Item>
                                     </Dropdown.Menu>
                                 </Dropdown>
                             </div>
@@ -281,7 +376,8 @@ const RequestedDocuments = () => {
                         }}>
                             <div>
                                 <div style={{marginBottom: "8px", fontWeight: "bold"}}>{doc.requestName}</div>
-                                <div><span className={getStatusClass(doc.status)}>{getStatusLabel(doc.status)}</span>
+                                <div>
+                                    <StatusBadge status={doc.status}/>
                                 </div>
                                 <div style={{margin: "6px 0"}}><strong>파일명:</strong> <Link
                                     to={`/detail/${doc.id}`}>{doc.fileName}</Link></div>
@@ -301,7 +397,7 @@ const RequestedDocuments = () => {
             )}
 
             <CancelModal isVisible={showModal} onClose={() => setShowModal(false)} onConfirm={handleConfirmCancel}
-                         cancelReason={cancelReason} setCancelReason={setCancelReason}/>
+                        cancelReason={cancelReason} setCancelReason={setCancelReason}/>
 
             <Modal open={showSignersModal} onClose={() => setShowSignersModal(false)}>
 
@@ -345,22 +441,22 @@ const RequestedDocuments = () => {
             </Modal>
             {viewMode === "list" && (
                 <div style={{display: "flex", justifyContent: "center", marginTop: "20px"}}>
-                    <Pagination count={Math.ceil(filteredDocuments.length / itemsPerPage)} color="default" page={currentPage}
+                    <Pagination count={Math.ceil(filteredDocuments.length / itemsPerPage)} color="default"
+                                page={currentPage}
                                 onChange={handlePageChange}/>
                 </div>
             )}
 
-<FloatingCenterLink to="/tasksetup">
-        <DrawIcon style={{ fontSize: "32px" }} />
-      </FloatingCenterLink>
-      
+            <FloatingCenterLink to="/tasksetup">
+                <DrawIcon style={{fontSize: "32px"}}/>
+            </FloatingCenterLink>
+
         </PageContainer>
 
     );
 };
 
 export default RequestedDocuments;
-
 
 const FloatingCenterLink = styled(Link)`
     position: fixed;

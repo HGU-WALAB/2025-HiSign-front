@@ -4,8 +4,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import ButtonBase from "../components/ButtonBase";
+import ConfirmModal from "../components/ConfirmModal";
 import RejectModal from "../components/ListPage/RejectModal";
-import SignatureMarker from "../components/PreviewPage/SignatureMarker";
 import PDFViewer from "../components/SignPage/PDFViewer";
 import { signingState } from "../recoil/atom/signingState";
 import ApiService from "../utils/ApiService";
@@ -21,8 +21,34 @@ const CheckTaskPage = () => {
   const navigate = useNavigate();
   const { documentId } = useParams();
   const [error, setError] = useState(null);
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [pdfScale, setPdfScale] = useState(1);
 
   useEffect(() => {
+    ApiService.fetchDocumentInfo(documentId)
+    .then(response => {
+      console.log("문서 정보:", response);
+      
+      // 🔥 여기 추가
+      if (response.data.status !== 7) {
+        setError("해당 문서는 검토가 필요한 상태가 아닙니다.");
+        return; // 나머지 코드 실행 중단
+      }
+
+      const partsTitle = response.data.requestName.split("_");
+      setUniqueId(partsTitle[3]);
+      setSigning((prevState) => ({
+        ...prevState,
+        requesterName: partsTitle[2],
+      }));
+      setSubject(partsTitle[0]);
+      setMonth(partsTitle[1]);
+    })
+    .catch(error => {
+      setError('문서 제목을 로드하는 중 오류가 발생했습니다: ' + error.message);
+    });
+
     ApiService.fetchDocument(documentId)
       .then(response => {
         const fileBlob = new Blob([response.data], { type: 'application/pdf' });
@@ -60,33 +86,29 @@ const CheckTaskPage = () => {
       .catch(error => {
         setError('서명자 정보를 로드하는 중 오류가 발생했습니다: ' + error.message);
       });
-
-      ApiService.fetchDocumentTitle(documentId)
-      .then(response => {
-        console.log("문서 제목:", response);
-        const partsTitle = response.split("_");
-        setUniqueId(partsTitle[3]);
-        setSigning((prevState) => ({
-          ...prevState,
-          requesterName: partsTitle[2],
-        }));
-        setSubject(partsTitle[0]);
-        setMonth(partsTitle[1]);
-      }).catch(error => {
-        setError('문서 제목을 로드하는 중 오류가 발생했습니다: ' + error.message);
-      });
   }, [documentId]);
 
-  const handleConfirm= () => {
-    ApiService.sendRequestMail(signing.documentId, signing.signerName)
-      .then(() => {
-        alert("서명 요청이 성공적으로 전송되었습니다.");
-        navigate("/");
-      })
-      .catch((error) => {
-        console.error("서명 요청 전송 중 오류 발생:", error);
-        alert("서명 요청 전송에 실패했습니다.");
-      });
+  const handleOpenModal = () => {
+    setOpen(true);
+  };
+  
+  const handleCloseModal = () => {
+    setOpen(false);
+  };
+
+  const handleConfirm= async  () => {
+    setLoading(true);
+    try {
+      await ApiService.sendRequestMail(signing.documentId, signing.signerName);
+      alert("서명 요청이 성공적으로 전송되었습니다.");
+      navigate("/");
+    } catch (error) {
+      console.error(error);
+      alert("서명 요청 전송에 실패했습니다.");
+    } finally {
+      setLoading(false);
+      setOpen(false);
+    }
   };
 
   const handleReject = () => {
@@ -100,7 +122,7 @@ const CheckTaskPage = () => {
       return;
     }
 
-    ApiService.rejectDocument(signing.documentId, rejectReason, signing.token, signing.signerEmail)
+    ApiService.rejectCheck(signing.documentId, rejectReason)
       .then(() => {
         alert("요청이 반려되었습니다.");
         setShowModal(false);
@@ -112,7 +134,16 @@ const CheckTaskPage = () => {
       });
   };
 
+  if (error) {
+    return (
+      <MainContainer>
+        <ErrorMessage>{error}</ErrorMessage>
+      </MainContainer>
+    );
+  }
+
   return (
+    
     <MainContainer>
       <ContentWrapper>
         <Sidebar>
@@ -141,7 +172,7 @@ const CheckTaskPage = () => {
 
           <ButtonContainer>
             <RejectButton onClick={handleReject}>요청 반려</RejectButton>
-            <NextButton onClick={handleConfirm}>요청 승인</NextButton>
+            <NextButton onClick={handleOpenModal}>요청 승인</NextButton>
           </ButtonContainer>
         </Sidebar>
 
@@ -151,8 +182,9 @@ const CheckTaskPage = () => {
               <PDFViewer
                 pdfUrl={signing.fileUrl}
                 setCurrentPage={setCurrentPage}
+                onScaleChange={setPdfScale}
+                type={"check"}
               />
-              <SignatureMarker currentPage={currentPage} />
             </DocumentContainer>
           ) : (
             <LoadingMessage>문서 및 서명 정보를 불러오는 중...</LoadingMessage>
@@ -166,6 +198,16 @@ const CheckTaskPage = () => {
         onConfirm={handleConfirmReject}
         rejectReason={rejectReason}
         setRejectReason={setRejectReason}
+        type={"return"}
+      />
+
+      <ConfirmModal
+        open={open}
+        loading={loading}
+        onClose={handleCloseModal}
+        onConfirm={handleConfirm}
+        title="요청 승인"
+        message="이 작업을 승인하시겠습니까?"
       />
     </MainContainer>
   );
@@ -227,7 +269,8 @@ const Value = styled.span`
 `;
 
 const DocumentContainer = styled.div`
-  max-width: 800px;
+  max-width: 70vw;
+  width: 100%;
   background-color: #f5f5f5;
   position: relative;
 `;
@@ -259,4 +302,19 @@ const RejectButton = styled(ButtonBase)`
   &:hover {
     background-color: rgb(179, 0, 0);
   }
+`;
+
+const ErrorMessage = styled.p`
+  color: #ff4d4f;
+  font-size: 16px;
+  font-weight: bold;
+  background-color: #fff3f3;
+  border: 1px solid #ff4d4f;
+  padding: 10px 15px;
+  border-radius: 5px;
+  text-align: center;
+  margin: 10px auto;
+  width: 80%;
+  max-width: 500px;
+  box-shadow: 0px 2px 8px rgba(255, 77, 79, 0.2);
 `;

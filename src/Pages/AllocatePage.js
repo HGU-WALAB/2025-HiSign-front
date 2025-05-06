@@ -119,7 +119,7 @@ const AllocatePage = () => {
                         onMouseLeave={() => setHoveredField(null)}
                       >
                         <SignatureBoxContainer color={signer.color || defaultColors[index % defaultColors.length]}>
-                          {signer.name} 서명
+                          {signer.name}
                           {hoveredField === box.id && (
                             <DeleteButton onClick={(e) => {
                               e.stopPropagation();

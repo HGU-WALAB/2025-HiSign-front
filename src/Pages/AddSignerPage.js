@@ -19,27 +19,30 @@ const AddSignerPage = () => {
   const document = useRecoilValue(taskState);
   const [signers, setSigners] = useRecoilState(signerState);
 
+  const [searchName, setSearchName] = useState("");        // 검색용
+  const [searchEmail, setSearchEmail] = useState("");      // 검색용
   const [newName, setNewName] = useState("");
   const [newEmailPrefix, setNewEmailPrefix] = useState("");
   const [newEmailDomain, setNewEmailDomain] = useState("@handong.ac.kr");
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const [activeList, setActiveList] = useState(false);
-  const [focusTarget, setFocusTarget] = useState("name");
+  const [focusTarget, setFocusTarget] = useState("name"); // "name" or "email"
+  const [showManualAddInputs, setShowManualAddInputs] = useState(false);
   const autocompleteRef = useRef(null);
 
   // 디바운싱
   const [debouncedName, setDebouncedName] = useState("");
   const [debouncedEmail, setDebouncedEmail] = useState("");
+  
+  useEffect(() => {
+    const handler = setTimeout(() => setDebouncedName(searchName), 300);
+    return () => clearTimeout(handler);
+  }, [searchName]);
 
   useEffect(() => {
-    const handler = setTimeout(() => setDebouncedName(newName), 300);
+    const handler = setTimeout(() => setDebouncedEmail(searchEmail), 300);
     return () => clearTimeout(handler);
-  }, [newName]);
-
-  useEffect(() => {
-    const handler = setTimeout(() => setDebouncedEmail(newEmailPrefix), 300);
-    return () => clearTimeout(handler);
-  }, [newEmailPrefix]);
+  }, [searchEmail]);
 
   // 쿼리 설정
   const { data: nameSearchResponse } = useQuery({
@@ -70,6 +73,11 @@ const AddSignerPage = () => {
         { name: signer.name, email: signer.email, signatureFields: [] },
       ]);
     }
+
+    setSearchName("");
+    setSearchEmail("");
+    setActiveList(false);
+    setHighlightedIndex(-1);
   };
 
   const handleKeyDown = (e) => {
@@ -124,13 +132,19 @@ const AddSignerPage = () => {
           <FileName>선택된 문서: {document.fileName}</FileName>
 
           <AddSignerSection>
-            <AddSignerTitle>서명자 추가하기</AddSignerTitle>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
+              <AddSignerTitle>서명자 검색하기</AddSignerTitle>
+              <AddButtonSmall onClick={() => setShowManualAddInputs(prev => !prev)}
+                active={showManualAddInputs}>
+                {showManualAddInputs ? "✕ 직접 추가 닫기" : "+ 서명자 직접 추가"}
+              </AddButtonSmall>
+            </div>
             <RowContainer ref={autocompleteRef}>
               <Input
-                placeholder="이름"
-                value={newName}
+                placeholder="이름 검색"
+                value={searchName}
                 onChange={(e) => {
-                  setNewName(e.target.value);
+                  setSearchName(e.target.value);
                   setFocusTarget("name");
                   setActiveList(true);
                 }}
@@ -139,10 +153,10 @@ const AddSignerPage = () => {
                 autoComplete="off"
               />
               <Input
-                placeholder="이메일"
-                value={newEmailPrefix}
+                placeholder="이메일 검색"
+                value={searchEmail}
                 onChange={(e) => {
-                  setNewEmailPrefix(e.target.value);
+                  setSearchEmail(e.target.value);
                   setFocusTarget("email");
                   setActiveList(true);
                 }}
@@ -150,17 +164,8 @@ const AddSignerPage = () => {
                 onKeyDown={handleKeyDown}
                 autoComplete="off"
               />
-              <span style={{ fontWeight: 'bold', fontSize: '1.2rem' }}>@</span>
-              <Select
-                value={newEmailDomain}
-                onChange={(e) => setNewEmailDomain(e.target.value)}
-              >
-                <option value="@handong.ac.kr">handong.ac.kr</option>
-                <option value="@handong.edu">handong.edu</option>
-              </Select>
-
               {activeList && activeResults.length > 0 && (
-                <SearchResults>
+                  <SearchResults>
                   {activeResults.map((signer, index) => {
                     const selected = signers.some((s) => s.email === signer.email);
                     return (
@@ -175,11 +180,40 @@ const AddSignerPage = () => {
                     );
                   })}
                 </SearchResults>
-              )}
+            )}
             </RowContainer>
-            <AddButtonContainer>
-              <AddButton onClick={handleAddSigner}>추가하기</AddButton>
-            </AddButtonContainer>
+              {showManualAddInputs && (
+                  <div style={{ marginTop: "20px" }}>
+                    <AddSignerTitle>서명자 추가하기</AddSignerTitle>
+                    <RowContainer>
+                    <Input
+                      placeholder="이름"
+                      value={newName}
+                      onChange={(e) => setNewName(e.target.value)}
+                      autoComplete="off"
+                    />
+                  
+                      <Input
+                        placeholder="이메일"
+                        value={newEmailPrefix}
+                        onChange={(e) => setNewEmailPrefix(e.target.value)}
+                        autoComplete="off"
+                      />
+                      <span style={{ fontWeight: 'bold', fontSize: '1.2rem' }}>@</span>
+                      <Select
+                        value={newEmailDomain}
+                        onChange={(e) => setNewEmailDomain(e.target.value)}
+                      >
+                        <option value="@handong.ac.kr">handong.ac.kr</option>
+                        <option value="@handong.edu">handong.edu</option>
+                      </Select>
+                    </RowContainer>
+
+                    <AddButtonContainer>
+                      <AddButton onClick={handleAddSigner}>추가하기</AddButton>
+                    </AddButtonContainer>
+                  </div>
+              )}
           </AddSignerSection>
 
           <AddSignerTitle>추가된 서명자 목록</AddSignerTitle>
@@ -264,6 +298,22 @@ const AddButton = styled.button`
   border-radius: 3px;
   cursor: pointer;
 `;
+
+const AddButtonSmall = styled.button`
+  padding: 8px 14px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+
+  background-color: ${({ active }) => (active ? "#b5b5b5" : "#03A3FF")};  // 🔥 상태별 색상
+  color: white;
+
+  &:hover {
+    background-color: ${({ active }) => (active ? "#999" : "#028de3")};
+  }
+`;
+
 const SignerBox = styled.div`
   background-color: white;
   border: 2px solid #007bff;
@@ -310,6 +360,7 @@ const SearchResults = styled.ul`
   overflow-y: auto;
   z-index: 2000;
   padding: 0;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 `;
 const SearchItem = styled.li`
   display: flex;
