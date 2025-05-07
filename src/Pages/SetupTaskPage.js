@@ -255,7 +255,7 @@ const SetupTaskPage = () => {
                     </FormRow>
                     <FormRow>
                       <Label>
-                        월 <RequiredMark>*</RequiredMark>
+                        근무 월 <RequiredMark>*</RequiredMark>
                       </Label>
                       <Select
                         value={selectedMonth}
