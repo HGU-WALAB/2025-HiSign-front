@@ -302,7 +302,8 @@ const RequestedDocuments = () => {
                                     fontSize: "16px",
                                     fontWeight: "bold",
                                     display: "flex",
-                                    alignItems: "center"
+                                    alignItems: "center",
+                                    color: "#000000"
                                 }}>
                                     {doc.requestName}
                                     <button
@@ -320,10 +321,10 @@ const RequestedDocuments = () => {
                                         {signerCounts[doc.id] || ""}
                                     </button>
                                 </div>
-                                <div style={{marginTop: "6px"}}>
+                                <div style={{marginTop: "6px",color: "#000000"}}>
                                     상태: <StatusBadge status={doc.status}/>
                                 </div>
-                                <div style={{marginTop: "4px"}}>
+                                <div style={{marginTop: "4px", color: "#000000"}}>
                                     생성일: {moment(doc.createdAt).format('YYYY/MM/DD')}
                                 </div>
                                 <div style={{

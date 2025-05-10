@@ -243,16 +243,16 @@ const ReceivedDocuments = () => {
                             minHeight: "8rem"
                         }}>
                             <div style={{flex: 1}}>
-                                <div style={{fontWeight: "bold"}}>{doc.requestName}</div>
-                                <div style={{marginTop: "6px"}}>상태: <StatusBadge status={doc.status}/></div>
-                                <div style={{marginTop: "4px"}}>생성일: {moment(doc.createdAt).format("YYYY/MM/DD")}</div>
+                                <div style={{fontWeight: "bold", color: "#000000"}}>{doc.requestName}</div>
+                                <div style={{marginTop: "6px", color: "#000000"}}>상태: <StatusBadge status={doc.status}/></div>
+                                <div style={{marginTop: "4px", color: "#000000"}}>생성일: {moment(doc.createdAt).format("YYYY/MM/DD")}</div>
                                 <div style={{
                                     marginTop: "4px",
                                     color: doc.status === 0 && moment(doc.expiredAt).isSame(moment(), "day") ? "red" : "black"
                                 }}>
                                     만료일: {moment(doc.expiredAt).format("YYYY/MM/DD HH:mm")}
                                 </div>
-                                <div style={{marginTop: "4px"}}>요청자: {doc.requesterName || "알 수 없음"}</div>
+                                <div style={{marginTop: "4px", color: "#000000"}}>요청자: {doc.requesterName || "알 수 없음"}</div>
                             </div>
                             <div style={{display: "flex", alignItems: "center"}}>
                                 {isMobileView ? (

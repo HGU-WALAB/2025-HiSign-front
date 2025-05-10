@@ -286,11 +286,11 @@ const AdminDocuments = () => {
                     disabled={!isDownloadable}
                     style={{
                         padding: "6px 10px",
-                        backgroundColor: !isDownloadable ? "#ccc" : "#28a745",
+                        backgroundColor: !isDownloadable ? "#ccc" : "#007bff",
                         color: "#fff",
                         borderRadius: "4px",
                         border: "none",
-                        fontSize: "14px",
+                        fontSize: "13px",
                         cursor: !isDownloadable ? "not-allowed" : "pointer",
                         marginLeft: "8px"
                     }}
@@ -356,12 +356,12 @@ const AdminDocuments = () => {
                                 style={{position: "absolute", top: "16px", left: "16px"}}
                             />
 
-                            <div style={{flex: 1, paddingLeft: "36px"}}>
-                                <div style={{fontWeight: "bold"}}>{doc.requestName}</div>
-                                <div style={{marginTop: "6px"}}>
+                            <div style={{flex: 1, paddingLeft: "36px", color: "#000000"}}>
+                                <div style={{fontWeight: "bold",color: "#000000"}}>{doc.requestName}</div>
+                                <div style={{marginTop: "6px", color: "#000000"}}>
                                     상태: <StatusBadge status={doc.status}/>
                                 </div>
-                                <div style={{marginTop: "4px"}}>생성일: {moment(doc.createdAt).format('YYYY/MM/DD')}</div>
+                                <div style={{marginTop: "4px",color: "#000000"}}>생성일: {moment(doc.createdAt).format('YYYY/MM/DD')}</div>
                                 <div style={{
                                     marginTop: "4px",
                                     color: doc.status === 0 && moment(doc.expiredAt).isSame(moment(), 'day') ? "red" : "black"
@@ -398,7 +398,7 @@ const AdminDocuments = () => {
                                             borderRadius: "4px",
                                             backgroundColor: doc.status === 7 ? "#007bff" : "transparent",
                                             color: doc.status === 7 ? "#fff" : "#aaa",
-                                            fontSize: "14.5px",
+                                            fontSize: "0.8rem",
                                             fontWeight: "bold",
                                             cursor: doc.status === 7 ? "pointer" : "not-allowed",
                                             minWidth: "60px",
