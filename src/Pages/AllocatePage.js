@@ -1,8 +1,9 @@
 // AllocatePage.js
-import { Typography, Menu, MenuItem, Card, CardContent, CardActionArea, IconButton } from '@mui/material';
-import { useState, useEffect } from "react";
+import { Card, CardActionArea, CardContent, Menu, MenuItem, Typography } from '@mui/material';
+import { useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import { Rnd } from "react-rnd";
+import { useNavigate } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
 import styled from 'styled-components';
 import CompleteButton from '../components/AllocatePage/CompleteButton';
@@ -10,8 +11,6 @@ import PagingControl from "../components/PagingControl";
 import { signerState } from "../recoil/atom/signerState";
 import { taskState } from "../recoil/atom/taskState";
 import SignatureService from "../utils/SignatureService";
-import { useNavigate } from "react-router-dom";
-import MenuIcon from '@mui/icons-material/Menu';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
@@ -247,7 +246,6 @@ const FloatingGrayButton = styled.button`
   background-color: #ccc;
   color: white;
   font-size: 1rem;
-  font-weight: bold;
   padding: 12px 24px;
   border-radius: 24px;
   border: none;

@@ -1,5 +1,5 @@
 // CompleteButton.js
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import styled from 'styled-components';
@@ -83,9 +83,9 @@ const CompleteButton = () => {
 
   return (
    <>
-  <FloatingCompleteButton onClick={handleOpenModal} disabled={loading}>
+  <CompleteButtonStyle onClick={handleOpenModal} disabled={loading}>
     완료
-  </FloatingCompleteButton>
+  </CompleteButtonStyle>
 
   <CompleteModal
     open={open}
@@ -108,16 +108,11 @@ export default CompleteButton;
 // `;
 
 
-const FloatingCompleteButton = styled(ButtonBase)`
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  z-index: 1000;
+const CompleteButtonStyle = styled(ButtonBase)`
 
   background-color: ${({ disabled }) => (disabled ? "#ccc" : "#03A3FF")};
   color: white;
   font-size: 1rem;
-  font-weight: bold;
   padding: 12px 24px;
   border-radius: 24px;
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);

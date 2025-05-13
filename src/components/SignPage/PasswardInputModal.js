@@ -14,12 +14,12 @@ function PasswordInputModal({ open, onSubmit, onClose }) {
 
   const handleValidate = () => {
     if (!password) {
-      setError("비밀번호를를 입력해주세요."); // 이메일이 비어있을 경우 에러 메시지 출력
-      triggerShake(); // 애니메이션 트리거
+      setError("비밀번호를 입력해주세요.");
+      triggerShake();
       return;
     }
 
-    onSubmit(password, setError, triggerShake); // onSubmit에 에러 상태 업데이트를 넘김
+    onSubmit(password, setError, triggerShake);
   };
 
   return (
@@ -39,7 +39,7 @@ function PasswordInputModal({ open, onSubmit, onClose }) {
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          width: 500,
+          width: { xs: "90%", sm: 400, md: 500 },
           bgcolor: "background.paper",
           borderRadius: 2,
           boxShadow: 24,
@@ -49,50 +49,55 @@ function PasswordInputModal({ open, onSubmit, onClose }) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className={shake ? "shake-horizontal" : ""}>
-        <Typography variant="h6" component="h2" sx={{ mb: 2 }}>
-          비밀번호 인증
-        </Typography>
+          <Typography variant="h6" component="h2" sx={{ mb: 2 }}>
+            비밀번호 인증
+          </Typography>
 
-        {/* 안내문 추가 */}
-        <Typography
-          variant="body1"
-          sx={{ mb: 2 }}
-        >
-          이메일에 첨부된 <strong>비밀번호</strong>를 입력하여 주세요.
-        </Typography>
+          <Typography variant="body1" sx={{ mb: 2 }}>
+            이메일에 첨부된 <strong>비밀번호</strong>를 입력하여 주세요.
+          </Typography>
 
-          <br>
-          </br>
-        <div style={{ width: "100%", display: "flex", justifyContent: "center", gap: "10px" }}>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-              setError(null); // 입력이 바뀌면 에러 초기화
-            }}
-            placeholder="비밀번호 입력"
+          <div
             style={{
-              width: "50%",
-              padding: "8px",
-              borderRadius: "4px",
-              border: "1px solid #ccc",
-              fontSize: "16px",
-            }}
-          />
-          <Button
-            onClick={handleValidate}
-            sx={{
-              backgroundColor: "#007BFF",
-              color: "white",
-              "&:hover": { backgroundColor: "#0056b3" },
+              width: "100%",
+              display: "flex",
+              flexDirection: window.innerWidth < 480 ? "column" : "row",
+              justifyContent: "center",
+              alignItems: "center",
+              gap: "10px",
             }}
           >
-            확인
-          </Button>
-        </div>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setError(null);
+              }}
+              placeholder="비밀번호 입력"
+              style={{
+                width: "100%",
+                maxWidth: "300px",
+                padding: "8px",
+                borderRadius: "4px",
+                border: "1px solid #ccc",
+                fontSize: "16px",
+              }}
+            />
+            <Button
+              onClick={handleValidate}
+              sx={{
+                backgroundColor: "#007BFF",
+                color: "white",
+                minWidth: "80px",
+                "&:hover": { backgroundColor: "#0056b3" },
+              }}
+            >
+              확인
+            </Button>
+          </div>
 
-        {error && <p style={{ color: "red", marginTop: "10px" }}>{error}</p>}
+          {error && <p style={{ color: "red", marginTop: "10px" }}>{error}</p>}
         </div>
       </Box>
     </Modal>
