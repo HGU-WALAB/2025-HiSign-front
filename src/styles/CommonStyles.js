@@ -32,7 +32,7 @@ export const StyledBody = styled.main`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: #e5e5e5;
+  background-color: #ffffff;
   padding: 20px;
 `;
 

@@ -153,7 +153,6 @@ const MainContainer = styled.div`
   display: flex;
   flex-direction: column;
   min-height: 50vh;
-  background-color: #f5f5f5;
 `;
 
 const ContentWrapper = styled.div`
@@ -172,7 +171,7 @@ const DocumentHeader = styled.div`
   padding: 12px 16px;
   margin-bottom: 12px;
   border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0px 7px 3px 6px rgba(0, 0, 0, 0.1);
   font-weight: bold;
   display: flex;
   justify-content: space-between;
@@ -185,7 +184,7 @@ const SignerList = styled.div`
   padding: 12px;
   border-radius: 8px;
   margin-bottom: 20px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0px 7px 3px 6px rgba(0, 0, 0, 0.1);
 `;
 
 const DocumentSection = styled.div`
