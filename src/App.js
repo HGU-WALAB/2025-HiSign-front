@@ -1,6 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { RecoilRoot } from 'recoil';
 import MyRoutes from "./Routes";
@@ -16,7 +15,6 @@ const queryClient = new QueryClient();
 function App() {
   return (
     <>
-      <GlobalStyle />
       <QueryClientProvider client={queryClient}>
         <BrowserRouter basename="/hisign">
           <RecoilRoot>
@@ -24,6 +22,7 @@ function App() {
           </RecoilRoot>
         </BrowserRouter>
       </QueryClientProvider>
+      <GlobalStyle />
     </>
   );
 }
