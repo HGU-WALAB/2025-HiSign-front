@@ -51,8 +51,8 @@ const CancelButton = ({ documentId, backgroundColor = '#ff4d4f', refreshDocument
                 fontWeight: 'bold',
                 textTransform: 'uppercase',
                 backgroundColor: backgroundColor,
-                color: '#fff',  // 텍스트 색상을 흰색으로 설정
-                border: 'none', // 기본 보더 제거
+                color: '#fff',
+                border: 'none',
             }}
         >
             요청 취소
