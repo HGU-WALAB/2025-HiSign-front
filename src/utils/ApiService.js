@@ -35,13 +35,16 @@ const ApiService = {
   // 🔐 문서 업로드
   fullUpload: async (file, uploadRequestDTO) => {
     if (!file) throw new Error('업로드할 파일이 없습니다.');
-    //console.log("업로드할 uploadDTO:", uploadRequestDTO);
+
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('dto', new Blob([JSON.stringify(uploadRequestDTO)], { type: 'application/json' }));
-  
-    return apiInstance.post('/documents/full-upload', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    formData.append('dto', new Blob(
+      [JSON.stringify(uploadRequestDTO)],
+      { type: 'application/json' }
+    ));
+
+    return axios.post(`${BASE_URL}/documents/full-upload`, formData, {
+      withCredentials: true
     });
   },
   // 🔐 문서 목록 조회

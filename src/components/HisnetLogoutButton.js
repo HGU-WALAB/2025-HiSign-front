@@ -8,14 +8,14 @@ const HisnetLogoutButton = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
+    navigate('/'); // 로그아웃 후 로그인 페이지로 이동
+    ApiService.logout(); // 로그아웃 API 호출
     setMember({
       uniqueId: null,          // 사용자 ID
       name: '',          // 사용자 이름
       email: '',         // 사용자 이메일
       level: '',         // 사용자 권한
     });
-    ApiService.logout(); // 로그아웃 API 호출
-    navigate('/'); // 로그아웃 후 로그인 페이지로 이동
   };
 
   return (
