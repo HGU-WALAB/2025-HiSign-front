@@ -1,7 +1,7 @@
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/esm/entry.webpack";
 import { useNavigate } from "react-router-dom";
@@ -523,7 +523,7 @@ const RightColumn = styled.div`
 const FormCard = styled.div`
   background: white;
   border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  box-shadow: 0px 8px 5px 7px rgba(0, 0, 0, 0.08);
   padding: 20px;
   margin-bottom: 20px;
 `;
