@@ -147,6 +147,8 @@ const RequestedDocuments = () => {
             });
     };
 
+
+
     const handleSearchClick = (docId) => {
         ApiService.fetchSignersByDocument(docId)
             .then((response) => {
@@ -337,11 +339,11 @@ const RequestedDocuments = () => {
 
                             <div style={{display: "flex", alignItems: "center"}}>
                                 {isMobileView ? (
-                                    <div style={{ position: "relative", marginTop: "12px" }}>
+                                    <div style={{position: "relative", marginTop: "12px"}}>
                                         <Dropdown style={{
-                                            position: "absolute",
+                                            position: "relative",
                                             top: "18px",
-                                            right: "-5px"
+                                            right: "-5px",
                                         }}>
                                             <Dropdown.Toggle
                                                 variant="dark"
@@ -359,16 +361,26 @@ const RequestedDocuments = () => {
                                             >
                                                 메뉴
                                             </Dropdown.Toggle>
-                                            <Dropdown.Menu>
+                                            <Dropdown.Menu
+                                                style={{
+                                                    backgroundColor: "#fff",
+                                                    boxShadow: "0 4px 8px rgba(0,0,0,0.2)", // 그림자 강화
+                                                    borderRadius: "6px",
+                                                    zIndex: 2000,
+                                                }}
+                                            >
+
                                                 <Dropdown.Item as={Link} to={`/detail/${doc.id}`}>
-                                                    <FindInPageIcon fontSize="small" style={{ marginRight: "6px", color:"#000000"}} />
+                                                    <FindInPageIcon fontSize="small"
+                                                                    style={{marginRight: "6px", color: "#000000"}}/>
                                                     문서 보기
                                                 </Dropdown.Item>
                                                 <Dropdown.Item onClick={() => downloadPDF(doc.id)}
                                                                disabled={doc.status !== 1}><DownloadIcon/> 다운로드
                                                 </Dropdown.Item>
-                                                <Dropdown.Item onClick={() => handleCancelClick(doc)} disabled={doc.status !== 0}>
-                                                    <CloseIcon fontSize="small" style={{ marginRight: "6px" }} />
+                                                <Dropdown.Item onClick={() => handleCancelClick(doc)}
+                                                               disabled={doc.status !== 0}>
+                                                    <CloseIcon fontSize="small" style={{marginRight: "6px"}}/>
                                                     요청 취소
                                                 </Dropdown.Item>
                                                 <Dropdown.Item
@@ -385,14 +397,15 @@ const RequestedDocuments = () => {
                                                                 });
                                                         }
                                                     }}
-                                                    style={{ color: "#000000", display: "flex", alignItems: "center" }}
+                                                    style={{color: "#000000", display: "flex", alignItems: "center"}}
                                                 >
-                                                    <DeleteIcon fontSize="small" style={{ marginRight: "6px" }} />
+                                                    <DeleteIcon fontSize="small" style={{marginRight: "6px"}}/>
                                                     삭제
                                                 </Dropdown.Item>
                                             </Dropdown.Menu>
                                         </Dropdown>
                                     </div>
+
                                 ) : (
                                     <div style={{
                                         display: "flex",
@@ -420,19 +433,19 @@ const RequestedDocuments = () => {
                                                 borderRadius: "5px",
                                                 textDecoration: "none",
                                                 backgroundColor:
-                                                (doc.status !== 1)
-                                                    ? "transparent"
-                                                    : "white",
+                                                    (doc.status !== 1)
+                                                        ? "transparent"
+                                                        : "white",
                                                 color:
-                                                (doc.status !== 1)
-                                                    ? "#aaa"
-                                                    : "black",
+                                                    (doc.status !== 1)
+                                                        ? "#aaa"
+                                                        : "black",
                                                 cursor:
-                                                (doc.status !== 1)
-                                                    ? "not-allowed"
-                                                    : "pointer"
+                                                    (doc.status !== 1)
+                                                        ? "not-allowed"
+                                                        : "pointer"
                                             }}
-                                            >
+                                        >
                                             <DownloadIcon fontSize="small" style={{marginRight: "6px"}}/>
                                             다운로드
                                         </button>

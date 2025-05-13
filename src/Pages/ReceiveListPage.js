@@ -256,10 +256,10 @@ const ReceivedDocuments = () => {
                             </div>
                             <div style={{display: "flex", alignItems: "center"}}>
                                 {isMobileView ? (
-                                    <Dropdown style={{
-                                        position: "absolute",
-                                        bottom: "12px",
-                                        right: "12px"
+                                    <Dropdown align="end" style={{
+                                        position: "relative",
+                                        top: "18px",
+                                        right: "-5px",
                                     }}>
                                         <Dropdown.Toggle
                                             variant="dark"
@@ -276,8 +276,14 @@ const ReceivedDocuments = () => {
                                             }}
                                         > 메뉴
                                         </Dropdown.Toggle>
-                                        <Dropdown.Menu>
-                                            <Dropdown.Item as={Link} to={`/detail/${doc.id}`}>
+                                        <Dropdown.Menu style={{
+                                            backgroundColor: "#fff",
+                                            border: "1px solid #ddd",
+                                            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                                            borderRadius: "8px",
+                                            zIndex: 2000,
+                                        }}>
+                                        <Dropdown.Item as={Link} to={`/detail/${doc.id}`}>
                                                 <FindInPageIcon fontSize="small" style={{marginRight: "6px"}}/>
                                                 문서 보기
                                             </Dropdown.Item>
