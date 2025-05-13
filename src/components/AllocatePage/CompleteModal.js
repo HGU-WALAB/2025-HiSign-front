@@ -1,6 +1,5 @@
 // CompleteModal.js
 import { Box, Button, Modal, Typography } from '@mui/material';
-import React from 'react';
 import { BeatLoader } from "react-spinners";
 import { useRecoilValue } from 'recoil';
 import { taskState } from '../../recoil/atom/taskState';
@@ -34,7 +33,7 @@ const CompleteModal = ({ open, onClose, onConfirm, loading, type}) => {
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            width: 550,
+            width: { xs: '90%', sm: 500, md: 550 },
             bgcolor: 'background.paper',
             borderRadius: 2,
             boxShadow: 24,
@@ -44,7 +43,7 @@ const CompleteModal = ({ open, onClose, onConfirm, loading, type}) => {
             overflowY: 'auto',
           }}
         >
-          {/* 근무일지 안내 (type 1일 때) */}
+          {/* 근무일지 안내 */}
           {document.type === 1 && type !== "complete" && (
             <>
               <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 'bold' }}>
@@ -69,65 +68,45 @@ const CompleteModal = ({ open, onClose, onConfirm, loading, type}) => {
             {warningText}
           </Typography>
 
-          {/* 버튼 */}
-{/* <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
-  {[ ['취소', onClose], ['확인', handleConfirm] ].map(([label, handler]) => (
-    <Button
-      key={label}
-      onClick={handler}
-      sx={{
-        backgroundColor: '#004C8C', // 아래 버튼 배경색과 유사하게 (진한 파랑)
-        color: '#fff',
-        minWidth: 100,
-        fontWeight: 'bold',
-        borderRadius: '9999px', // pill-shaped
-        paddingX: 3,
-        paddingY: 1,
-        boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)', // 그림자 효과
-        '&:hover': {
-          backgroundColor: '#003B70', // hover 색상 약간 진하게
-          boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.25)',
-        },
-      }}
-    >
-      {label}
-    </Button>
-  ))}
-</div> */}
-
-{/* 버튼 */}
-<div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
-  {[ ['취소', onClose],['확인', handleConfirm]].map(([label, handler]) => (
-    <Button
-      key={label}
-      onClick={handler}
-      disableElevation
-      sx={{
-        backgroundColor: '#03A3FF',
-        color: 'white',
-        fontSize: '1rem',
-        fontWeight: 'bold',
-        padding: '12px 24px',
-        borderRadius: '24px',
-        boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.2)',
-        border: 'none',
-        '&:hover': {
-          backgroundColor: '#0393e6', // hover 시 약간 어둡게
-          boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.25)',
-        },
-      }}
-    >
-      {label}
-    </Button>
-  ))}
-</div>
-
-
-
+          {/* 버튼 영역 (반응형 적용) */}
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              flexWrap: 'wrap',
+              gap: '10px',
+              marginTop: '10px',
+            }}
+          >
+            {[['취소', onClose], ['확인', handleConfirm]].map(([label, handler]) => (
+              <Button
+                key={label}
+                onClick={handler}
+                disableElevation
+                sx={{
+                  backgroundColor: '#03A3FF',
+                  color: 'white',
+                  fontSize: '1rem',
+                  fontWeight: 'bold',
+                  padding: '12px 24px',
+                  borderRadius: '24px',
+                  boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.2)',
+                  border: 'none',
+                  whiteSpace: 'nowrap',
+                  '&:hover': {
+                    backgroundColor: '#0393e6',
+                    boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.25)',
+                  },
+                }}
+              >
+                {label}
+              </Button>
+            ))}
+          </div>
         </Box>
       </Modal>
 
-      {/* 로딩 모달 (로딩 중일 때만) */}
+      {/* 로딩 모달 (반응형 적용) */}
       <Modal open={loading}>
         <Box
           sx={{
@@ -135,12 +114,12 @@ const CompleteModal = ({ open, onClose, onConfirm, loading, type}) => {
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            width: 300,
+            width: { xs: '80%', sm: 300 },
             bgcolor: 'background.paper',
             borderRadius: 2,
             boxShadow: 24,
             p: 4,
-            textAlign: 'center'
+            textAlign: 'center',
           }}
         >
           <Typography variant="h6" component="h2" sx={{ mb: 2 }}>

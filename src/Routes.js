@@ -1,4 +1,3 @@
-import React from 'react';
 import { Route, Routes } from "react-router-dom";
 import LoginCallback from "./auth/LoginCallback";
 import useRestoreLoginFromCookie from './hooks/useRestoreLoginFromCookie';
@@ -58,14 +57,11 @@ function MyRoutes() {
                 <Route path="/detail/:documentId" element={
                     <RequireLogin><DetailPage /></RequireLogin>
                 } />
-
                 <Route path="/dashboard" element={
                     <RequireLogin><DashBoardPage /></RequireLogin>
-                 } />
-
+                } />
                 <Route path="/check-task/:documentId" element={
                     <RequireLogin><CheckTaskPage /></RequireLogin>
-
                 } />
             </Route>
         </Routes>

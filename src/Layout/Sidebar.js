@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import HisnetLogoutButton from "../components/HisnetLogoutButton";
@@ -29,6 +29,7 @@ function Sidebar() {
 
   const fullName = loginMember.name || "";
   const firstChar = fullName.charAt(0);
+  const isAdmin = loginMember.role === "ROLE_ADMIN";
 
   useEffect(() => {
     const handleResize = () => {
@@ -46,7 +47,7 @@ function Sidebar() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isMobile, sidebarOpen]);
-
+  
   return (
     <div style={{ display: "flex", minHeight: "100vh", position: "relative" }}>
       {isMobile && (
@@ -134,7 +135,7 @@ function Sidebar() {
                 </div>
               )}
               <div className="fw-bold text-dark">{fullName + "님"}</div>
-              {loginMember.role?.trim().toUpperCase() === "ROLE_ADMIN" && (
+              {isAdmin && (
                   <div className="fw-bold text-dark">{"(관리자)"}</div>
               )}
               <div
@@ -183,7 +184,7 @@ function Sidebar() {
                 active={currentPath === "/receive-document"}
                 label="[ 공유 작업 ] "
               />
-              {loginMember.role?.trim().toUpperCase() === "ROLE_ADMIN" && (
+              {isAdmin && (
                 <LinkItem
                   to="/admin-document"
                   active={currentPath === "/admin-document"}
