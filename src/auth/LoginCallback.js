@@ -34,7 +34,7 @@ const LoginCallback = () => {
           uniqueId: payload.sub,
           name: payload.name,
           email: payload.email,
-          level: payload.role,
+          role: payload.role,
         });
         
         // 페이지 이동

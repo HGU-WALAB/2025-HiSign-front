@@ -1,30 +1,42 @@
 import { useNavigate } from 'react-router-dom';
 import { useSetRecoilState } from 'recoil';
+import { isLoggingOutState } from '../recoil/atom/isLoggingOutState';
 import { loginMemberState } from '../recoil/atom/loginMemberState';
 import ApiService from '../utils/ApiService';
 
 const HisnetLogoutButton = () => {
   const setMember = useSetRecoilState(loginMemberState);
+  const setIsLoggingOut = useSetRecoilState(isLoggingOutState);
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    navigate('/'); // 로그아웃 후 로그인 페이지로 이동
-    ApiService.logout(); // 로그아웃 API 호출
-    setMember({
-      uniqueId: null,          // 사용자 ID
-      name: '',          // 사용자 이름
-      email: '',         // 사용자 이메일
-      level: '',         // 사용자 권한
-    });
+    console.log("🔴 로그아웃 시작");
+    setIsLoggingOut(true);
+    ApiService.logout();
+    console.log("➡️ 이동 중...");
+    navigate("/", { replace: true });
+
+    setTimeout(() => {
+      console.log("🧹 상태 초기화 중...");
+      setMember({
+        uniqueId: null,
+        name: '',
+        email: '',
+        role: '',
+        isLoading: false,
+      });
+
+      // ❗ 로그아웃 플래그는 조금 뒤에 끈다
+      setTimeout(() => {
+        setIsLoggingOut(false);
+        console.log("✅ 로그아웃 완료");
+      }, 300);
+    }, 0);
   };
 
+
   return (
-    <button
-      onClick={handleLogout}
-      style={buttonStyle}
-      onMouseOver={(e) => (e.currentTarget.style.backgroundColor = buttonHoverStyle.backgroundColor)}
-      onMouseOut={(e) => (e.currentTarget.style.backgroundColor = buttonStyle.backgroundColor)}
-    >
+    <button onClick={handleLogout} style={buttonStyle}>
       로그아웃
     </button>
   );

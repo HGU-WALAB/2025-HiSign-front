@@ -29,7 +29,7 @@ function Sidebar() {
 
   const fullName = loginMember.name || "";
   const firstChar = fullName.charAt(0);
-  const isAdmin = loginMember.level === 1 || loginMember.level === "ROLE_ADMIN";
+  const isAdmin = loginMember.role === "ROLE_ADMIN";
 
   useEffect(() => {
     const handleResize = () => {
