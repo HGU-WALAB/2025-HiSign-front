@@ -1,9 +1,13 @@
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import UploadIcon from "@mui/icons-material/CloudUpload";
+import DrawIcon from "@mui/icons-material/Draw";
+import EditIcon from "@mui/icons-material/Edit";
+import ShareIcon from "@mui/icons-material/Share";
+import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import moment from "moment";
 import ApiService from "../utils/ApiService";
-import DrawIcon from "@mui/icons-material/Draw";
 
 function DashBoardPage() {
   const [recentDocuments, setRecentDocuments] = useState([]);
@@ -32,6 +36,29 @@ function DashBoardPage() {
     return labels[status] || "알 수 없음";
   };
 
+  const steps = [
+    {
+      icon: <UploadIcon fontSize="large" />,
+      title: "서명 요청",
+      desc: "문서를 업로드하고 서명 요청을 생성합니다.",
+    },
+    {
+      icon: <ShareIcon fontSize="large" />,
+      title: "문서 이메일 전송",
+      desc: "상대방에게 이메일로 문서를 전달합니다.",
+    },
+    {
+      icon: <EditIcon fontSize="large" />,
+      title: "서명 진행",
+      desc: "상대방이 서명하거나 거절합니다.",
+    },
+    {
+      icon: <CheckCircleIcon fontSize="large" />,
+      title: "완료 확인",
+      desc: "완료된 문서를 확인하거나 다운로드합니다.",
+    },
+  ];
+
   return (
     <Container>
       <Title>대시 보드</Title>
@@ -51,41 +78,30 @@ function DashBoardPage() {
       </Section>
 
       <Section>
-        <SectionTitle>사용 방법</SectionTitle>
-        <GuideContainer>
-          <StepCard>
-            <StepNumber>1</StepNumber>
-            <StepTitle>서명 요청</StepTitle>
-            <StepDesc>문서를 업로드하고 서명 요청을 생성합니다.</StepDesc>
-          </StepCard>
-          <Arrow>→</Arrow>
-          <StepCard>
-            <StepNumber>2</StepNumber>
-            <StepTitle>문서 공유</StepTitle>
-            <StepDesc>상대방에게 링크로 문서를 전달합니다.</StepDesc>
-          </StepCard>
-          <Arrow>→</Arrow>
-          <StepCard>
-            <StepNumber>3</StepNumber>
-            <StepTitle>서명 진행</StepTitle>
-            <StepDesc>상대방이 서명하거나 거절합니다.</StepDesc>
-          </StepCard>
-          <Arrow>→</Arrow>
-          <StepCard>
-            <StepNumber>4</StepNumber>
-            <StepTitle>완료 확인</StepTitle>
-            <StepDesc>완료된 문서를 확인하거나 다운로드합니다.</StepDesc>
-          </StepCard>
-        </GuideContainer>
-      </Section>
+  <SectionTitle>사용 방법</SectionTitle>
+  <StepFlowContainer>
+    {steps.map((step, index) => (
+      <React.Fragment key={index}>
+        <StepCardStyled>
+          <IconCircle>{step.icon}</IconCircle>
+          <StepText>
+            <StepTitle>{step.title}</StepTitle>
+            <StepDesc>{step.desc}</StepDesc>
+          </StepText>
+        </StepCardStyled>
+        {index !== steps.length - 1 && <Arrow>➝</Arrow>}
+      </React.Fragment>
+    ))}
+  </StepFlowContainer>
+</Section>
+
 
       <InquirySection>
-  <p>도움이 필요하신가요?</p>
-  <a href="http://pf.kakao.com/_xcmKXn" target="_blank" rel="noopener noreferrer">
-    <InquiryButton>문의하기</InquiryButton>
-  </a>
-</InquirySection>
-
+        <p>도움이 필요하신가요?</p>
+        <a href="http://pf.kakao.com/_xcmKXn" target="_blank" rel="noopener noreferrer">
+          <InquiryButton>문의하기</InquiryButton>
+        </a>
+      </InquirySection>
 
       <FloatingCenterLink to="/tasksetup">
         <DrawIcon style={{ fontSize: "32px" }} />
@@ -131,11 +147,22 @@ const SectionTitle = styled.h2`
 
 const CardContainer = styled.div`
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: row;
   gap: 20px;
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: center;
+  overflow-x: auto;
+  padding-bottom: 10px;
+
+  &::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: #f0f0f0;
   }
 `;
 
@@ -143,15 +170,12 @@ const DocumentCard = styled.div`
   background: #f9f9f9;
   border-radius: 10px;
   padding: 20px;
-  flex: 1 1 300px;
-  min-width: 250px;
+  width: 280px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   gap: 10px;
-  @media (max-width: 768px) {
-    width: 100%;
-  }
+  flex-shrink: 0;
 `;
 
 const DocTitle = styled.h3`
@@ -177,43 +201,72 @@ const DetailLink = styled(Link)`
   }
 `;
 
-const GuideContainer = styled.div`
+const TimelineContainer = styled.div`
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px;
-  justify-content: center;
+  overflow-x: auto;
+  gap: 20px;
+  padding-bottom: 10px;
+  justify-content: flex-start;
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  &::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: #f0f0f0;
+  }
 `;
 
-const StepCard = styled.div`
+const StepItem = styled.div`
   background: #eef4ff;
   border-radius: 12px;
   padding: 20px;
-  width: 220px;
-  text-align: center;
+  min-width: 240px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 16px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+  }
 `;
 
-const StepNumber = styled.div`
-  font-size: 2rem;
-  font-weight: bold;
-  color: #1976d2;
+const IconCircle = styled.div`
+  background-color: #1976d2;
+  color: white;
+  border-radius: 50%;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const StepText = styled.div`
+  display: flex;
+  flex-direction: column;
 `;
 
 const StepTitle = styled.h3`
-  font-size: 1.2rem;
-  margin: 10px 0 5px;
+  font-size: 1.1rem;
+  margin: 0;
 `;
 
 const StepDesc = styled.p`
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   color: #444;
-`;
-
-const Arrow = styled.div`
-  font-size: 1.5rem;
-  color: #999;
-  font-weight: bold;
+  margin: 4px 0 0;
 `;
 
 const InquirySection = styled.div`
@@ -259,4 +312,40 @@ const FloatingCenterLink = styled(Link)`
   &:hover {
     background-color: #4682b4;
   }
+`;
+
+const StepFlowContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: nowrap;
+  flex-direction: row;
+  gap: 12px;
+  width: 100%;
+`;
+
+const StepCardStyled = styled.div`
+  background: #eef4ff;
+  border-radius: 12px;
+  padding: 20px;
+  width: 220px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+  }
+`;
+
+
+
+const Arrow = styled.div`
+  font-size: 1.8rem;
+  color: #999;
+  font-weight: bold;
+  margin: 0 5px;
 `;
