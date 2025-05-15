@@ -99,7 +99,7 @@ const DetailPage = () => {
                 maxWidth: '600px',
                 width: '100%',
                 margin: '0 auto',
-                textAlign: 'center',
+                textAlign: 'left',
             }}>
 
                 {documentInfo && (
