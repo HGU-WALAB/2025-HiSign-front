@@ -256,10 +256,10 @@ const ReceivedDocuments = () => {
                             </div>
                             <div style={{display: "flex", alignItems: "center"}}>
                                 {isMobileView ? (
-                                    <Dropdown align="end" style={{
-                                        position: "relative",
-                                        top: "18px",
-                                        right: "-5px",
+                                    <Dropdown style={{
+                                        position: "absolute",
+                                        bottom: "12px",
+                                        right: "12px"
                                     }}>
                                         <Dropdown.Toggle
                                             variant="dark"
