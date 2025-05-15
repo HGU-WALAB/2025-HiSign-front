@@ -17,21 +17,19 @@ const DetailPage = () => {
     const toolbar = toolbarPlugin();
 
     useEffect(() => {
-        // 문서 정보를 가져오는 API 호출
         ApiService.fetchDocumentInfo(documentId)
             .then(response => {
-                setDocumentInfo(response.data); // 문서 정보 설정
+                setDocumentInfo(response.data);
             })
             .catch(error => {
                 console.error("Error loading document info:", error);
                 setError('문서 정보를 로드하는 중 오류가 발생했습니다: ' + error.message);
             });
 
-        // PDF 파일도 별도로 가져오기
         ApiService.fetchDocument(documentId)
             .then(response => {
                 const fileBlob = new Blob([response.data], { type: 'application/pdf' });
-                setFileUrl(URL.createObjectURL(fileBlob)); // PDF 파일 URL 설정
+                setFileUrl(URL.createObjectURL(fileBlob));
             })
             .catch(error => {
                 console.error("Error loading document:", error);
@@ -39,71 +37,110 @@ const DetailPage = () => {
             });
     }, [documentId]);
 
-    const getStatusClass = (status) => {
-        const statusClasses = {
-            0: "label label-info",
-            1: "label label-success",
-            2: "label label-danger",
-            3: "label label-warning",
-            4: "label label-default",
-        };
-        return statusClasses[status] || "badge bg-secondary";
-    };
-
     const getStatusLabel = (status) => {
         const statusLabels = {
             0: "서명중",
             1: "완료",
-            2: "거절",
+            2: "반려",
             3: "취소",
             4: "만료",
+            6: "반려",
+            7: "검토중",
         };
         return statusLabels[status] || "알 수 없음";
+    };
+
+    const getStatusStyle = (status) => {
+        const statusStyles = {
+            0: { backgroundColor: "#5ec9f3", color: "#fff" },
+            1: { backgroundColor: "#2ecc71", color: "#fff" },
+            2: { backgroundColor: "#f5a623", color: "#fff" },
+            3: { backgroundColor: "#f0625d", color: "#fff" },
+            4: { backgroundColor: "#555555", color: "#fff" },
+            6: { backgroundColor: "#f5a623", color: "#fff" },
+            7: { backgroundColor: "#b6c3f2", color: "#fff" },
+        };
+        return statusStyles[status] || { backgroundColor: "#ccc", color: "#000" };
+    };
+
+    const StatusBadge = ({ status }) => {
+        const label = getStatusLabel(status);
+        const style = {
+            ...getStatusStyle(status),
+            borderRadius: "12px",
+            padding: "2px 10px",
+            fontSize: "13px",
+            fontWeight: 600,
+            display: "inline-block",
+            whiteSpace: "nowrap",
+            minWidth: "50px",
+            textAlign: "center",
+        };
+        return <span style={style}>{label}</span>;
     };
 
     return (
         <div style={{
             display: 'flex',
             flexDirection: 'column',
+            gap: '24px',
+            padding: '24px',
             height: '100vh',
-            width: '70%',
-            border: '1px solid #000',
-            borderRadius: '5px',
-            overflow: 'hidden',
-            margin: '0 auto',
+            boxSizing: 'border-box',
+            backgroundColor: '#ffffff',
         }}>
-            {error && <p>{error}</p>}
-            <div style={{ flex: '0 0 auto', padding: '10px', backgroundColor: '#eeeeee', borderBottom: '1px solid rgba(0, 0, 0, 0.1)' }}>
-                {/* 문서 정보 영역 */}
+            {/* 문서 정보 영역 */}
+            <div style={{
+                backgroundColor: '#ffffff',
+                border: '1px solid #ccc',
+                borderRadius: '8px',
+                padding: '16px',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
+                maxWidth: '600px',
+                width: '100%',
+                margin: '0 auto',
+                textAlign: 'center',
+            }}>
+
                 {documentInfo && (
-                    <div>
+                    <>
                         <p><strong>서명 요청자:</strong> {documentInfo.requesterName}</p>
-                        <div style={{marginTop: "6px"}}>
-                            상태: <span className={getStatusClass(documentInfo.status)}>{getStatusLabel(documentInfo.status)}</span>
-                        </div>
-                        <p><strong>취소 사유:</strong> {documentInfo.rejectReason}</p>
+                        <p><strong>상태:</strong> <StatusBadge status={documentInfo.status}/></p>
+                        <p><strong>취소 사유:</strong> {documentInfo.rejectReason || '없음'}</p>
                         <p><strong>서명 생성 시간:</strong> {new Date(documentInfo.createdAt).toLocaleString()}</p>
                         <p><strong>파일명:</strong> {documentInfo.fileName}</p>
                         <p><strong>작업명:</strong> {documentInfo.requestName}</p>
-                    </div>
+                    </>
                 )}
             </div>
 
-            {/* PDF 파일 영역 */}
-            <div style={{flex: 1, overflow: 'hidden', width: '100%'}}>
+            {/* 툴바 + PDF 영역 */}
+            <div
+                style={{
+                    flex: 1,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #ccc',
+                    borderRadius: '8px',
+                    overflow: 'hidden',
+                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
+                    width: '90vw',
+                    maxWidth: '1200px',
+                    minHeight: '100vh',
+                    alignSelf: 'center',
+                }}
+            >
                 {fileUrl ? (
                     <>
-                        {/* 툴바 영역 */}
+                        {/* 툴바 */}
                         <div style={{
-                            backgroundColor: '#eeeeee',
-                            borderBottom: '1px solid rgba(0, 0, 0, 0.1)',
-                            padding: '4px',
-                            width: '100%',
-                            position: 'relative',
+                            padding: '6px 12px',
+                            backgroundColor: '#f7f7f7',
+                            borderBottom: '1px solid #ccc',
                             display: 'flex',
-                            flexDirection: 'row',
-                            justifyContent: 'flex-start',
                             alignItems: 'center',
+                            justifyContent: 'center',
                         }}>
                             <toolbar.Toolbar>
                                 {(props) => {
@@ -117,39 +154,30 @@ const DetailPage = () => {
                                     } = props;
                                     return (
                                         <>
-                                            <div style={{ padding: '0px 2px', marginLeft: "24rem" }}>
-                                                <ZoomOut />
-                                            </div>
-                                            <div style={{ padding: '0px 2px' }}>
-                                                <Zoom />
-                                            </div>
-                                            <div style={{ padding: '0px 2px' }}>
-                                                <ZoomIn />
-                                            </div>
-                                            <div style={{ padding: '0px 2px' }}>
-                                                <GoToPreviousPage />
-                                            </div>
-                                            <div style={{ padding: '0px 2px', width: "3rem" }}>
-                                                <CurrentPageInput />
-                                            </div>
-                                            <div style={{ padding: '0px 2px' }}>
-                                                <GoToNextPage />
-                                            </div>
+                                            <ZoomOut/>
+                                            <Zoom/>
+                                            <ZoomIn/>
+                                            <GoToPreviousPage/>
+                                            <CurrentPageInput/>
+                                            <GoToNextPage/>
                                         </>
                                     );
                                 }}
                             </toolbar.Toolbar>
                         </div>
 
-                        {/* PDF 뷰어 영역 */}
-                        <div style={{ flex: 1, overflow: 'hidden', width: '100%' }}>
+                        {/* PDF 뷰어 */}
+                        <div style={{flex: 1, overflow: 'auto'}}>
                             <Worker workerUrl={pdfjsWorkerUrl}>
-                                <Viewer fileUrl={fileUrl} plugins={[toolbar]} />
+                                <Viewer
+                                    fileUrl={fileUrl}
+                                    plugins={[toolbar]}
+                                />
                             </Worker>
                         </div>
                     </>
                 ) : (
-                    <p>로딩 중...</p>
+                    <p style={{padding: '1rem'}}>로딩 중...</p>
                 )}
             </div>
         </div>
