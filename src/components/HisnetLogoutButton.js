@@ -10,14 +10,14 @@ const HisnetLogoutButton = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    console.log("🔴 로그아웃 시작");
+    //console.log("🔴 로그아웃 시작");
     setIsLoggingOut(true);
     ApiService.logout();
-    console.log("➡️ 이동 중...");
+    //console.log("➡️ 이동 중...");
     navigate("/", { replace: true });
 
     setTimeout(() => {
-      console.log("🧹 상태 초기화 중...");
+      //console.log("🧹 상태 초기화 중...");
       setMember({
         uniqueId: null,
         name: '',
@@ -29,7 +29,7 @@ const HisnetLogoutButton = () => {
       // ❗ 로그아웃 플래그는 조금 뒤에 끈다
       setTimeout(() => {
         setIsLoggingOut(false);
-        console.log("✅ 로그아웃 완료");
+        //console.log("✅ 로그아웃 완료");
       }, 300);
     }, 0);
   };

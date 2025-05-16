@@ -165,7 +165,7 @@ const CheckTaskPage = () => {
               <Value>{month|| "알 수 없음"}</Value>
             </InfoItem>
             <InfoItem>
-              <Label>담당 교수:</Label>
+              <Label>서명자:</Label>
               <Value>{signing.signerName || "알 수 없음"}</Value>
             </InfoItem>
           </InfoSection>

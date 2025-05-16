@@ -129,7 +129,7 @@ const SetupTaskPage = () => {
       const day = now.getDay(); // 0 (일) ~ 6 (토)
       const daysToFriday = (5 - day + 7) % 7;
       expiration.setDate(now.getDate() + daysToFriday);
-      expiration.setHours(12, 0, 0, 0); // 12:00:00
+      expiration.setHours(17, 0, 0, 0);
     } else {
       // basicTask인 경우, 사용자가 지정한 날짜 + 시간 사용
       const [year, month, day] = expirationDate.split("-").map(Number);
@@ -137,6 +137,7 @@ const SetupTaskPage = () => {
       expiration = new Date(year, month - 1, day, hour, minute);
     }
     const formattedExpiration = expiration.toISOString().slice(0, 19);
+    console.log("만료일:", formattedExpiration);
     const finalRequestName =
       taskType === "taTask"
         ? `${selectedSubject}_${selectedMonth}_${member.name}_${member.uniqueId}`
