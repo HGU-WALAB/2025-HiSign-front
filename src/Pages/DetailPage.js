@@ -1,10 +1,10 @@
 import { Viewer, Worker } from '@react-pdf-viewer/core';
 import '@react-pdf-viewer/core/lib/styles/index.css';
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import ApiService from '../utils/ApiService';
 import { toolbarPlugin } from '@react-pdf-viewer/toolbar';
 import '@react-pdf-viewer/toolbar/lib/styles/index.css';
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import ApiService from '../utils/ApiService';
 
 const pdfjsWorkerUrl = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
@@ -106,7 +106,8 @@ const DetailPage = () => {
                     <>
                         <p><strong>서명 요청자:</strong> {documentInfo.requesterName}</p>
                         <p><strong>상태:</strong> <StatusBadge status={documentInfo.status}/></p>
-                        <p><strong>취소 사유:</strong> {documentInfo.rejectReason || '없음'}</p>
+                        {documentInfo.status == 3 ? (<p><strong>취소 사유:</strong> {documentInfo.rejectReason || '없음'}</p>) : null}
+                        {documentInfo.status == 2 || documentInfo.status == 6 ? (<p><strong>반려 사유:</strong> {documentInfo.reviewRejectReason}</p>) : null}
                         <p><strong>서명 생성 시간:</strong> {new Date(documentInfo.createdAt).toLocaleString()}</p>
                         <p><strong>파일명:</strong> {documentInfo.fileName}</p>
                         <p><strong>작업명:</strong> {documentInfo.requestName}</p>

@@ -1,12 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { IoClose } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
 import styled from "styled-components";
 import { signerState } from "../recoil/atom/signerState";
 import { taskState } from "../recoil/atom/taskState";
-import { ButtonContainer, Container as BaseContainer, GrayButton, MainArea, NextButton, StyledBody } from "../styles/CommonStyles";
+import { Container as BaseContainer, ButtonContainer, GrayButton, MainArea, NextButton, StyledBody } from "../styles/CommonStyles";
 import ApiService from "../utils/ApiService";
 
 // BaseContainer를 흰 배경으로 덮는 새로운 Container
@@ -29,7 +29,7 @@ const AddSignerPage = () => {
   const [focusTarget, setFocusTarget] = useState("name"); // "name" or "email"
   const [showManualAddInputs, setShowManualAddInputs] = useState(false);
   const autocompleteRef = useRef(null);
-
+  const itemRefs = useRef([]);
   // 디바운싱
   const [debouncedName, setDebouncedName] = useState("");
   const [debouncedEmail, setDebouncedEmail] = useState("");
@@ -79,6 +79,22 @@ const AddSignerPage = () => {
     setActiveList(false);
     setHighlightedIndex(-1);
   };
+
+    // 🔄 검색 결과가 바뀔 때 itemRefs 초기화
+  useEffect(() => {
+    itemRefs.current = [];
+  }, [activeResults]);
+
+  // 🔽 highlight 이동 시 스크롤 이동
+  useEffect(() => {
+    const el = itemRefs.current[highlightedIndex];
+    if (el) {
+      el.scrollIntoView({
+        block: "nearest",
+        behavior: "smooth"
+      });
+    }
+  }, [highlightedIndex]);
 
   const handleKeyDown = (e) => {
     if (!activeResults.length) return;
@@ -171,10 +187,11 @@ const AddSignerPage = () => {
                     return (
                       <SearchItem
                         key={signer.email}
+                        ref={(el) => itemRefs.current[index] = el}
                         onClick={() => toggleSigner(signer)}
                         className={highlightedIndex === index ? "highlighted" : ""}
                       >
-                        <span>{signer.name} ({signer.email})</span>
+                        <span>{signer.name} {signer.position} ({signer.email})</span>
                         <span>{selected ? "✅" : "⬜"}</span>
                       </SearchItem>
                     );
