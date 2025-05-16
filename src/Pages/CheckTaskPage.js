@@ -102,7 +102,9 @@ const CheckTaskPage = () => {
   const handleConfirm= async  () => {
     setLoading(true);
     try {
-      await ApiService.sendRequestMail(signing.documentId, signing.signerName);
+      for (const signer of signers) {
+        await ApiService.sendRequestMail(signing.documentId, signer.name);
+      }
       alert("서명 요청이 성공적으로 전송되었습니다.");
       navigate("/admin-document");
     } catch (error) {
