@@ -11,23 +11,23 @@ const RequireLogin = ({ children }) => {
   const location = useLocation();
 
   useEffect(() => {
-    console.log("▶️ RequireLogin 실행");
-    console.log("  ⮑ location:", location.pathname);
-    console.log("  ⮑ loginUser:", loginUser);
-    console.log("  ⮑ isLoggingOut:", isLoggingOut);
+    // console.log("▶️ RequireLogin 실행");
+    // console.log("  ⮑ location:", location.pathname);
+    // console.log("  ⮑ loginUser:", loginUser);
+    // console.log("  ⮑ isLoggingOut:", isLoggingOut);
 
     if (loginUser.isLoading) {
-      console.log("⏳ 로딩 중 - 아무 것도 하지 않음");
+      //console.log("⏳ 로딩 중 - 아무 것도 하지 않음");
       return;
     }
 
     if (isLoggingOut) {
-      console.log("🚪 로그아웃 중 - 아무 것도 하지 않음");
+      //console.log("🚪 로그아웃 중 - 아무 것도 하지 않음");
       return;
     }
 
     if (!loginUser?.uniqueId) {
-      console.log("🚨 로그인 필요함 - alert 띄움");
+      //console.log("🚨 로그인 필요함 - alert 띄움");
       alert("로그인이 필요합니다.");
       navigate("/");
     }

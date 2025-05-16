@@ -1,4 +1,3 @@
-import React from 'react';
 import ApiService from '../../utils/ApiService'; // 실제 경로에 맞게 조정
 
 const CancelButton = ({ documentId, backgroundColor = '#ff4d4f', refreshDocuments, setDocuments }) => {
