@@ -1,17 +1,16 @@
 // CheckTaskPage.js
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import ButtonBase from "../components/ButtonBase";
 import ConfirmModal from "../components/ConfirmModal";
 import RejectModal from "../components/ListPage/RejectModal";
 import PDFViewer from "../components/SignPage/PDFViewer";
-import { signingState } from "../recoil/atom/signingState";
 import ApiService from "../utils/ApiService";
+import { defaultColors } from "./AllocatePage";
 
 const CheckTaskPage = () => {
-  const [signing,setSigning] = useRecoilState(signingState);
+  const [signing,setSigning] = useState("");
   const [uniqueId, setUniqueId] = useState("");
   const [month,setMonth] = useState("");
   const [subject, setSubject] = useState("");
@@ -24,6 +23,7 @@ const CheckTaskPage = () => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [pdfScale, setPdfScale] = useState(1);
+  const [signers, setSigners] = useState([]);
 
   useEffect(() => {
     ApiService.fetchDocumentInfo(documentId)
@@ -63,29 +63,32 @@ const CheckTaskPage = () => {
       });
   
     ApiService.fetchSignersByDocument(documentId)
-      .then(response => {
-        //console.log("서명자 정보:", response);
-        setSigning((prevState) => ({
-          ...prevState,
-          signerName: response[0]?.name || "",
-          signerEmail: response[0]?.email || "",
-        }));
-        
-        ApiService.fetchSignatureFields(documentId,response[0]?.email)
-          .then(response => {
-            //console.log("서명 필드 정보:", response);
-            setSigning((prevState) => ({
-              ...prevState,
-              signatureFields: response.data,
-            }));
-          })
-          .catch(error => {
-            setError('서명 필드를 로드하는 중 오류가 발생했습니다: ' + error.message);
-          });
-      })
-      .catch(error => {
-        setError('서명자 정보를 로드하는 중 오류가 발생했습니다: ' + error.message);
-      });
+    .then((response) => {
+      const signerList = response;
+
+      // 서명자별 필드 로딩
+      Promise.all(
+        signerList.map(async (signer, idx) => {
+          const { data: fields } = await ApiService.fetchSignatureFields(documentId, signer.email);
+          return {
+            ...signer,
+            color: defaultColors[idx % defaultColors.length],
+            signatureFields: fields,
+          };
+        })
+      )
+        .then((signersWithFields) => {
+          setSigners(signersWithFields);
+        })
+        .catch((error) => {
+          console.error("🔴 서명 필드 로딩 실패:", error);
+          setError("서명 필드를 불러오는 중 오류가 발생했습니다.");
+        });
+    })
+    .catch((error) => {
+      console.error("🔴 서명자 정보 로딩 실패:", error);
+      setError("서명자 정보를 로드하는 중 오류가 발생했습니다.");
+    });
   }, [documentId]);
 
   const handleOpenModal = () => {
@@ -164,10 +167,22 @@ const CheckTaskPage = () => {
               <Label>기준 월:</Label>
               <Value>{month|| "알 수 없음"}</Value>
             </InfoItem>
-            <InfoItem>
-              <Label>서명자:</Label>
-              <Value>{signing.signerName || "알 수 없음"}</Value>
-            </InfoItem>
+            {signers.length > 0 ? (
+              signers.map((signer, idx) => (
+                <InfoItem key={signer.email}>
+                  <Label>서명자 {idx + 1}:</Label>
+                  <Value style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <ColorDot style={{ backgroundColor: signer.color }} />
+                    <span>{signer.name}</span>
+                  </Value>
+                </InfoItem>
+              ))
+            ) : (
+              <InfoItem>
+                <Label>서명자:</Label>
+                <Value>알 수 없음</Value>
+              </InfoItem>
+            )}
           </InfoSection>
 
           <ButtonContainer>
@@ -177,13 +192,14 @@ const CheckTaskPage = () => {
         </Sidebar>
 
         <PDFWrapper>
-          {signing.fileUrl && signing.signatureFields ? (
+          {signing.fileUrl && signers.length !== 0 ? (
             <DocumentContainer>
               <PDFViewer
                 pdfUrl={signing.fileUrl}
                 setCurrentPage={setCurrentPage}
                 onScaleChange={setPdfScale}
                 type={"check"}
+                signers={signers}
               />
             </DocumentContainer>
           ) : (
@@ -317,4 +333,12 @@ const ErrorMessage = styled.p`
   width: 80%;
   max-width: 500px;
   box-shadow: 0px 2px 8px rgba(255, 77, 79, 0.2);
+`;
+
+const ColorDot = styled.span`
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid #aaa;
 `;

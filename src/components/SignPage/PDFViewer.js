@@ -6,7 +6,7 @@ import SignatureOverlay from "./SignatureOverlay";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
-function PDFViewer({ pdfUrl, setCurrentPage, onScaleChange, currentPage, type}) {
+function PDFViewer({ pdfUrl, setCurrentPage, onScaleChange, currentPage, type, signers}) {
   const containerRef = useRef(null);
   const [pageNum, setPageNum] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
@@ -56,7 +56,7 @@ function PDFViewer({ pdfUrl, setCurrentPage, onScaleChange, currentPage, type}) 
 
         {/* ✅ 동적으로 Overlay 또는 Marker 렌더링 */}
         {type === "sign" && <SignatureOverlay currentPage={pageNum} scale={scale} />}
-        {type === "check" && <SignatureMarker currentPage={pageNum} scale={scale}/>}
+        {type === "check" && <SignatureMarker currentPage={pageNum} scale={scale} signers={signers} />}
       </div>
 
       <PagingControl pageNum={pageNum} setPageNum={handlePageChange} totalPages={totalPages} />
