@@ -19,6 +19,7 @@ const DetailPage = () => {
     useEffect(() => {
         ApiService.fetchDocumentInfo(documentId)
             .then(response => {
+                console.log("Document Info:", response);
                 setDocumentInfo(response.data);
             })
             .catch(error => {
@@ -108,12 +109,17 @@ const DetailPage = () => {
                         <p><strong>상태:</strong> <StatusBadge status={documentInfo.status}/></p>
                         {documentInfo.status == 3 ? (
                         <p style={{ color: "#d9534f", fontWeight: "bold" }}>
-                            <strong>취소 사유:</strong> {documentInfo.rejectReason || '없음'}
+                            <strong>취소 사유:</strong> {documentInfo.cancelReason || '없음'}
                         </p>
                         ) : null}
-                        {(documentInfo.status == 2 || documentInfo.status == 6) ? (
+                        {(documentInfo.status == 2) ? (
                         <p style={{ color: "#f0ad4e", fontWeight: "bold" }}>
                             <strong>반려 사유:</strong> {documentInfo.reviewRejectReason || '없음'}
+                        </p>
+                        ) : null}
+                        {(documentInfo.status == 6) ? (
+                        <p style={{ color: "#f0ad4e", fontWeight: "bold" }}>
+                            <strong>반려 사유:</strong> {documentInfo.rejectReason || '없음'}
                         </p>
                         ) : null}
                         <p><strong>서명 생성 시간:</strong> {new Date(documentInfo.createdAt).toLocaleString()}</p>
