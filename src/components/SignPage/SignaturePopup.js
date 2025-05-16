@@ -4,7 +4,9 @@ import { BigButton } from "../BigButton";
 
 const SignaturePopup = ({ field, fieldIndex, onClose, onSave, applyToAll = false }) => {
   const sigCanvas = useRef(null);
-
+  const canvasWidth = window.innerWidth < 480 ? 300 : 400;
+  const canvasHeight = 200;
+  
   const handleSave = () => {
     if (sigCanvas.current) {
       const canvas = sigCanvas.current.getCanvas();
@@ -45,10 +47,20 @@ const SignaturePopup = ({ field, fieldIndex, onClose, onSave, applyToAll = false
         ref={sigCanvas}
         penColor="black"
         canvasProps={{
-          width: window.innerWidth < 480 ? 300 : 400,
-          height: 200,
+          width: canvasWidth,
+          height: canvasHeight,
           className: "signatureCanvas",
-          style: signatureCanvasStyle,
+          style: {
+            border: "1px solid #000",
+            borderRadius: "8px",
+            boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.1)",
+            marginTop: "8px",
+            display: "block",
+            marginLeft: "auto",
+            marginRight: "auto",
+            width: `${canvasWidth}px`,
+            height: `${canvasHeight}px`,
+          },
         }}
       />
 
@@ -75,6 +87,9 @@ const popupStyle = {
   width: "90%",
   maxWidth: "500px",
   boxSizing: "border-box",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
 };
 
 const signatureCanvasStyle = {
