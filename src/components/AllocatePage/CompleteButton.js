@@ -19,6 +19,12 @@ const CompleteButton = () => {
   const navigate = useNavigate();
 
   const handleOpenModal = () => {
+    for (const signer of signers) {
+      if (!signer.signatureFields || signer.signatureFields.length === 0) {
+        alert("모든 서명자에게 서명 위치를 하나 이상 지정해주세요.");
+        return;
+      }
+    }
     setOpen(true);
   };
 
@@ -38,7 +44,7 @@ const CompleteButton = () => {
       const response = await fetch(document.fileUrl);
       const blob = await response.blob();
       const file = new File([blob], document.fileName, { type: blob.type });
-  
+      
       // UploadRequestDTO 준비
       const uploadRequestDTO = {
         uniqueId: member.uniqueId,    // ✅ 업로더 고유 ID

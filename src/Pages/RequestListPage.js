@@ -379,7 +379,7 @@ const RequestedDocuments = () => {
                                                                disabled={doc.status !== 1}><DownloadIcon/> 다운로드
                                                 </Dropdown.Item>
                                                 <Dropdown.Item onClick={() => handleCancelClick(doc)}
-                                                               disabled={doc.status !== 0}>
+                                                               disabled={!(doc.status == 0 || doc.status === 7)}>
                                                     <CloseIcon fontSize="small" style={{marginRight: "6px"}}/>
                                                     요청 취소
                                                 </Dropdown.Item>
@@ -451,13 +451,13 @@ const RequestedDocuments = () => {
                                         </button>
                                         <button
                                             onClick={() => handleCancelClick(doc)}
-                                            disabled={doc.status !== 0}
+                                            disabled={!(doc.status == 0 || doc.status == 7)}
                                             style={{
                                                 display: "flex", alignItems: "center", padding: "5px 10px",
                                                 border: "1px solid #ccc", borderRadius: "5px",
                                                 backgroundColor: "transparent",
-                                                color: doc.status !== 0 ? "#aaa" : "#000000",
-                                                pointerEvents: doc.status !== 0 ? "none" : "auto"
+                                                color: !(doc.status == 0 || doc.status == 7) ? "#aaa" : "#000000",
+                                                pointerEvents: !(doc.status == 0 || doc.status == 7) ? "none" : "auto"
                                             }}
                                         >
                                             <CloseIcon fontSize="small" style={{marginRight: "6px"}}/>

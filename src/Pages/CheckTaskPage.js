@@ -220,7 +220,7 @@ const MainContainer = styled.div`
   flex-direction: column;
   min-height: 100vh;
   background-color: #f5f5f5;
-  padding-top: 80px;
+
 `;
 
 const ContentWrapper = styled.div`

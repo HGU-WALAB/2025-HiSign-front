@@ -288,7 +288,7 @@ const ReceivedDocuments = () => {
                                                 문서 보기
                                             </Dropdown.Item>
                                             <Dropdown.Item as={Link} to={`/checkEmail?token=${doc.token}`}
-                                                            disabled={doc.status !== 0}>
+                                                            disabled={doc.status !== 0 && doc.signStatus !== 0}>
                                                 <DrawIcon fontSize="small" style={{marginRight: "6px"}}/>
                                                 서명 하기
                                             </Dropdown.Item>
@@ -298,7 +298,7 @@ const ReceivedDocuments = () => {
                                                 다운로드
                                             </Dropdown.Item>
                                             <Dropdown.Item onClick={() => handleRejectClick(doc)}
-                                                           disabled={doc.status !== 0 || doc.isRejectable !== 1}>
+                                                           disabled={doc.status !== 0 || doc.isRejectable !== 1 || doc.signStatus !== 0}>
                                                 <DoDisturbIcon fontSize="small" style={{marginRight: "6px"}}/>
                                                 요청 거절
                                             </Dropdown.Item>
@@ -344,8 +344,8 @@ const ReceivedDocuments = () => {
                                             display: "flex", alignItems: "center", padding: "5px 10px",
                                             border: "1px solid #ccc", borderRadius: "5px",
                                             textDecoration: "none",
-                                            color: doc.status !== 0 ? "#aaa" : "#007bff",
-                                            pointerEvents: doc.status !== 0 ? "none" : "auto"
+                                            color: (doc.status !== 0 || doc.signStatus !== 0)? "#aaa" : "#007bff",
+                                            pointerEvents: (doc.status !== 0 || doc.signStatus !== 0)? "none" : "auto"
                                         }}>
                                             <DrawIcon fontSize="small" style={{marginRight: "6px"}}/>
                                             서명 하기
@@ -379,16 +379,25 @@ const ReceivedDocuments = () => {
                                         </button>
                                         <button
                                             onClick={() => handleRejectClick(doc)}
-                                            disabled={doc.status !== 0 || doc.isRejectable !== 1}
+                                            disabled={!(doc.status === 0 && doc.isRejectable === 1 && doc.signStatus === 0)}
                                             style={{
-                                                display: "flex", alignItems: "center", padding: "5px 10px",
-                                                border: "1px solid #ccc", borderRadius: "5px",
+                                                display: "flex",
+                                                alignItems: "center",
+                                                padding: "5px 10px",
+                                                border: "1px solid #ccc",
+                                                borderRadius: "5px",
                                                 backgroundColor: "transparent",
-                                                color: doc.status !== 0 || doc.isRejectable !== 1 ? "#aaa" : "#000000",
-                                                pointerEvents: doc.status !== 0 || doc.isRejectable !== 1 ? "none" : "auto"
+                                                color:
+                                                doc.status === 0 && doc.isRejectable === 1 && doc.signStatus === 0
+                                                    ? "#000000"
+                                                    : "#aaa",
+                                                pointerEvents:
+                                                doc.status === 0 && doc.isRejectable === 1 && doc.signStatus === 0
+                                                    ? "auto"
+                                                    : "none",
                                             }}
-                                        >
-                                            <DoDisturbIcon fontSize="small" style={{marginRight: "6px"}}/>
+                                            >
+                                            <DoDisturbIcon fontSize="small" style={{ marginRight: "6px" }} />
                                             요청 거절
                                         </button>
                                         <button
