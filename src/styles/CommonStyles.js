@@ -45,12 +45,16 @@ export const MainArea = styled.div`
 `;
 
 export const ButtonContainer = styled.div`
+  position: sticky;
+  bottom: 20px;
+  left: 0;
+  right: 0;
   display: flex;
   justify-content: center;
-  align-items: center;
-  gap: 10px;
-  margin: 20px 0;
-  padding: 20px;
+  gap: 20px;
+  padding: 15px 0;
+  background-color: transparent;
+  z-index: 100;
 `;
 
 export const GrayButton = styled(ButtonBase)`

@@ -1,6 +1,5 @@
-import React from 'react';
-import {primary45} from '../utils/colors';
-import {useIsSmallScreen} from '../hooks/useIsSmallScreen';
+import { useIsSmallScreen } from '../hooks/useIsSmallScreen';
+import { primary45 } from '../utils/colors';
 
 export function Modal({onClose, children, isVisible, style, positionTop}) {
   const isSmallScreen = useIsSmallScreen();
