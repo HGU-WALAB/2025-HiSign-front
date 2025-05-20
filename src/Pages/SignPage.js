@@ -217,7 +217,6 @@ const DocumentContainer = styled.div`
 
 
 
-
 const StyledDrawer = styled(Drawer)`
   && {
     width: 300px;
