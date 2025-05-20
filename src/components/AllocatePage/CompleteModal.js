@@ -4,7 +4,7 @@ import { BeatLoader } from "react-spinners";
 import { useRecoilValue } from 'recoil';
 import { taskState } from '../../recoil/atom/taskState';
 
-const CompleteModal = ({ open, onClose, onConfirm, loading, type}) => {
+const CompleteModal = ({ open, onClose, onConfirm, loading}) => {
   const document = useRecoilValue(taskState);
 
   const handleConfirm = async () => {
@@ -12,16 +12,11 @@ const CompleteModal = ({ open, onClose, onConfirm, loading, type}) => {
   };
 
   const confirmMessage =
-    type === "sign"
-      ? "서명을 완료하시겠습니까?"
-      : document.type === 1
-        ? "검토 요청을 보내시겠습니까?"
-        : "요청을 완료하시겠습니까?";
+    document.type === 1
+      ? "검토 요청을 보내시겠습니까?"
+      : "요청을 완료하시겠습니까?";
 
-  const warningText =
-    type === "sign"
-      ? "*서명을 완료하시면 취소는 불가합니다."
-      : "*요청을 보내시면 수정이 불가합니다.";
+  const warningText = "*요청을 보내시면 수정이 불가합니다.";
 
   return (
     <>
@@ -44,7 +39,7 @@ const CompleteModal = ({ open, onClose, onConfirm, loading, type}) => {
           }}
         >
           {/* 근무일지 안내 */}
-          {document.type === 1 && type !== "complete" && (
+          {document.type === 1 && (
             <>
               <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 'bold' }}>
                 📝 근무일지 작성 시 확인사항
@@ -84,17 +79,18 @@ const CompleteModal = ({ open, onClose, onConfirm, loading, type}) => {
                 onClick={handler}
                 disableElevation
                 sx={{
-                  backgroundColor: '#03A3FF',
-                  color: 'white',
+                  backgroundColor: label === '취소' ? 'white' : '#03A3FF',
+                  color: label === '취소' ? '#03A3FF' : 'white',
                   fontSize: '1rem',
                   fontWeight: 'bold',
                   padding: '12px 24px',
                   borderRadius: '24px',
                   boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.2)',
-                  border: 'none',
+                  border:'2px solid #03A3FF',
                   whiteSpace: 'nowrap',
                   '&:hover': {
-                    backgroundColor: '#0393e6',
+                    backgroundColor: label === '취소' ? '#f0f8ff' : '#0393e6',
+                    color: label === '취소' ? '#03A3FF' : 'white',
                     boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.25)',
                   },
                 }}

@@ -2,12 +2,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import styled from 'styled-components';
 import { loginMemberState } from '../../recoil/atom/loginMemberState';
 import { signerState } from '../../recoil/atom/signerState';
 import { taskState } from '../../recoil/atom/taskState';
+import { NextButton } from "../../styles/CommonStyles";
 import ApiService from '../../utils/ApiService';
-import ButtonBase from '../ButtonBase';
 import CompleteModal from './CompleteModal';
 
 const CompleteButton = () => {
@@ -89,9 +88,9 @@ const CompleteButton = () => {
 
   return (
    <>
-  <CompleteButtonStyle onClick={handleOpenModal} disabled={loading}>
+  <NextButton onClick={handleOpenModal} disabled={loading}>
     완료
-  </CompleteButtonStyle>
+  </NextButton>
 
   <CompleteModal
     open={open}
@@ -106,23 +105,4 @@ const CompleteButton = () => {
 };
 
 export default CompleteButton;
-
-// const BigButton = styled(ButtonBase)`
-//   background-color: ${({ disabled }) => (disabled ? "#ccc" : "#03A3FF")};
-//   font-size: 1rem;
-//   font-weight: bold;
-// `;
-
-
-const CompleteButtonStyle = styled(ButtonBase)`
-
-  background-color: ${({ disabled }) => (disabled ? "#ccc" : "#03A3FF")};
-  color: white;
-  font-size: 1rem;
-  padding: 12px 24px;
-  border-radius: 24px;
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
-  border: none;
-`;
-
 

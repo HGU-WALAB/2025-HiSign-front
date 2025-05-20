@@ -10,6 +10,7 @@ import CompleteButton from '../components/AllocatePage/CompleteButton';
 import PagingControl from "../components/PagingControl";
 import { signerState } from "../recoil/atom/signerState";
 import { taskState } from "../recoil/atom/taskState";
+import { ButtonContainer, GrayButton } from "../styles/CommonStyles";
 import SignatureService from "../utils/SignatureService";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
@@ -138,10 +139,10 @@ const AllocatePage = () => {
           </DocumentSection>
 
           {/* ✅ 버튼 영역 이동 */}
-          <FloatingButtonContainer>
-            <FloatingGrayButton onClick={() => navigate("/request")}>이전으로</FloatingGrayButton>
+          <ButtonContainer>
+            <GrayButton onClick={() => navigate("/request")}>이전으로</GrayButton>
             <CompleteButton />
-          </FloatingButtonContainer>
+          </ButtonContainer>
         </Container>
       </ContentWrapper>
     </MainContainer>
@@ -232,28 +233,6 @@ const LoadingMessage = styled.p`
   text-align: center;
   padding: 20px;
   color: #666;
-`;
-
-const FloatingButtonContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin-top: 24px;
-`;
-
-const FloatingGrayButton = styled.button`
-  background-color: #ccc;
-  color: white;
-  font-size: 1rem;
-  padding: 12px 24px;
-  border-radius: 24px;
-  border: none;
-  cursor: pointer;
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
-
-  &:hover {
-    background-color: #bbb;
-  }
 `;
 
 export default AllocatePage;

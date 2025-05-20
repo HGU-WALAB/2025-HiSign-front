@@ -1,10 +1,10 @@
 // PreviewTaskPage.js
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
-import CompleteModal from "../components/AllocatePage/CompleteModal";
 import ButtonBase from "../components/ButtonBase";
+import ConfirmModal from "../components/ConfirmModal";
 import RejectModal from "../components/ListPage/RejectModal";
 import PDFViewer from "../components/SignPage/PDFViewer";
 import SignaturePopup from "../components/SignPage/SignaturePopup";
@@ -144,12 +144,14 @@ const PreviewPage = () => {
         />
       )}
 
-      <CompleteModal
+      <ConfirmModal
         open={showCompleteModal}
+        loading={loading}
         onClose={() => setShowCompleteModal(false)}
         onConfirm={handleSubmitSignature}
-        loading={loading}
-        type="sign"
+        title="서명 완료"
+        message="서명을 완료하시겠습니까?"
+        warningText="완료 후에는 수정할 수 없습니다."
       />
 
       <RejectModal
@@ -257,7 +259,7 @@ const ButtonContainer = styled.div`
   flex-direction: column-reverse;
 
   @media (max-width: 768px) {
-    flex-direction: column;
+    flex-direction: row;
     gap: 10px;
   }
 `;
@@ -265,8 +267,13 @@ const ButtonContainer = styled.div`
 const NextButton = styled(ButtonBase)`
   background-color: #03a3ff;
   color: white;
+
   &:hover {
     background-color: rgba(3, 163, 255, 0.66);
+  }
+
+  @media (max-width: 768px) {
+    width: 40%;
   }
 `;
 
@@ -276,5 +283,9 @@ const RejectButton = styled(ButtonBase)`
 
   &:hover {
     background-color: rgb(179, 0, 0);
+  }
+
+  @media (max-width: 768px) {
+    width: 40%;
   }
 `;

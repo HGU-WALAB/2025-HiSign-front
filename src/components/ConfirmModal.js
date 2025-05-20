@@ -1,6 +1,5 @@
 // ConfirmModal.js
 import { Box, Button, Modal, Typography } from '@mui/material';
-import React from 'react';
 import { BeatLoader } from "react-spinners";
 
 const ConfirmModal = ({
@@ -9,7 +8,8 @@ const ConfirmModal = ({
   onClose,
   onConfirm,
   title,
-  message
+  message,
+  warningText
 }) => {
 
   const handleConfirm = async () => {
@@ -40,8 +40,12 @@ const ConfirmModal = ({
             </Typography>
           )}
 
-          <Typography variant="body1" sx={{ mb: 3 }}>
+          <Typography variant="body1" sx={{ mb: 1 }}>
             {message}
+          </Typography>
+
+          <Typography variant="caption" sx={{ color: 'red', display: 'block', mb: 3 }}>
+            *{warningText}
           </Typography>
 
           <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
