@@ -1,13 +1,15 @@
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import UploadIcon from "@mui/icons-material/CloudUpload";
-import DrawIcon from "@mui/icons-material/Draw";
-import EditIcon from "@mui/icons-material/Edit";
-import ShareIcon from "@mui/icons-material/Share";
-import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import moment from "moment";
 import ApiService from "../utils/ApiService";
+import DrawIcon from "@mui/icons-material/Draw";
+import PersonAddAltIcon from "@mui/icons-material/PersonAddAlt";
+
+import SettingsIcon from "@mui/icons-material/Settings";
+import ShareIcon from "@mui/icons-material/Share";
+import EditIcon from "@mui/icons-material/Edit";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 function DashBoardPage() {
   const [recentDocuments, setRecentDocuments] = useState([]);
@@ -38,25 +40,27 @@ function DashBoardPage() {
 
   const steps = [
     {
-      icon: <UploadIcon fontSize="large" />,
-      title: "서명 요청",
-      desc: "문서를 업로드하고 서명 요청을 생성합니다.",
+     title: "1. 작업 정보 입력",
+icon: <EditIcon fontSize="large" />,
+desc: "진행할 작업의 유형과 세부 내용을 입력하세요.",
+
     },
     {
-      icon: <ShareIcon fontSize="large" />,
-      title: "문서 이메일 전송",
-      desc: "상대방에게 이메일로 문서를 전달합니다.",
+      icon: <PersonAddAltIcon fontSize="large" />,
+      title: "2. 서명자 지정",
+desc: "문서에 서명할 사람을 추가하고 지정하세요.",
     },
     {
-      icon: <EditIcon fontSize="large" />,
-      title: "서명 진행",
-      desc: "상대방이 서명하거나 거절합니다.",
+      icon: <SettingsIcon fontSize="large" />,
+      title: "3. 서명 구역 설정",
+desc: "서명자가 서명할 위치를 문서에 지정하세요.",
     },
     {
       icon: <CheckCircleIcon fontSize="large" />,
-      title: "완료 확인",
-      desc: "완료된 문서를 확인하거나 다운로드합니다.",
+      title: "4. 작업 생성 완료",
+desc: "모든 작업 생성 설정이 완료되었습니다! ",
     },
+    
   ];
 
   return (
@@ -78,12 +82,15 @@ function DashBoardPage() {
       </Section>
 
       <Section>
-  <SectionTitle>사용 방법</SectionTitle>
+  <SectionTitle>작업 생성 방법</SectionTitle>
   <StepFlowContainer>
     {steps.map((step, index) => (
       <React.Fragment key={index}>
         <StepCardStyled>
+          
           <IconCircle>{step.icon}</IconCircle>
+          <br/>
+          
           <StepText>
             <StepTitle>{step.title}</StepTitle>
             <StepDesc>{step.desc}</StepDesc>
@@ -319,7 +326,7 @@ const StepFlowContainer = styled.div`
   justify-content: space-between;
   align-items: center;
   flex-wrap: nowrap;
-  flex-direction: row;
+  flex-direction: col;
   gap: 12px;
   width: 100%;
 `;

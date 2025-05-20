@@ -99,8 +99,8 @@ const styles = {
     },
     confirmButton: {
         padding: "6px 12px",
-        border: "1px solid #007BFF",
-        backgroundColor: "#007BFF",
+        border: "1px solid #2566e8;",
+        backgroundColor: "#2566e8;",
         color: "white",
         borderRadius: "8px",
         cursor: "pointer",
@@ -111,8 +111,8 @@ const styles = {
     cancelButton: {
         padding: "6px 12px",
         border: "1px solid #ccc",
-        backgroundColor: "#ccc",
-        color: "#000",
+        backgroundColor: "#2566e8;",
+        color: "#2566e8;",
         borderRadius: "8px",
         cursor: "pointer",
         fontSize: "14px",

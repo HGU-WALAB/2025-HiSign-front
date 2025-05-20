@@ -16,7 +16,7 @@ const RejectModal = ({ isVisible, onClose, onConfirm, rejectReason, setRejectRea
                     value={rejectReason}
                     onChange={(e) => setRejectReason(e.target.value)}
                     style={styles.textarea}
-                    placeholder={`${actionLabel} 사유를 입력하세요`}
+                    placeholder={`${actionLabel} 사유를 입력해주세요. `}
                 />
 
                 <div style={styles.footer}>
@@ -94,8 +94,8 @@ const styles = {
     },
     confirmButton: {
         padding: "6px 12px",
-        border: "1px solid #007BFF",
-        backgroundColor: "#007BFF",
+        border: "1px solid #c02424",
+        backgroundColor: "#c02424",
         color: "white",
         borderRadius: "8px",
         cursor: "pointer",

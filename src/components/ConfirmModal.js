@@ -45,11 +45,12 @@ const ConfirmModal = ({
           </Typography>
 
           <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
+            
+            <Button variant="outlined" color="grey" onClick={onClose}>
+              취소
+            </Button>
             <Button variant="contained" color="primary" onClick={handleConfirm}>
               확인
-            </Button>
-            <Button variant="outlined" color="secondary" onClick={onClose}>
-              취소
             </Button>
           </div>
         </Box>

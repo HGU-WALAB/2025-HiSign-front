@@ -109,13 +109,28 @@ const PreviewPage = () => {
             <InfoItem><Label>서명 상태:</Label><Value>{signing.isSigned ? "서명 완료" : "서명 대기중"}</Value></InfoItem>
           </InfoSection>
 
-          <ButtonContainer>
+          {/* <ButtonContainer>
             {signing.isRejectable && <RejectButton onClick={handleReject}>거절하기</RejectButton>}
             <NextButton onClick={() => setShowPopup(true)}>
               {isAllSigned ? "다시 서명하기" : "서명하기"}
-            </NextButton>
+            </NextButton>Button
             {isAllSigned && <NextButton onClick={() => setShowCompleteModal(true)}>서명 완료</NextButton>}
-          </ButtonContainer>
+          </ButtonContainer> */}
+
+          <ButtonContainer>
+  {signing.isRejectable && <RejectButton onClick={handleReject}>거절하기</RejectButton>}
+  
+  {isAllSigned ? (
+    <OutlinedButton onClick={() => setShowPopup(true)}>다시 서명하기</OutlinedButton>
+  ) : (
+    <NextButton onClick={() => setShowPopup(true)}>서명하기</NextButton>
+  )}
+
+  {isAllSigned && (
+    <NextButton onClick={() => setShowCompleteModal(true)}>서명 완료</NextButton>
+  )}
+</ButtonContainer>
+
         </Sidebar>
 
         <PDFWrapper>
@@ -265,16 +280,29 @@ const ButtonContainer = styled.div`
 const NextButton = styled(ButtonBase)`
   background-color: #03a3ff;
   color: white;
+
   &:hover {
     background-color: rgba(3, 163, 255, 0.66);
   }
 `;
+
+const OutlinedButton = styled(ButtonBase)`
+  background-color: transparent;
+  color: #03a3ff;
+  border: 2px solid #03a3ff;
+
+  &:hover {
+    background-color: rgba(3, 163, 255, 0.05);
+  }
+`;
+
+
 
 const RejectButton = styled(ButtonBase)`
   background-color: rgb(255, 0, 0);
   color: white;
 
   &:hover {
-    background-color: rgb(179, 0, 0);
+    background-color: rgb(200, 0, 0);
   }
 `;
