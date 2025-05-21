@@ -9,6 +9,7 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import styled from "styled-components";
 import Drop from "../components/Drop";
 import PasswordInputSection from "../components/SetupTask/PasswordInputSection";
+import StepProgressBar from "../components/StepProgressBar";
 import { loginMemberState } from "../recoil/atom/loginMemberState";
 import { taskState } from "../recoil/atom/taskState";
 import { GrayButton, Label, NextButton, StyledBody } from "../styles/CommonStyles";
@@ -164,6 +165,7 @@ const SetupTaskPage = () => {
 
   return (
     <OptimizedContainer>
+      <StepProgressBar currentStep={0} />
       <StyledBody>
         <OptimizedMainArea>
           <PageHeader>

@@ -8,6 +8,7 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import styled from 'styled-components';
 import CompleteButton from '../components/AllocatePage/CompleteButton';
 import PagingControl from "../components/PagingControl";
+import StepProgressBar from "../components/StepProgressBar";
 import { signerState } from "../recoil/atom/signerState";
 import { taskState } from "../recoil/atom/taskState";
 import { ButtonContainer, GrayButton } from "../styles/CommonStyles";
@@ -45,6 +46,7 @@ const AllocatePage = () => {
 
   return (
     <MainContainer>
+      <StepProgressBar currentStep={2}/>
       <ContentWrapper>
         <Container>
           <DocumentHeader>
