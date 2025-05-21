@@ -195,19 +195,69 @@ function Sidebar() {
           )}
         </div>
 
-        <div
-          style={{
-            marginTop: "auto",
-            fontSize: 12,
-            color: "#888",
-            textAlign: "center",
-            paddingTop: "1rem",
-          }}
-        >
-          Copyright © WALAB. HiSign 2025
-          <br />
-          김솔미 김홍찬 류찬미
-        </div>
+      <div>
+
+  <a
+    href="https://thisissolmi.notion.site/KOR-HiSign-1f4a5fe4505f809b975ae0a4cd864602"
+    target="_blank"
+    rel="noopener noreferrer"
+    style={{
+      display: "block",
+      width: "100%",
+      backgroundColor: "#1976d2",
+      color: "white",
+      textAlign: "center",
+      padding: "10px 0",
+      borderRadius: "8px",
+      textDecoration: "none",
+      fontWeight: "500",
+      fontSize: "14px",
+      marginBottom: "12px",
+    }}
+  >
+    
+    국문 메뉴얼 보기
+  </a>
+
+      
+  <a
+    href="https://pf.kakao.com/_xcmKXn"
+    target="_blank"
+    rel="noopener noreferrer"
+    style={{
+      display: "block",
+      width: "100%",
+      backgroundColor: "#1976d2",
+      color: "white",
+      textAlign: "center",
+      padding: "10px 0",
+      borderRadius: "8px",
+      textDecoration: "none",
+      fontWeight: "500",
+      fontSize: "14px",
+      marginBottom: "12px",
+    }}
+  >
+    
+    문의하기
+  </a>
+
+
+  <div
+    style={{
+      fontSize: 12,
+      color: "#888",
+      textAlign: "center",
+      lineHeight: 1.4,
+    }}
+  >
+    Copyright © WALAB. HiSign 2025
+    <br />
+    김솔미 김홍찬 류찬미
+  </div>
+</div>
+
+   
       </aside>
 
       {isMobile && sidebarOpen && (

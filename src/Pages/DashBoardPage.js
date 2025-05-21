@@ -1,3 +1,5 @@
+// DashBoardPage.js
+
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
@@ -5,7 +7,6 @@ import moment from "moment";
 import ApiService from "../utils/ApiService";
 import DrawIcon from "@mui/icons-material/Draw";
 import PersonAddAltIcon from "@mui/icons-material/PersonAddAlt";
-
 import SettingsIcon from "@mui/icons-material/Settings";
 import ShareIcon from "@mui/icons-material/Share";
 import EditIcon from "@mui/icons-material/Edit";
@@ -40,27 +41,25 @@ function DashBoardPage() {
 
   const steps = [
     {
-     title: "1. 작업 정보 입력",
-icon: <EditIcon fontSize="large" />,
-desc: "진행할 작업의 유형과 세부 내용을 입력하세요.",
-
+      title: "1. 작업 정보 입력",
+      icon: <EditIcon fontSize="large" />,
+      desc: "진행할 작업의 유형과 세부 내용을 입력하세요.",
     },
     {
       icon: <PersonAddAltIcon fontSize="large" />,
       title: "2. 서명자 지정",
-desc: "문서에 서명할 사람을 추가하고 지정하세요.",
+      desc: "문서에 서명할 사람을 추가하고 지정하세요.",
     },
     {
       icon: <SettingsIcon fontSize="large" />,
       title: "3. 서명 구역 설정",
-desc: "서명자가 서명할 위치를 문서에 지정하세요.",
+      desc: "서명자가 서명할 위치를 문서에 지정하세요.",
     },
     {
       icon: <CheckCircleIcon fontSize="large" />,
       title: "4. 작업 생성 완료",
-desc: "모든 작업 생성 설정이 완료되었습니다! ",
+      desc: "모든 작업 생성 설정이 완료되었습니다!",
     },
-    
   ];
 
   return (
@@ -82,33 +81,22 @@ desc: "모든 작업 생성 설정이 완료되었습니다! ",
       </Section>
 
       <Section>
-  <SectionTitle>작업 생성 방법</SectionTitle>
-  <StepFlowContainer>
-    {steps.map((step, index) => (
-      <React.Fragment key={index}>
-        <StepCardStyled>
-          
-          <IconCircle>{step.icon}</IconCircle>
-          <br/>
-          
-          <StepText>
-            <StepTitle>{step.title}</StepTitle>
-            <StepDesc>{step.desc}</StepDesc>
-          </StepText>
-        </StepCardStyled>
-        {index !== steps.length - 1 && <Arrow>➝</Arrow>}
-      </React.Fragment>
-    ))}
-  </StepFlowContainer>
-</Section>
+        <SectionTitle>작업 생성 방법</SectionTitle>
+        <StepFlowContainer>
+          {steps.map((step, index) => (
+            <StepCardStyled key={index}>
+              <IconCircle>{step.icon}</IconCircle>
+              <br />
+              <StepText>
+                <StepTitle>{step.title}</StepTitle>
+                <StepDesc>{step.desc}</StepDesc>
+              </StepText>
+            </StepCardStyled>
+          ))}
+        </StepFlowContainer>
+      </Section>
 
-
-      <InquirySection>
-        <p>도움이 필요하신가요?</p>
-        <a href="http://pf.kakao.com/_xcmKXn" target="_blank" rel="noopener noreferrer">
-          <InquiryButton>문의하기</InquiryButton>
-        </a>
-      </InquirySection>
+  
 
       <FloatingCenterLink to="/tasksetup">
         <DrawIcon style={{ fontSize: "32px" }} />
@@ -159,17 +147,9 @@ const CardContainer = styled.div`
   overflow-x: auto;
   padding-bottom: 10px;
 
-  &::-webkit-scrollbar {
-    height: 8px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background-color: #ccc;
-    border-radius: 4px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background-color: #f0f0f0;
+  @media (max-width: 768px) {
+    flex-direction: column;
+    overflow-x: hidden;
   }
 `;
 
@@ -183,6 +163,10 @@ const DocumentCard = styled.div`
   flex-direction: column;
   gap: 10px;
   flex-shrink: 0;
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 
 const DocTitle = styled.h3`
@@ -208,45 +192,36 @@ const DetailLink = styled(Link)`
   }
 `;
 
-const TimelineContainer = styled.div`
+const StepFlowContainer = styled.div`
   display: flex;
-  overflow-x: auto;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 20px;
-  padding-bottom: 10px;
-  justify-content: flex-start;
+
   @media (max-width: 768px) {
     flex-direction: column;
-    align-items: center;
-  }
-
-  &::-webkit-scrollbar {
-    height: 8px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background-color: #ccc;
-    border-radius: 4px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background-color: #f0f0f0;
+    align-items: stretch;
   }
 `;
 
-const StepItem = styled.div`
+const StepCardStyled = styled.div`
   background: #eef4ff;
   border-radius: 12px;
   padding: 20px;
-  min-width: 240px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  gap: 16px;
+  width: 220px;
+  text-align: center;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   transition: transform 0.2s ease;
 
   &:hover {
-    transform: translateY(-4px);
+    transform: translateY(-5px);
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
   }
 `;
 
@@ -319,40 +294,4 @@ const FloatingCenterLink = styled(Link)`
   &:hover {
     background-color: #4682b4;
   }
-`;
-
-const StepFlowContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: nowrap;
-  flex-direction: col;
-  gap: 12px;
-  width: 100%;
-`;
-
-const StepCardStyled = styled.div`
-  background: #eef4ff;
-  border-radius: 12px;
-  padding: 20px;
-  width: 220px;
-  text-align: center;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  transition: transform 0.2s ease;
-
-  &:hover {
-    transform: translateY(-5px);
-  }
-`;
-
-
-
-const Arrow = styled.div`
-  font-size: 1.8rem;
-  color: #999;
-  font-weight: bold;
-  margin: 0 5px;
 `;
