@@ -121,22 +121,25 @@ const CheckTaskPage = () => {
     setShowModal(true);
   };
 
-  const handleConfirmReject = () => {
+  const handleConfirmReject = async () => {
     if (!rejectReason.trim()) {
       alert("반려 사유를 입력해주세요.");
       return;
     }
 
-    ApiService.rejectCheck(signing.documentId, rejectReason)
-      .then(() => {
-        alert("요청이 반려되었습니다.");
-        setShowModal(false);
-        navigate("/");
-      })
-      .catch((error) => {
-        console.error("요청 반려 중 오류 발생:", error);
-        alert("요청 반려에 실패했습니다.");
-      });
+    setLoading(true);
+
+    try {
+      await ApiService.rejectCheck(signing.documentId, rejectReason);
+      alert("요청이 반려되었습니다.");
+      setShowModal(false);
+      navigate("/");
+    } catch (error) {
+      console.error("요청 반려 중 오류 발생:", error);
+      alert("요청 반려에 실패했습니다.");
+    } finally {
+      setLoading(false); // 성공/실패 모두 로딩 해제
+    }
   };
 
   if (error) {
@@ -212,6 +215,7 @@ const CheckTaskPage = () => {
 
       <RejectModal
         isVisible={showModal}
+        loading={loading}
         onClose={() => setShowModal(false)}
         onConfirm={handleConfirmReject}
         rejectReason={rejectReason}

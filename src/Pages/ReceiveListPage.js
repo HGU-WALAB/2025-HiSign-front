@@ -34,6 +34,7 @@ const ReceivedDocuments = () => {
     const [expiredSortOrder, setExpiredSortOrder] = useState(null);
     const [statusFilter, setStatusFilter] = useState("all");
     const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 1024);
+    const [loading, setLoading] = useState(false);
 
 
     //드롭다운 메뉴 반응형
@@ -108,31 +109,34 @@ const ReceivedDocuments = () => {
         setShowModal(true);
     };
 
-    const handleConfirmReject = () => {
+    const handleConfirmReject = async () => {
         if (!rejectReason.trim()) {
             alert("거절 사유를 입력해주세요.");
             return;
         }
+        setLoading(true);
+        try {
+            await ApiService.rejectDocument(
+                selectedDocument.id,
+                rejectReason,
+                selectedDocument.token,
+                loginMember.email,
+                loginMember.name
+            );
 
-        ApiService.rejectDocument(
-            selectedDocument.id,
-            rejectReason,
-            selectedDocument.token,
-            loginMember.email
-        )
-            .then(() => {
-                alert("요청이 거절되었습니다.");
-                setShowModal(false);
-                setDocuments((prevDocs) =>
-                    prevDocs.map((doc) =>
-                        doc.id === selectedDocument.id ? { ...doc, status: 2 } : doc
-                    )
-                );
-            })
-            .catch((error) => {
-                console.error("요청 거절 중 오류 발생:", error);
-                alert("요청 거절에 실패했습니다.");
-            });
+            alert("요청이 거절되었습니다.");
+            setShowModal(false);
+            setDocuments((prevDocs) =>
+                prevDocs.map((doc) =>
+                    doc.id === selectedDocument.id ? { ...doc, status: 2 } : doc
+                )
+            );
+        } catch (error) {
+            console.error("요청 거절 중 오류 발생:", error);
+            alert("요청 거절에 실패했습니다.");
+        } finally {
+            setLoading(false); // ✅ 로딩 종료
+        }
     };
 
     const handlePageChange = (event, value) => {
@@ -549,6 +553,7 @@ const ReceivedDocuments = () => {
 
             <RejectModal
                 isVisible={showModal}
+                loading={loading}
                 onClose={() => setShowModal(false)}
                 onConfirm={handleConfirmReject}
                 rejectReason={rejectReason}
