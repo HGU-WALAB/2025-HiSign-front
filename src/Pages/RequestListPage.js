@@ -126,7 +126,6 @@ const RequestedDocuments = () => {
     };
 
 
-
     const handleConfirmCancel = () => {
         if (!cancelReason.trim()) {
             alert("취소 사유를 입력해주세요.");
@@ -188,6 +187,12 @@ const RequestedDocuments = () => {
         });
 
     const paginatedDocuments = filteredDocuments.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+    const [openDropdownId, setOpenDropdownId] = useState(null); // 추가
+
+    const toggleDropdown = (id) => {
+        setOpenDropdownId((prevId) => (prevId === id ? null : id));
+    };
 
     return (
         <PageContainer>
@@ -340,13 +345,10 @@ const RequestedDocuments = () => {
                             <div style={{display: "flex", alignItems: "center"}}>
                                 {isMobileView ? (
                                     <div style={{position: "relative", marginTop: "12px"}}>
-                                        <Dropdown style={{
-                                            position: "relative",
-                                            top: "18px",
-                                            right: "-5px",
-                                        }}>
+                                        <Dropdown style={{position: "relative", top: "35px", right: "-5px"}}>
                                             <Dropdown.Toggle
                                                 variant="dark"
+                                                onClick={() => toggleDropdown(doc.id)}
                                                 style={{
                                                     padding: "6px 12px",
                                                     borderRadius: "6px",
@@ -361,48 +363,92 @@ const RequestedDocuments = () => {
                                             >
                                                 메뉴
                                             </Dropdown.Toggle>
-                                            <Dropdown.Menu
-                                                style={{
-                                                    backgroundColor: "#fff",
-                                                    boxShadow: "0 4px 8px rgba(0,0,0,0.2)", // 그림자 강화
-                                                    borderRadius: "6px",
-                                                    zIndex: 2000,
-                                                }}
-                                            >
 
-                                                <Dropdown.Item as={Link} to={`/detail/${doc.id}`}>
-                                                    <FindInPageIcon fontSize="small"
-                                                                    style={{marginRight: "6px", color: "#000000"}}/>
-                                                    문서 보기
-                                                </Dropdown.Item>
-                                                <Dropdown.Item onClick={() => downloadPDF(doc.id)}
-                                                               disabled={doc.status !== 1}><DownloadIcon/> 다운로드
-                                                </Dropdown.Item>
-                                                <Dropdown.Item onClick={() => handleCancelClick(doc)}
-                                                               disabled={!(doc.status == 0 || doc.status === 7)}>
-                                                    <CloseIcon fontSize="small" style={{marginRight: "6px"}}/>
-                                                    요청 취소
-                                                </Dropdown.Item>
-                                                <Dropdown.Item
-                                                    onClick={() => {
-                                                        if (window.confirm("정말 이 문서를 삭제하시겠습니까?")) {
-                                                            ApiService.deleteDocument(doc.id)
-                                                                .then(() => {
-                                                                    alert("문서가 삭제되었습니다.");
-                                                                    setDocuments(prevDocs => prevDocs.filter(d => d.id !== doc.id));
-                                                                })
-                                                                .catch((err) => {
-                                                                    console.error("문서 삭제 실패:", err);
-                                                                    alert("문서 삭제에 실패했습니다.");
-                                                                });
-                                                        }
+                                            {openDropdownId === doc.id && (
+                                                <div
+                                                    style={{
+                                                        position: "absolute",
+                                                        top: "100%",
+                                                        right: 0,
+                                                        marginTop: "4px",
+                                                        backgroundColor: "#fff",
+                                                        border: "1px solid #ddd",
+                                                        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                                                        borderRadius: "8px",
+                                                        zIndex: 2000,
+                                                        width: "160px",
+                                                        padding: "6px 0"
                                                     }}
-                                                    style={{color: "#000000", display: "flex", alignItems: "center"}}
                                                 >
-                                                    <DeleteIcon fontSize="small" style={{marginRight: "6px"}}/>
-                                                    삭제
-                                                </Dropdown.Item>
-                                            </Dropdown.Menu>
+                                                    <div
+                                                        onClick={() => {
+                                                            window.location.href = `/detail/${doc.id}`;
+                                                            setOpenDropdownId(null);
+                                                        }}
+                                                        style={iconButtonStyle}
+                                                    >
+                                                        <FindInPageIcon fontSize="small" style={{marginRight: "6px"}}/>
+                                                        문서 보기
+                                                    </div>
+
+                                                    <div
+                                                        onClick={() => {
+                                                            if (doc.status === 1) {
+                                                                downloadPDF(doc.id);
+                                                                setOpenDropdownId(null);
+                                                            }
+                                                        }}
+                                                        style={{
+                                                            ...iconButtonStyle,
+                                                            color: doc.status !== 1 ? "#aaa" : "#333",
+                                                            pointerEvents: doc.status !== 1 ? "none" : "auto"
+                                                        }}
+                                                    >
+                                                        <DownloadIcon fontSize="small" style={{marginRight: "6px"}}/>
+                                                        다운로드
+                                                    </div>
+
+                                                    <div
+                                                        onClick={() => {
+                                                            if (doc.status === 0) {
+                                                                handleCancelClick(doc);
+                                                                setOpenDropdownId(null);
+                                                            }
+                                                        }}
+                                                        style={{
+                                                            ...iconButtonStyle,
+                                                            color: doc.status !== 0 ? "#aaa" : "#333",
+                                                            pointerEvents: doc.status !== 0 ? "none" : "auto"
+                                                        }}
+                                                    >
+                                                        <CloseIcon fontSize="small" style={{marginRight: "6px"}}/>
+                                                        요청 취소
+                                                    </div>
+
+                                                    <div
+                                                        onClick={() => {
+                                                            if (window.confirm("정말 이 문서를 삭제하시겠습니까?")) {
+                                                                ApiService.deleteDocument(doc.id)
+                                                                    .then(() => {
+                                                                        alert("문서가 삭제되었습니다.");
+                                                                        setDocuments((prevDocs) =>
+                                                                            prevDocs.filter((d) => d.id !== doc.id)
+                                                                        );
+                                                                        setOpenDropdownId(null);
+                                                                    })
+                                                                    .catch((err) => {
+                                                                        console.error("문서 삭제 실패:", err);
+                                                                        alert("문서 삭제에 실패했습니다.");
+                                                                    });
+                                                            }
+                                                        }}
+                                                        style={{...iconButtonStyle, color: "#dc3545"}}
+                                                    >
+                                                        <DeleteIcon fontSize="small" style={{marginRight: "6px"}}/>
+                                                        삭제
+                                                    </div>
+                                                </div>
+                                            )}
                                         </Dropdown>
                                     </div>
 
@@ -601,6 +647,19 @@ const RequestedDocuments = () => {
 };
 
 export default RequestedDocuments;
+
+const iconButtonStyle = {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    padding: "8px 16px",
+    cursor: "pointer",
+    fontSize: "14px",
+    color: "#333",
+    whiteSpace: "nowrap",
+    transition: "background-color 0.2s",
+};
+
 
 const FloatingCenterLink = styled(Link)`
     position: fixed;
