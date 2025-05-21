@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import { InputRow, Label } from "../../styles/CommonStyles";
 import { PasswordRequiredNotice, PasswordRow, RequiredMark } from "../../styles/SetupTaskStyle";
 import ValidatedTextField from "./ValidatedTextField";
-
 
 const PasswordInputSection = ({ onValid }) => {
   const [password, setPassword] = useState("");
@@ -10,39 +9,30 @@ const PasswordInputSection = ({ onValid }) => {
   const [passwordError, setPasswordError] = useState("");
   const [passwordMatch, setPasswordMatch] = useState(null);
 
+  useEffect(() => {
+    if (password.length === 5 && passwordConfirm.length === 5) {
+      const match = password === passwordConfirm;
+      setPasswordMatch(match);
+      onValid(password, match);
+    } else {
+      setPasswordMatch(null);
+      onValid(password, false);
+    }
+  }, [password, passwordConfirm]);
+
   const handlePasswordChange = (value) => {
     if (/^\d{0,5}$/.test(value)) {
       setPassword(value);
       setPasswordError(value.length !== 5 ? "숫자 5자리를 입력해주세요." : "");
-  
-      if (value.length === 5 && passwordConfirm.length === 5) {
-        const match = value === passwordConfirm;
-        setPasswordMatch(match);
-        onValid(value, match); // ✅ 일치 여부 전달
-      } else {
-        setPasswordMatch(null);
-        onValid(value, false);
-      }
     }
   };
-  
+
   const handlePasswordConfirmChange = (value) => {
     if (/^\d{0,5}$/.test(value)) {
       setPasswordConfirm(value);
-
-      const match = password === value;
-      const shouldCompare = password.length > 0 || value.length > 0;
-
-      if (shouldCompare) {
-        setPasswordMatch(match);
-        onValid(password, match); // 실시간 전달
-      } else {
-        setPasswordMatch(null); // 둘 다 비어있을 경우
-        onValid(password, false);
-      }
     }
   };
-  
+
   return (
     <InputRow>
       <Label>
@@ -53,15 +43,10 @@ const PasswordInputSection = ({ onValid }) => {
           type="password"
           placeholder="비밀번호 (숫자 5자리)"
           value={password}
-          onChange={(e) => {
-            handlePasswordChange(e.target.value);
-            handlePasswordConfirmChange(passwordConfirm);
-          }}
+          onChange={(e) => handlePasswordChange(e.target.value)}
           error={!!passwordError || passwordMatch === false}
           success={passwordMatch === true}
-          helperText={
-            passwordError ? passwordError : ""
-          }
+          helperText={passwordError || ""}
           size="small"
           sx={{ flex: 1, mr: 1 }}
         />
