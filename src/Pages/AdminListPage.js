@@ -4,6 +4,7 @@ import FindInPageIcon from '@mui/icons-material/FindInPage';
 import SearchIcon from '@mui/icons-material/Search';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import ViewModuleIcon from '@mui/icons-material/ViewModule';
+import { Modal, Box, Typography, Button } from "@mui/material";
 import { Pagination } from "@mui/material";
 import { saveAs } from "file-saver";
 import moment from 'moment';
@@ -167,6 +168,47 @@ const AdminDocuments = () => {
         const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
         saveAs(blob, "Ta근무일지.xlsx");
     };
+
+    const [signers, setSigners] = useState([]);
+    const [showSignersModal, setShowSignersModal] = useState(false);
+    const [signerCounts, setSignerCounts] = useState({});
+
+    const handleSearchClick = (docId) => {
+        ApiService.fetchSignersByDocument(docId)
+            .then((response) => {
+                setSigners(response);
+                setShowSignersModal(true);
+            })
+            .catch(() => {
+                alert("서명자 정보를 불러오는데 실패했습니다.");
+            });
+    };
+
+    useEffect(() => {
+        ApiService.fetchDocuments("admin")
+            .then(async (response) => {
+                const filteredDocuments = response.data.filter(doc => doc.status !== 5);
+                setDocuments(filteredDocuments);
+
+                const counts = {};
+                await Promise.all(filteredDocuments.map(async (doc) => {
+                    try {
+                        const response = await ApiService.fetchSignersByDocument(doc.id);
+                        const total = response.length;
+                        const signed = response.filter(s => s.status === 1).length;
+                        counts[doc.id] = `${signed}/${total}`;
+                    } catch (e) {
+                        counts[doc.id] = "0/0";
+                    }
+                }));
+
+                setSignerCounts(counts);
+            })
+            .catch((error) => {
+                console.error("문서 불러오기 오류:", error);
+                setError("문서를 불러오는 중 문제가 발생했습니다: " + error.message);
+            });
+    }, []);
 
     return (
         <PageContainer>
@@ -356,11 +398,31 @@ const AdminDocuments = () => {
                             />
 
                             <div style={{flex: 1, paddingLeft: "36px", color: "#000000"}}>
-                                <div style={{fontWeight: "bold",color: "#000000"}}>{doc.requestName}</div>
+                                <div style={{fontWeight: "bold", color: "#000000"}}>
+                                    {doc.requestName}
+                                    <button
+                                        onClick={() => handleSearchClick(doc.id)}
+                                        style={{
+                                            marginLeft: "8px",
+                                            padding: "2px 6px",
+                                            border: "none",
+                                            backgroundColor: "white",
+                                            color: "#000000",
+                                            cursor: "pointer",
+                                            fontSize: "13px"
+                                        }}
+                                    >
+                                        {signerCounts[doc.id] || ""}
+                                    </button>
+
+                                </div>
                                 <div style={{marginTop: "6px", color: "#000000"}}>
                                     상태: <StatusBadge status={doc.status}/>
                                 </div>
-                                <div style={{marginTop: "4px",color: "#000000"}}>생성일: {moment(doc.createdAt).format('YYYY/MM/DD')}</div>
+                                <div style={{
+                                    marginTop: "4px",
+                                    color: "#000000"
+                                }}>생성일: {moment(doc.createdAt).format('YYYY/MM/DD')}</div>
                                 <div style={{
                                     marginTop: "4px",
                                     color: doc.status === 0 && moment(doc.expiredAt).isSame(moment(), 'day') ? "red" : "black"
@@ -560,6 +622,40 @@ const AdminDocuments = () => {
                     ))}
                 </div>
             )}
+            <Modal open={showSignersModal} onClose={() => setShowSignersModal(false)}>
+                <Box sx={{
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                    bgcolor: "background.paper",
+                    boxShadow: 24,
+                    p: 4,
+                    width: "90%",
+                    maxWidth: "600px",
+                    minWidth: "280px",
+                    borderRadius: "8px"
+                }}>
+                    <Typography variant="h6" component="h2" sx={{ textAlign: "center" }}>서명자 정보</Typography>
+                    <Box sx={{ maxHeight: "300px", overflowY: "auto", mt: 2, p: 1 }}>
+                        {signers.length > 0 ? (
+                            <ul>
+                                {signers.map((signer, index) => (
+                                    <li key={index}>
+                                        {signer.name} ({signer.email}) - {signer.status === 1 ? `서명 완료 (${moment(signer.signedAt).format("YYYY-MM-DD HH:mm")})` : "서명 전"}
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <Typography textAlign="center">서명자 정보가 없습니다.</Typography>
+                        )}
+                    </Box>
+                    <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 3 }}>
+                        <Button variant="contained" color="info" onClick={() => setShowSignersModal(false)} sx={{ width: "80px", height: "36px" }}>닫기</Button>
+                    </Box>
+                </Box>
+            </Modal>
+
 
             {viewMode === "list" && (
                 <div style={{display: "flex", justifyContent: "center", marginTop: "20px"}}>
