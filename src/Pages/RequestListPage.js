@@ -533,7 +533,7 @@ const RequestedDocuments = () => {
                                 <Button variant="outlined" size="small" onClick={() => handleSearchClick(doc.id)}>🔍
                                     서명자</Button>
                                 <Button variant="outlined" color="error" size="small" disabled={doc.status !== 0}
-                                        onClick={() => handleCancelClick(doc)}>❌ 요청 거절</Button>
+                                        onClick={() => handleCancelClick(doc)}>❌ 요청 취소</Button>
                             </div>
                         </div>
                     ))}

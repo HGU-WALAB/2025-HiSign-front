@@ -45,7 +45,7 @@ const ConfirmModal = ({
           </Typography>
 
           <Typography variant="caption" sx={{ color: 'red', display: 'block', mb: 3 }}>
-            *{warningText}
+            {warningText}
           </Typography>
 
           <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
