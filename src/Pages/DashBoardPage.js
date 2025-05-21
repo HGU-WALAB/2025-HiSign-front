@@ -106,7 +106,7 @@ function DashBoardPage() {
               <DocTitle>{doc.requestName}</DocTitle>
               {/* <DocInfo>상태: {getStatusLabel(doc.status)}</DocInfo> */}
               <div>
-                                    <StatusBadge status={doc.status}/>
+                                 상태:   <StatusBadge  status={doc.status}/>
                                 </div>
               <DocInfo>생성일: {moment(doc.createdAt).format("YYYY/MM/DD")}</DocInfo>
               <DetailLink to={`/detail/${doc.id}`}>자세히 보기</DetailLink>
