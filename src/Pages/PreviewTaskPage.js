@@ -34,22 +34,32 @@ const PreviewPage = () => {
     setShowRejectModal(true);
   };
 
-  const handleConfirmReject = () => {
+  const handleConfirmReject = async () => {
     if (!rejectReason.trim()) {
       alert("거절 사유를 입력해주세요.");
       return;
     }
 
-    ApiService.rejectDocument(signing.documentId, rejectReason, signing.token, signing.signerEmail)
-      .then(() => {
-        alert("요청이 거절되었습니다.");
-        setShowRejectModal(false);
-        navigate("/");
-      })
-      .catch((error) => {
-        console.error("요청 거절 중 오류 발생:", error);
-        alert("요청 거절에 실패했습니다.");
-      });
+    setLoading(true); // ✅ 로딩 시작
+
+    try {
+      await ApiService.rejectDocument(
+        signing.documentId,
+        rejectReason,
+        signing.token,
+        signing.signerEmail,
+        signing.signerName
+      );
+
+      alert("요청이 거절되었습니다.");
+      setShowRejectModal(false);
+      navigate("/");
+    } catch (error) {
+      console.error("요청 거절 중 오류 발생:", error);
+      alert("요청 거절에 실패했습니다.");
+    } finally {
+      setLoading(false); // ✅ 로딩 종료 (성공/실패 모두에 대해 실행)
+    }
   };
 
   const handleSaveSignature = async (imageData) => {
@@ -158,11 +168,12 @@ const PreviewPage = () => {
         onConfirm={handleSubmitSignature}
         title="서명 완료"
         message="서명을 완료하시겠습니까?"
-        warningText="완료 후에는 수정할 수 없습니다."
+        warningText="*완료 후에는 취소하실 수 없습니다."
       />
 
       <RejectModal
         isVisible={showRejectModal}
+        loading={loading}
         onClose={() => setShowRejectModal(false)}
         onConfirm={handleConfirmReject}
         rejectReason={rejectReason}

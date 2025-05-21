@@ -62,7 +62,7 @@ const ApiService = {
     return apiInstance.get(`/signature-requests/document/${documentId}/signers`).then(res => res.data);
   },
 
-  // 🔐 특정 문서(PDF) 다운로드
+  // 🔐 특정 문서(PDF)
   fetchDocument: async (documentId) => {
     return apiInstance.get(`/documents/${documentId}`, { responseType: 'arraybuffer' });
   },
@@ -152,9 +152,9 @@ const ApiService = {
   },
 
   // 🌐 서명 요청 거절
-  rejectDocument: async (documentId, reason, token, email) => {
+  rejectDocument: async (documentId, reason, token, email, signerName) => {
     if (!documentId || !reason || !token || !email) throw new Error("필수 정보가 누락되었습니다.");
-    return apiInstance.put(`/signature-requests/reject/${documentId}`, { reason, token, email });
+    return apiInstance.put(`/signature-requests/reject/${documentId}`, { reason, token, email, signerName });
   },
 
   // 🌐 서명 요청 토큰 유효성 확인
