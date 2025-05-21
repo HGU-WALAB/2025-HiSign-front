@@ -72,5 +72,6 @@ export const OutlineButton = styled(ButtonBase)`
 export const NextButton = styled(ButtonBase)`
   background-color: ${({ disabled }) => (disabled ? "#ccc" : "#03A3FF")};
   color: white;
+  
 `;
 
