@@ -62,8 +62,16 @@ export const GrayButton = styled(ButtonBase)`
   color: white;
 `;
 
+export const OutlineButton = styled(ButtonBase)`
+  background-color: white;
+  color: #03A3FF;
+  border: 2px solid #03A3FF,
+`;
+
+
 export const NextButton = styled(ButtonBase)`
   background-color: ${({ disabled }) => (disabled ? "#ccc" : "#03A3FF")};
   color: white;
+  
 `;
 

@@ -103,7 +103,7 @@ const RequestedDocuments = () => {
             2: { backgroundColor: "#f5a623", color: "#fff" },  // 반려(선생님)
             3: { backgroundColor: "#f0625d", color: "#fff" },  // 취소
             4: { backgroundColor: "#555555", color: "#fff" },  // 만료
-            6: { backgroundColor: "#f78b2d", color: "#fff" },  // 반려(교수님)
+            6: { backgroundColor: "#f5a623", color: "#fff" },  // 반려(교수님)
             7: { backgroundColor: "#b6c3f2", color: "#fff" },  // 검토중
         };
         return statusStyles[status] || { backgroundColor: "#ccc", color: "#000" };

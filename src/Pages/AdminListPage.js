@@ -84,7 +84,7 @@ const AdminDocuments = () => {
             2: { backgroundColor: "#f5a623", color: "#fff" },
             3: { backgroundColor: "#f0625d", color: "#fff" },
             4: { backgroundColor: "#555555", color: "#fff" },
-            6: { backgroundColor: "#f78b2d", color: "#fff" },
+            6: { backgroundColor: "#f5a623", color: "#fff" },
             7: { backgroundColor: "#b6c3f2", color: "#fff" },
         };
         return statusStyles[status] || { backgroundColor: "#ccc", color: "#000" };
