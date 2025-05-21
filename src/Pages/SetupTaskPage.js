@@ -163,6 +163,22 @@ const SetupTaskPage = () => {
     navigate(`/request`);
   };
 
+  const handleExit = () => {
+    if(window.confirm('정말로 나가시겠습니까?\n나가시면 진행상황은 초기화 됩니다.')){
+      setTaskState({
+      requestName: '',       
+      description: '',       
+      ownerId: null,         
+      fileName: '',          
+      fileUrl: null,        
+      isRejectable : null,
+      type: null,
+      password: null, 
+    });
+    navigate(`/request-document`);
+    }
+  }; 
+
   return (
     <OptimizedContainer>
       <StepProgressBar currentStep={0} />
@@ -452,9 +468,7 @@ const SetupTaskPage = () => {
         </OptimizedMainArea>
       </StyledBody>
       <FloatingButtonContainer>
-        <GrayButton onClick={() => navigate(`/request-document`)}>
-          나가기
-        </GrayButton>
+        <GrayButton onClick={handleExit}>나가기</GrayButton>
         <NextButton onClick={handleNextStep}>
           다음단계
         </NextButton>

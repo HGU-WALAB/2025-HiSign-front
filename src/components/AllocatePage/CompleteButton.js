@@ -89,8 +89,8 @@ const CompleteButton = () => {
   return (
    <>
   <NextButton onClick={handleOpenModal} disabled={loading}>
-    완료
-  </NextButton>
+    ㅤ완료ㅤ
+  </NextButton> 
 
   <CompleteModal
     open={open}

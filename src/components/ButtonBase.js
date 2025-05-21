@@ -1,6 +1,5 @@
 import styled from "styled-components";
 
-// ✅ 반응형 기본 버튼 컴포넌트
 const ButtonBase = styled.button`
   padding: ${({ size }) =>
     size === "large" ? "14px 28px" : size === "small" ? "8px 16px" : "12px 24px"};

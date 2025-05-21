@@ -11,7 +11,7 @@ import PagingControl from "../components/PagingControl";
 import StepProgressBar from "../components/StepProgressBar";
 import { signerState } from "../recoil/atom/signerState";
 import { taskState } from "../recoil/atom/taskState";
-import { ButtonContainer, GrayButton } from "../styles/CommonStyles";
+import { ButtonContainer, GrayButton, OutlineButton } from "../styles/CommonStyles";
 import SignatureService from "../utils/SignatureService";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
@@ -19,7 +19,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/$
 export const defaultColors = ['#FF6B6B', '#4ECDC4', '#FFD93D', '#1A535C', '#FF9F1C', '#6A4C93'];
 
 const AllocatePage = () => {
-  const document = useRecoilValue(taskState);
+  const [document, setDocument] = useRecoilState(taskState);
   const [signers, setSigners] = useRecoilState(signerState);
   const [menuAnchor, setMenuAnchor] = useState(null);
   const [selectedSigner, setSelectedSigner] = useState(null);
@@ -43,6 +43,25 @@ const AllocatePage = () => {
       handleMenuClose();
     }
   };
+
+  const handleExit = () => {
+    if(window.confirm('정말로 나가시겠습니까?\n나가시면 진행상황은 초기화 됩니다.')){
+      setDocument({
+      requestName: '',       
+      description: '',       
+      ownerId: null,         
+      fileName: '',          
+      fileUrl: null,        
+      isRejectable : null,
+      type: null,
+      password: null, 
+    });
+    setSigners([]);
+    navigate(`/request-document`);
+    }
+  }; 
+
+  
 
   return (
     <MainContainer>
@@ -142,7 +161,8 @@ const AllocatePage = () => {
 
           {/* ✅ 버튼 영역 이동 */}
           <ButtonContainer>
-            <GrayButton onClick={() => navigate("/request")}>이전으로</GrayButton>
+            <OutlineButton onClick={() => navigate("/request")}>이전으로</OutlineButton>
+            <GrayButton onClick={handleExit}>나가기</GrayButton>
             <CompleteButton />
           </ButtonContainer>
         </Container>

@@ -7,7 +7,7 @@ import styled from "styled-components";
 import StepProgressBar from "../components/StepProgressBar";
 import { signerState } from "../recoil/atom/signerState";
 import { taskState } from "../recoil/atom/taskState";
-import { Container as BaseContainer, ButtonContainer, GrayButton, MainArea, NextButton, StyledBody } from "../styles/CommonStyles";
+import { Container as BaseContainer, ButtonContainer, GrayButton, MainArea, NextButton, OutlineButton, StyledBody } from "../styles/CommonStyles";
 import ApiService from "../utils/ApiService";
 
 // BaseContainer를 흰 배경으로 덮는 새로운 Container
@@ -17,7 +17,7 @@ const Container = styled(BaseContainer)`
 
 const AddSignerPage = () => {
   const navigate = useNavigate();
-  const document = useRecoilValue(taskState);
+  const [document, setDocument] = useRecoilState(taskState);
   const [signers, setSigners] = useRecoilState(signerState);
 
   const [searchName, setSearchName] = useState("");        // 검색용
@@ -141,6 +141,24 @@ const AddSignerPage = () => {
 
   const handleNextStep = () => navigate("/align");
 
+  const handleExit = () => {
+    if(window.confirm('정말로 나가시겠습니까?\n나가시면 진행상황은 초기화 됩니다.')) 
+    {
+      setDocument({
+      requestName: '',       
+      description: '',       
+      ownerId: null,         
+      fileName: '',          
+      fileUrl: null,        
+      isRejectable : null,
+      type: null,
+      password: null, 
+    });
+    setSigners([]);
+    navigate(`/request-document`);
+    }
+  }; 
+
   return (
     <Container>
       <StepProgressBar currentStep={1}/>
@@ -250,8 +268,8 @@ const AddSignerPage = () => {
         </MainArea>
       </StyledBody>
       <ButtonContainer>
-        <GrayButton onClick={() => navigate(`/tasksetup`)}>이전으로</GrayButton>
-        <GrayButton onClick={() => navigate(`/request-document`)}>나가기</GrayButton>
+        <OutlineButton onClick={() => navigate(`/tasksetup`)}>이전으로</OutlineButton>
+        <GrayButton onClick={handleExit}>나가기</GrayButton>
         <NextButton onClick={handleNextStep} disabled={signers.length === 0}>다음단계</NextButton>
       </ButtonContainer>
     </Container>

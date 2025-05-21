@@ -29,16 +29,48 @@ function DashBoardPage() {
   }, []);
 
   const getStatusLabel = (status) => {
-    const labels = {
-      0: "서명중",
-      1: "완료",
-      2: "거절",
-      3: "취소",
-      4: "만료",
+        const statusLabels = {
+            0: "서명중",
+            1: "완료",
+            2: "반려됨",
+            3: "취소",
+            4: "만료",
+            6: "반려됨",
+            7: "검토중",
+        };
+        return statusLabels[status] || "알 수 없음";
     };
-    return labels[status] || "알 수 없음";
-  };
 
+    const getStatusStyle = (status) => {
+        const statusStyles = {
+            0: { backgroundColor: "#5ec9f3", color: "#fff" },  // 서명중
+            1: { backgroundColor: "#2ecc71", color: "#fff" },  // 완료
+            2: { backgroundColor: "#f5a623", color: "#fff" },  // 반려(선생님)
+            3: { backgroundColor: "#f0625d", color: "#fff" },  // 취소
+            4: { backgroundColor: "#555555", color: "#fff" },  // 만료
+            6: { backgroundColor: "#f5a623", color: "#fff" },  // 반려(교수님)
+            7: { backgroundColor: "#b6c3f2", color: "#fff" },  // 검토중
+        };
+        return statusStyles[status] || { backgroundColor: "#ccc", color: "#000" };
+    };
+
+
+
+    const StatusBadge = ({ status }) => {
+        const label = getStatusLabel(status);
+        const style = {
+            ...getStatusStyle(status),
+            borderRadius: "12px",
+            padding: "2px 10px",
+            fontSize: "13px",
+            fontWeight: 600,
+            display: "inline-block",
+            whiteSpace: "nowrap",
+            minWidth: "50px",
+            textAlign: "center",
+        };
+        return <span style={style}>{label}</span>;
+    };
   const steps = [
     {
       title: "1. 작업 정보 입력",
@@ -72,7 +104,10 @@ function DashBoardPage() {
           {recentDocuments.map((doc) => (
             <DocumentCard key={doc.id}>
               <DocTitle>{doc.requestName}</DocTitle>
-              <DocInfo>상태: {getStatusLabel(doc.status)}</DocInfo>
+              {/* <DocInfo>상태: {getStatusLabel(doc.status)}</DocInfo> */}
+              <div>
+                                    <StatusBadge status={doc.status}/>
+                                </div>
               <DocInfo>생성일: {moment(doc.createdAt).format("YYYY/MM/DD")}</DocInfo>
               <DetailLink to={`/detail/${doc.id}`}>자세히 보기</DetailLink>
             </DocumentCard>
