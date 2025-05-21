@@ -109,27 +109,19 @@ const PreviewPage = () => {
             <InfoItem><Label>서명 상태:</Label><Value>{signing.isSigned ? "서명 완료" : "서명 대기중"}</Value></InfoItem>
           </InfoSection>
 
-          {/* <ButtonContainer>
-            {signing.isRejectable && <RejectButton onClick={handleReject}>거절하기</RejectButton>}
-            <NextButton onClick={() => setShowPopup(true)}>
-              {isAllSigned ? "다시 서명하기" : "서명하기"}
-            </NextButton>Button
-            {isAllSigned && <NextButton onClick={() => setShowCompleteModal(true)}>서명 완료</NextButton>}
-          </ButtonContainer> */}
-
           <ButtonContainer>
-  {signing.isRejectable && <RejectButton onClick={handleReject}>거절하기</RejectButton>}
-  
-  {isAllSigned ? (
-    <OutlinedButton onClick={() => setShowPopup(true)}>다시 서명하기</OutlinedButton>
-  ) : (
-    <NextButton onClick={() => setShowPopup(true)}>서명하기</NextButton>
-  )}
+            {signing.isRejectable && <RejectButton onClick={handleReject}>거절하기</RejectButton>}
+            
+            {isAllSigned ? (
+              <OutlinedButton onClick={() => setShowPopup(true)}>다시 서명하기</OutlinedButton>
+            ) : (
+              <NextButton onClick={() => setShowPopup(true)}>서명하기</NextButton>
+            )}
 
-  {isAllSigned && (
-    <NextButton onClick={() => setShowCompleteModal(true)}>서명 완료</NextButton>
-  )}
-</ButtonContainer>
+            {isAllSigned && (
+              <NextButton onClick={() => setShowCompleteModal(true)}>서명 완료</NextButton>
+            )}
+          </ButtonContainer>
 
         </Sidebar>
 

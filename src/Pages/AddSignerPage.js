@@ -4,6 +4,7 @@ import { IoClose } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
 import styled from "styled-components";
+import StepProgressBar from "../components/StepProgressBar";
 import { signerState } from "../recoil/atom/signerState";
 import { taskState } from "../recoil/atom/taskState";
 import { Container as BaseContainer, ButtonContainer, GrayButton, MainArea, NextButton, StyledBody } from "../styles/CommonStyles";
@@ -142,6 +143,7 @@ const AddSignerPage = () => {
 
   return (
     <Container>
+      <StepProgressBar currentStep={1}/>
       <StyledBody>
         <MainArea>
           <RequestName>{document.requestName}</RequestName>
