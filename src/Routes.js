@@ -18,32 +18,32 @@ import SetupTaskPage from "./Pages/SetupTaskPage";
 import SignPage from './Pages/SignPage';
 import RequireLogin from './utils/RequireLogin';
 
-
 function MyRoutes() {
     useRestoreLoginFromCookie();
+
     return (
         <Routes>
+            {/* 사이드바 없는 페이지 */}
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/login-ing" element={<LoginCallback />} />
+            <Route path="/checkEmail" element={<CheckPassowrdPage />} />
+            <Route path="/preview" element={<PreviewTaskPage />} />
+            <Route path="/sign" element={<SignPage />} />
+            <Route path="/sign-complete" element={<CompleteSignPage />} />
+            <Route path="/tasksetup" element={
+                <RequireLogin><SetupTaskPage /></RequireLogin>
+            } />
+            <Route path="/request" element={
+                <RequireLogin><AddSignerPage /></RequireLogin>
+            } />
+            <Route path="/align" element={
+                <RequireLogin><AllocatePage /></RequireLogin>
+            } />
+
+            {/* 사이드바 포함된 페이지들 */}
             <Route element={<Sidebar />}>
-            
-                <Route path="/" element={<LandingPage />} />
-                <Route path="/login-ing" element={<LoginCallback />} />
-                <Route path="/checkEmail" element={<CheckPassowrdPage />} />
-                <Route path="/preview" element={<PreviewTaskPage />} />
-                <Route path="/sign" element={<SignPage />} />
-                <Route path="/sign-complete" element={<CompleteSignPage />} />
-    
-                {/* Login-required routes */}
                 <Route path="/dashboard" element={
                     <RequireLogin><DashBoardPage /></RequireLogin>
-                } />
-                <Route path="/tasksetup" element={
-                    <RequireLogin><SetupTaskPage /></RequireLogin>
-                } />
-                <Route path="/request" element={
-                    <RequireLogin><AddSignerPage /></RequireLogin>
-                } />
-                <Route path="/align" element={
-                    <RequireLogin><AllocatePage /></RequireLogin>
                 } />
                 <Route path="/request-document" element={
                     <RequireLogin><RequestedDocuments /></RequireLogin>
@@ -56,9 +56,6 @@ function MyRoutes() {
                 } />
                 <Route path="/detail/:documentId" element={
                     <RequireLogin><DetailPage /></RequireLogin>
-                } />
-                <Route path="/dashboard" element={
-                    <RequireLogin><DashBoardPage /></RequireLogin>
                 } />
                 <Route path="/check-task/:documentId" element={
                     <RequireLogin><CheckTaskPage /></RequireLogin>
