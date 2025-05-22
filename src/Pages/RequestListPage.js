@@ -382,7 +382,7 @@ const RequestedDocuments = () => {
                                                 >
                                                     <div
                                                         onClick={() => {
-                                                            window.location.href = `/detail/${doc.id}`;
+                                                            window.location.href = `/hisign/detail/${doc.id}`;
                                                             setOpenDropdownId(null);
                                                         }}
                                                         style={iconButtonStyle}

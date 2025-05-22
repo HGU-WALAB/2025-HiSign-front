@@ -303,7 +303,7 @@ const ReceivedDocuments = () => {
                                             >
                                                 <div
                                                     onClick={() => {
-                                                        window.location.href = `detail/${doc.id}`;
+                                                        window.location.href = `/hisign/detail/${doc.id}`;
                                                         setOpenDropdownId(null); // 닫기
                                                     }}
                                                     style={iconButtonStyle}
@@ -315,7 +315,7 @@ const ReceivedDocuments = () => {
                                                 <div
                                                     onClick={() => {
                                                         if (doc.status === 0) {
-                                                            window.location.href = `checkEmail?token=${doc.token}`;
+                                                            window.location.href = `/hisign/checkEmail?token=${doc.token}`;
                                                             setOpenDropdownId(null); // 닫기
                                                         }
                                                     }}
