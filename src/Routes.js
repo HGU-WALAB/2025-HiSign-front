@@ -30,6 +30,7 @@ function MyRoutes() {
             <Route path="/preview" element={<PreviewTaskPage />} />
             <Route path="/sign" element={<SignPage />} />
             <Route path="/sign-complete" element={<CompleteSignPage />} />
+            
             <Route path="/tasksetup" element={
                 <RequireLogin><SetupTaskPage /></RequireLogin>
             } />
