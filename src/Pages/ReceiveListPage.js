@@ -450,7 +450,7 @@ const ReceivedDocuments = () => {
                                         </button>
                                         <button
                                             onClick={() => handleRejectClick(doc)}
-                                            disabled={!(doc.status === 0 && doc.isRejectable === 1 && doc.signStatus === 0)}
+                                            disabled={!(doc.status === 0 && doc.isRejectable === true && doc.signStatus === 0)}
                                             style={{
                                                 display: "flex",
                                                 alignItems: "center",
@@ -459,11 +459,11 @@ const ReceivedDocuments = () => {
                                                 borderRadius: "5px",
                                                 backgroundColor: "transparent",
                                                 color:
-                                                doc.status === 0 && doc.isRejectable === 1 && doc.signStatus === 0
+                                                doc.status === 0 && doc.isRejectable === true && doc.signStatus === 0
                                                     ? "#000000"
                                                     : "#aaa",
                                                 pointerEvents:
-                                                doc.status === 0 && doc.isRejectable === 1 && doc.signStatus === 0
+                                                doc.status === 0 && doc.isRejectable === true && doc.signStatus === 0
                                                     ? "auto"
                                                     : "none",
                                             }}
