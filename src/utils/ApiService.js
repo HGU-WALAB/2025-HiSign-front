@@ -68,9 +68,11 @@ const ApiService = {
   },
 
   // 🔐 문서 삭제
-  deleteDocument: async (documentId) => {
-    if (!documentId) throw new Error('문서 ID가 필요합니다.');
-    return apiInstance.delete(`/documents/${documentId}`).then(res => res.data);
+  deleteDocument: async (documentId, viewType) => {
+    if (!documentId || !viewType) throw new Error('문서 ID가 필요합니다.');
+
+    return apiInstance.delete(`/documents/${documentId}?viewType=${viewType}`)
+    .then(res => res.data);
   },
 
   // 🔐 서명 요청 취소
