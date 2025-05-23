@@ -4,8 +4,7 @@ import FindInPageIcon from '@mui/icons-material/FindInPage';
 import SearchIcon from '@mui/icons-material/Search';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import ViewModuleIcon from '@mui/icons-material/ViewModule';
-import { Modal, Box, Typography, Button } from "@mui/material";
-import { Pagination } from "@mui/material";
+import { Box, Button, Modal, Pagination, Typography } from "@mui/material";
 import { saveAs } from "file-saver";
 import moment from 'moment';
 import { useEffect, useState } from "react";
@@ -17,7 +16,6 @@ import { PageContainer } from "../components/PageContainer";
 import { loginMemberState } from "../recoil/atom/loginMemberState";
 import ApiService from "../utils/ApiService";
 import { downloadPDF, downloadZip } from "../utils/DownloadUtils";
-import CloseIcon from "@mui/icons-material/Close";
 
 const AdminDocuments = () => {
     const loginMember = useRecoilValue(loginMemberState);
@@ -545,7 +543,7 @@ const AdminDocuments = () => {
                                                 <div
                                                     onClick={() => {
                                                         if (window.confirm("정말 이 문서를 삭제하시겠습니까?")) {
-                                                            ApiService.deleteDocument(doc.id)
+                                                            ApiService.deleteDocument(doc.id,'admin')
                                                                 .then(() => {
                                                                     alert("문서가 삭제되었습니다.");
                                                                     setDocuments((prevDocs) =>
@@ -607,7 +605,7 @@ const AdminDocuments = () => {
                                         <button
                                             onClick={() => {
                                                 if (window.confirm("정말 이 문서를 삭제하시겠습니까?")) {
-                                                    ApiService.deleteDocument(doc.id)
+                                                    ApiService.deleteDocument(doc.id,'admin')
                                                         .then(() => {
                                                             alert("문서가 삭제되었습니다.");
                                                             setDocuments(prevDocs => prevDocs.filter(d => d.id !== doc.id));

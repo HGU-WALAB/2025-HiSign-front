@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { IoClose } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import StepProgressBar from "../components/StepProgressBar";
 import { signerState } from "../recoil/atom/signerState";
@@ -145,11 +145,11 @@ const AddSignerPage = () => {
     if(window.confirm('정말로 나가시겠습니까?\n나가시면 진행상황은 초기화 됩니다.')) 
     {
       setDocument({
-      requestName: '',       
-      description: '',       
-      ownerId: null,         
-      fileName: '',          
-      fileUrl: null,        
+      requestName: '',
+      description: '',
+      ownerId: null,
+      fileName: '',
+      fileUrl: null,
       isRejectable : null,
       type: null,
       password: null, 

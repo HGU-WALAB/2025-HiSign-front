@@ -227,7 +227,7 @@ function Sidebar() {
                         style={{
                             display: "block",
                             width: "100%",
-                            backgroundColor: "#ccc",
+                            backgroundColor: "#1976d2",
                             color: "white",
                             textAlign: "center",
                             padding: "10px 0",

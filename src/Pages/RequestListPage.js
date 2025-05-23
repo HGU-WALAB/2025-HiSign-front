@@ -428,7 +428,7 @@ const RequestedDocuments = () => {
                                                     <div
                                                         onClick={() => {
                                                             if (window.confirm("정말 이 문서를 삭제하시겠습니까?")) {
-                                                                ApiService.deleteDocument(doc.id)
+                                                                ApiService.deleteDocument(doc.id,'sent')
                                                                     .then(() => {
                                                                         alert("문서가 삭제되었습니다.");
                                                                         setDocuments((prevDocs) =>
@@ -512,7 +512,7 @@ const RequestedDocuments = () => {
                                         <button
                                             onClick={() => {
                                                 if (window.confirm("정말 이 문서를 삭제하시겠습니까?")) {
-                                                    ApiService.deleteDocument(doc.id)
+                                                    ApiService.deleteDocument(doc.id,'sent')
                                                         .then(() => {
                                                             alert("문서가 삭제되었습니다.");
                                                             setDocuments(prevDocs => prevDocs.filter(d => d.id !== doc.id));

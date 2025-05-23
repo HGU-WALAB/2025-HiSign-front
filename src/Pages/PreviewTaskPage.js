@@ -1,13 +1,14 @@
 // PreviewTaskPage.js
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useRecoilState } from "recoil";
+import { Link, useNavigate } from "react-router-dom";
+import { useRecoilState, useRecoilValue } from "recoil";
 import styled from "styled-components";
 import ButtonBase from "../components/ButtonBase";
 import ConfirmModal from "../components/ConfirmModal";
 import RejectModal from "../components/ListPage/RejectModal";
 import PDFViewer from "../components/SignPage/PDFViewer";
 import SignaturePopup from "../components/SignPage/SignaturePopup";
+import { loginMemberState } from "../recoil/atom/loginMemberState";
 import { signingState } from "../recoil/atom/signingState";
 import ApiService from "../utils/ApiService";
 
@@ -20,6 +21,7 @@ const PreviewPage = () => {
   const [loading, setLoading] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
   const [pdfScale, setPdfScale] = useState(1);
+  const loginMember = useRecoilValue(loginMemberState);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -110,6 +112,20 @@ const PreviewPage = () => {
     <MainContainer>
       <ContentWrapper>
         <Sidebar>
+          <Link
+            to={loginMember.uniqueId ? "/dashboard" : "/"}
+            style={{
+                display: "flex",
+                justifyContent: "center",
+                marginBottom: "1.5rem",
+            }}
+            >
+            <img
+                src={`${process.env.PUBLIC_URL}/hisignlogo_resized.png`}
+                alt="HI-Sign 로고"
+                style={{ height: 120, maxWidth: "100%" }}
+            />
+          </Link>
           <InfoSection>
             <InfoItem><Label>작업 요청자:</Label><Value>{signing.requesterName}</Value></InfoItem>
             <InfoItem><Label>작업명:</Label><Value>{signing.requestName}</Value></InfoItem>
