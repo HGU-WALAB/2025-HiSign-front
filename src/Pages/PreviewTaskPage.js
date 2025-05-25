@@ -26,9 +26,10 @@ const PreviewPage = () => {
 
   useEffect(() => {
     if (!signing.documentId) {
-      alert("유효한 문서 정보가 없습니다. 이메일을 먼저 인증해주세요.");
+      alert("유효한 문서 정보가 없습니다. 다시 진행해 주세요");
       navigate("/");
     }
+
   }, [signing.documentId, navigate]);
 
   const handleReject = () => {
@@ -70,6 +71,26 @@ const PreviewPage = () => {
     );
     setSigning((prev) => ({ ...prev, signatureFields: updatedFields }));
     setShowPopup(false);
+  };
+
+  const handleLoadExistingSignature = async () => {
+    try {
+      const imageUrl = await ApiService.getLatestImageSignature(signing.signerEmail);
+
+      const updatedFields = signing.signatureFields.map((field) =>
+        field.type === 0 ? { ...field, image: imageUrl } : field
+      );
+
+      setSigning((prev) => ({
+        ...prev,
+        signatureFields: updatedFields,
+      }));
+
+      alert("이전 서명이 불러와졌습니다.");
+    } catch (error) {
+      alert("기존 서명을 불러오는 데 실패했습니다.");
+      console.error(error);
+    }
   };
 
   const handleSubmitSignature = async () => {
@@ -146,6 +167,12 @@ const PreviewPage = () => {
 
             {isAllSigned && (
               <NextButton onClick={() => setShowCompleteModal(true)}>서명 완료</NextButton>
+            )}
+
+            {signing.hasExistingSignature && (
+              <OutlinedButton onClick={handleLoadExistingSignature}>
+                기존 서명 불러오기
+              </OutlinedButton>
             )}
           </ButtonContainer>
 

@@ -6,7 +6,8 @@ export const signingState = atom({
     requesterName: '', // 요청자 이름
     requestName: '',   // 요청 이름
     description: '',   // 요청 설명
-    isRejectable: false, // 거부 가능 여부
+    isRejectable: null, // 거부 가능 여부
+    hasExistingSignature: null, // 기존 서명 여부
     signerEmail: '',  // 서명자의 이메일
     signerName: '',   // 서명자의 이름 (API 요청에 필요)
     documentId: null, // 서명할 문서 ID

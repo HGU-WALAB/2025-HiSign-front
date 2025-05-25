@@ -312,22 +312,19 @@ const ReceivedDocuments = () => {
                                                     문서 보기
                                                 </div>
 
-                                                <div
-                                                    onClick={() => {
-                                                        if (doc.status === 0) {
-                                                            window.location.href = `/hisign/checkEmail?token=${doc.token}`;
-                                                            setOpenDropdownId(null); // 닫기
-                                                        }
-                                                    }}
+                                                <Link
+                                                    to={`/checkEmail?token=${doc.token}`}
                                                     style={{
                                                         ...iconButtonStyle,
-                                                        color: doc.status !== 0 ? "#aaa" : "#333",
-                                                        pointerEvents: doc.status !== 0 ? "none" : "auto"
+                                                        color: doc.status !== 0 || doc.signStatus !== 0 ? "#aaa" : "#333",
+                                                        pointerEvents: doc.status !== 0 || doc.signStatus !== 0 ? "none" : "auto",
+                                                        textDecoration: "none",
                                                     }}
-                                                >
+                                                    onClick={() => setOpenDropdownId(null)}  // 드롭다운 닫기
+                                                    >
                                                     <DrawIcon fontSize="small" />
                                                     서명 하기
-                                                </div>
+                                                </Link>
 
                                                 <div
                                                     onClick={() => {
