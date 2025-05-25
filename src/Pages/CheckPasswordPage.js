@@ -87,7 +87,8 @@ const CheckPasswordPage = () => {
           .then((fieldsResponse) => {
             setSigning((prevState) => ({
               ...prevState,
-              signatureFields: fieldsResponse.data,
+              hasExistingSignature: fieldsResponse.data.hasExistingSignature,
+              signatureFields: fieldsResponse.data.fields,
             }));
             navigate("/preview");
             //console.log("서명 필드 정보:", fieldsResponse.data);
@@ -131,7 +132,8 @@ const CheckPasswordPage = () => {
           .then((fieldsResponse) => {
             setSigning((prevState) => ({
               ...prevState,
-              signatureFields: fieldsResponse.data,
+              hasExistingSignature: fieldsResponse.data.hasExistingSignature,
+              signatureFields: fieldsResponse.data.fields,
             }));
             navigate("/preview");
             //console.log("서명 필드 정보:", fieldsResponse.data);

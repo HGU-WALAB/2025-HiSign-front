@@ -205,6 +205,13 @@ const ApiService = {
     return apiInstance.get(`/documents/sign/${documentId}`, { responseType: "arraybuffer" });
   },
 
+  getLatestImageSignature: async (signerEmail) => {
+    const response = await apiInstance.get(`/signature/latest-image-signature?signerEmail=${encodeURIComponent(signerEmail)}&t=${Date.now()}`, {
+      responseType: "blob"
+    });
+    return URL.createObjectURL(response.data);
+  },
+
   // 🌐 서명 저장 요청
   saveSignatures: async (documentId, signingData) => {
     if (!documentId || !signingData) throw new Error('문서 ID와 서명자가 필요합니다.');

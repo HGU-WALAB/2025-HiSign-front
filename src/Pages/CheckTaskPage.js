@@ -69,11 +69,11 @@ const CheckTaskPage = () => {
       // 서명자별 필드 로딩
       Promise.all(
         signerList.map(async (signer, idx) => {
-          const { data: fields } = await ApiService.fetchSignatureFields(documentId, signer.email);
+          const { data } = await ApiService.fetchSignatureFields(documentId, signer.email);
           return {
             ...signer,
             color: defaultColors[idx % defaultColors.length],
-            signatureFields: fields,
+            signatureFields: data.fields,
           };
         })
       )
