@@ -5,6 +5,7 @@ import '@react-pdf-viewer/toolbar/lib/styles/index.css';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import ApiService from '../utils/ApiService';
+import { defaultColors } from './AllocatePage';
 
 const pdfjsWorkerUrl = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
@@ -13,13 +14,14 @@ const DetailPage = () => {
     const [fileUrl, setFileUrl] = useState(null);
     const [documentInfo, setDocumentInfo] = useState(null);
     const [error, setError] = useState(null);
+    const [signers, setSigners] = useState([]);
 
     const toolbar = toolbarPlugin();
 
     useEffect(() => {
         ApiService.fetchDocumentInfo(documentId)
             .then(response => {
-                console.log("Document Info:", response);
+                //console.log("Document Info:", response);
                 setDocumentInfo(response.data);
             })
             .catch(error => {
@@ -27,7 +29,7 @@ const DetailPage = () => {
                 setError('문서 정보를 로드하는 중 오류가 발생했습니다: ' + error.message);
             });
 
-        ApiService.fetchDocument(documentId)
+        ApiService.generateReviewDocument(documentId)
             .then(response => {
                 const fileBlob = new Blob([response.data], { type: 'application/pdf' });
                 setFileUrl(URL.createObjectURL(fileBlob));
@@ -35,6 +37,20 @@ const DetailPage = () => {
             .catch(error => {
                 console.error("Error loading document:", error);
                 setError('문서를 로드하는 중 오류가 발생했습니다: ' + error.message);
+            });
+
+        ApiService.fetchSignersByDocument(documentId)
+            .then((response) => {
+                const signerList = response;
+                const coloredSigners = signerList.map((signer, idx) => ({
+                    ...signer,
+                    color: defaultColors[idx % defaultColors.length]
+                }));
+                setSigners(coloredSigners);
+            })
+            .catch((error) => {
+                console.error("서명자 정보 로딩 실패:", error);
+                setError("서명자 정보를 로드하는 중 오류가 발생했습니다.");
             });
     }, [documentId]);
 
@@ -80,6 +96,20 @@ const DetailPage = () => {
         return <span style={style}>{label}</span>;
     };
 
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth <= 768);
+        };
+
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+    
     return (
         <div style={{
             display: 'flex',
@@ -97,14 +127,17 @@ const DetailPage = () => {
                 borderRadius: '8px',
                 padding: '16px',
                 boxShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
-                maxWidth: '600px',
+                maxWidth: '800px',
                 width: '100%',
                 margin: '0 auto',
                 textAlign: 'left',
+                display: 'flex',
+                flexDirection: isMobile ? 'column' : 'row',
+                justifyContent: 'space-between',
             }}>
 
                 {documentInfo && (
-                    <>
+                    <div>
                         <p><strong>서명 요청자:</strong> {documentInfo.requesterName}</p>
                         <p><strong>상태:</strong> <StatusBadge status={documentInfo.status}/></p>
                         {documentInfo.status == 3 ? (
@@ -125,8 +158,30 @@ const DetailPage = () => {
                         <p><strong>서명 생성 시간:</strong> {new Date(documentInfo.createdAt).toLocaleString()}</p>
                         <p><strong>파일명:</strong> {documentInfo.fileName}</p>
                         <p><strong>작업명:</strong> {documentInfo.requestName}</p>
-                    </>
+                    </div>
                 )}
+                <div style={{ marginTop: '10px' }}>
+                    <p><strong>서명자 정보:</strong></p>
+                    {signers.length > 0 ? (
+                        signers.map((signer, idx) => (
+                            <div key={signer.email} style={{ display: 'flex', alignItems: 'center', gap: '6px', margin: '4px 30px  0 0' }}>
+                                <span
+                                    style={{
+                                        display: 'inline-block',
+                                        width: '14px',
+                                        height: '14px',
+                                        borderRadius: '50%',
+                                        border: '1px solid #aaa',
+                                        backgroundColor: signer.color
+                                    }}
+                                />
+                                <span>{`서명자 ${idx + 1}: ${signer.name}`}</span>
+                            </div>
+                        ))
+                    ) : (
+                        <p>서명자 없음</p>
+                    )}
+                </div>
             </div>
 
             {/* 툴바 + PDF 영역 */}
@@ -141,8 +196,8 @@ const DetailPage = () => {
                     overflow: 'hidden',
                     boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
                     width: '90vw',
-                    maxWidth: '1200px',
-                    minHeight: '100vh',
+                    maxWidth: '1000px',
+                    minHeight: 'vh',
                     alignSelf: 'center',
                 }}
             >
@@ -200,3 +255,4 @@ const DetailPage = () => {
 };
 
 export default DetailPage;
+

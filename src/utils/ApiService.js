@@ -138,6 +138,14 @@ const ApiService = {
       responseType: "arraybuffer",
     });
   },
+
+  generateReviewDocument: async (documentId) => {
+    return apiInstance.get(`/documents/${documentId}/signed-preview`, {
+      responseType: "arraybuffer", // PDF 바이너리 받기
+    });
+  },
+
+
   // =================================
   // ✅ 서명자 상태에서도 사용 가능한 API
   // =================================
