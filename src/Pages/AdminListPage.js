@@ -27,11 +27,16 @@ const AdminDocuments = () => {
     const [itemsPerPage] = useState(10);
     const [viewMode, setViewMode] = useState("list");
     const [searchQuery, setSearchQuery] = useState("");
-    const [createdSortOrder, setCreatedSortOrder] = useState('desc');
-    const [expiredSortOrder, setExpiredSortOrder] = useState(null);
     const [statusFilter, setStatusFilter] = useState('all');
     const [selectedDocs, setSelectedDocs] = useState([]);
     const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 1024);
+    const [sortKey, setSortKey] = useState(localStorage.getItem("admin_sortKey") || "createdAt");
+    const [sortOrder, setSortOrder] = useState(localStorage.getItem("admin_sortOrder") || "desc");
+
+    useEffect(() => {
+        localStorage.setItem("admin_sortKey", sortKey);
+        localStorage.setItem("admin_sortOrder", sortOrder);
+    }, [sortKey, sortOrder]);
 
     useEffect(() => {
         const handleResize = () => setIsMobileView(window.innerWidth <= 1200);
@@ -121,14 +126,11 @@ const AdminDocuments = () => {
             return String(doc.status) === statusFilter;
         })
         .sort((a, b) => {
-            if (createdSortOrder) {
-                const result = new Date(b.createdAt) - new Date(a.createdAt);
-                return createdSortOrder === 'desc' ? result : -result;
-            } else if (expiredSortOrder) {
-                const result = new Date(b.expiredAt) - new Date(a.expiredAt);
-                return expiredSortOrder === 'desc' ? result : -result;
-            }
-            return 0;
+            const dateA = new Date(a[sortKey] ?? 0); // null이면 new Date(0) → 1970-01-01
+            const dateB = new Date(b[sortKey] ?? 0);
+
+            const result = dateB - dateA;
+            return sortOrder === "desc" ? result : -result;
         });
 
     const toggleSelectDoc = (doc) => {
@@ -156,6 +158,7 @@ const AdminDocuments = () => {
             상태: getStatusLabel(doc.status),
             요청생성일: moment(doc.createdAt).format("YYYY-MM-DD HH:mm"),
             요청만료일: moment(doc.expiredAt).format("YYYY-MM-DD HH:mm"),
+            수정일: doc.updatedAt ? moment(doc.updatedAt).format("YYYY-MM-DD HH:mm") : "없음",
             요청자: doc.requesterName || "알 수 없음"
         }));
 
@@ -248,47 +251,40 @@ const AdminDocuments = () => {
                     flex: "1 1 0"
                 }}>
                     <select
-                        value={createdSortOrder || ''}
-                        onChange={(e) => {
-                            setCreatedSortOrder(e.target.value);
-                            setExpiredSortOrder(null);
-                        }}
+                        value={sortKey}
+                        onChange={(e) => setSortKey(e.target.value)}
                         style={{
-                            padding: "4px 8px",
-                            border: "none",
-                            background: "transparent",
-                            outline: "none",
-                            fontSize: "14px",
-                            minWidth: "80px",
-                            height: "32px",
-                            cursor: "pointer",
-                        }}
+                                padding: "4px 8px",
+                                border: "none",
+                                background: "transparent",
+                                outline: "none",
+                                fontSize: "14px",
+                                minWidth: "80px",
+                                height: "32px",
+                                cursor: "pointer",
+                            }}
                     >
-                        <option value="">생성일</option>
-                        <option value="desc">최신순</option>
-                        <option value="asc">오래된순</option>
+                        <option value="createdAt">생성일</option>
+                        <option value="expiredAt">만료일</option>
+                        <option value="updatedAt">수정일</option>
                     </select>
 
                     <select
-                        value={expiredSortOrder || ''}
-                        onChange={(e) => {
-                            setExpiredSortOrder(e.target.value);
-                            setCreatedSortOrder(null);
-                        }}
+                        value={sortOrder}
+                        onChange={(e) => setSortOrder(e.target.value)}
                         style={{
-                            padding: "4px 8px",
-                            border: "none",
-                            background: "transparent",
-                            outline: "none",
-                            fontSize: "14px",
-                            minWidth: "80px",
-                            height: "32px",
-                            cursor: "pointer",
-                        }}
+                                padding: "4px 8px",
+                                border: "none",
+                                background: "transparent",
+                                outline: "none",
+                                fontSize: "14px",
+                                minWidth: "80px",
+                                height: "32px",
+                                cursor: "pointer",
+                            }}
                     >
-                        <option value="">만료일</option>
                         <option value="desc">최신순</option>
-                        <option value="asc">오래된순</option>
+                        <option value="asc">오래된 순</option>
                     </select>
 
                     <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
