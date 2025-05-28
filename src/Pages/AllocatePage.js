@@ -143,7 +143,7 @@ const AllocatePage = () => {
                   file={documentData.fileUrl}
                   onLoadSuccess={({ numPages }) => setTotalPages(numPages)}
                 >
-                  <Page pageNumber={pageNum} width={803} />
+                  <Page pageNumber={pageNum} width={800} /> 
                 </Document>
 
                 {signers.map((signer, index) =>
@@ -232,7 +232,7 @@ const ContentWrapper = styled.div`
 `;
 
 const Container = styled.div`
-  max-width: 800px;
+  max-width: 875px;
   margin: 0 auto;
   padding: 20px 10px 120px;  // 하단 버튼과 겹치지 않도록 패딩 추가
   position: relative;
@@ -264,7 +264,7 @@ const DocumentSection = styled.div`
 `;
 
 const DocumentContainer = styled.div`
-  max-width: 802px;
+  max-width: 802px; //기본이 802
   margin: 20px auto;
   border: 1px solid #999;
   position: relative;
