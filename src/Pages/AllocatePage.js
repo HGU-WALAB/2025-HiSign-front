@@ -66,70 +66,70 @@ const AllocatePage = () => {
       <StepProgressBar currentStep={2} />
       <ContentWrapper>
         <Container>
-          <DocumentHeader>
-            <Typography variant="h6">{documentData.title || '문서 제목'}</Typography>
-            <Typography variant="body2" color="textSecondary">
-              {documentData.fileName || '파일명 없음'}
-            </Typography>
-          </DocumentHeader>
+          
+        <DocumentHeader>
+  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+    
+    <Typography variant="h6" style={{ fontWeight: 'bold' }}>
+      {documentData.title || '문서 제목'}
+    </Typography>
+    <Typography variant="body2" color="textSecondary" style={{ marginBottom: '6px' }}>
+      {documentData.requestName || '작업명 없음'}
+    </Typography>
+    
+    <Typography variant="body2" color="textSecondary">
+      선택한 파일: {documentData.fileName || '파일명 없음'}
+    </Typography>
+  </div>
+</DocumentHeader>
+
 
           <SignerList>
             <Typography variant="h6">서명 인원</Typography>
             <Typography variant="body2" color="textSecondary" style={{ marginBottom: '12px' }}>
-              대상을 선택 후 위치를 지정하세요
+              대상을 선택 후 위치를 지정하세요.
             </Typography>
             {signers.map((signer, index) => (
-              <Card
-                key={signer.email}
-                sx={{
-                  width: '100%',
-                  marginBottom: '10px',
-                  cursor: 'pointer',
-                  borderLeft: `6px solid ${signer.color || defaultColors[index % defaultColors.length]}`,
-                }}
-                onClick={(e) => handleMenuClick(e, signer)}
-              >
-                <CardActionArea>
-                  <CardContent>
-                    <Grid container spacing={1} alignItems="center">
-                      <Grid item xs={12} sm={4}>
-                        <Typography variant="subtitle1" fontWeight="bold">
-                          {documentData.requestName || '작업명 없음'}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={6} sm={4}>
-                        <Typography variant="body2">
-                          만료일: {documentData.expirationDate || '—'}
-                        </Typography>
-                      </Grid>
-                      
+  <Card
+    key={signer.email}
+    sx={{
+      width: '100%',
+      marginBottom: '10px',
+      cursor: 'pointer',
+      borderLeft: `6px solid ${signer.color || defaultColors[index % defaultColors.length]}`,
+    }}
+    onClick={(e) => handleMenuClick(e, signer)}
+  >
+    <CardActionArea>
+      <CardContent>
+        <Grid container spacing={1} alignItems="center">
+          <Grid item xs={12} sm={6}>
+            <Typography variant="subtitle2" fontWeight="bold">
+              {signer.name}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {signer.email}
+            </Typography>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <Typography
+              variant="caption"
+              sx={{
+                backgroundColor: '#f5f5f5',
+                padding: '2px 6px',
+                borderRadius: '12px',
+                display: 'inline-block',
+              }}
+            >
+              서명 {signer.signatureFields.length}개 할당
+            </Typography>
+          </Grid>
+        </Grid>
+      </CardContent>
+    </CardActionArea>
+  </Card>
+))}
 
-                      <Grid item xs={12} sm={4}>
-                        <Typography variant="subtitle2" fontWeight="bold">
-                          {signer.name}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {signer.email}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} sm={8}>
-                        <Typography
-                          variant="caption"
-                          sx={{
-                            backgroundColor: '#f5f5f5',
-                            padding: '2px 6px',
-                            borderRadius: '12px',
-                            display: 'inline-block',
-                          }}
-                        >
-                          서명 {signer.signatureFields.length}개 할당
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                  </CardContent>
-                </CardActionArea>
-              </Card>
-            ))}
           </SignerList>
 
           <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={handleMenuClose}>
