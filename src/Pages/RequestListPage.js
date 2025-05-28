@@ -633,7 +633,7 @@ const RequestedDocuments = () => {
                 <div style={{display: "flex", justifyContent: "center", marginTop: "20px"}}>
                     <Pagination count={Math.ceil(filteredDocuments.length / itemsPerPage)} color="default"
                                 page={currentPage}
-                                onChange={handlePageChange}/>
+                                onChange={handlePageChange} style={{marginBottom: "1rem"}}/>
                 </div>
             )}
 

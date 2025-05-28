@@ -256,7 +256,7 @@ const SetupTaskPage = () => {
                         <option value="딥러닝 개론">딥러닝 개론</option>
                         <option value="마이크로프로세서응용">마이크로프로세서응용</option>
                         <option value="모바일 앱 개발">모바일 앱 개발</option>
-                        <option value="소트프웨어 입문">소트프웨어 입문</option>
+                        <option value="소프트웨어 입문">소프트웨어 입문</option>
                         <option value="스타트업 제품 기획 및 개발">스타트업 제품 기획 및 개발</option>
                         <option value="아이디어 개발 및 프로토타이핑">아이디어 개발 및 프로토타이핑</option>
                         <option value="알고리듬분석">알고리듬분석</option>

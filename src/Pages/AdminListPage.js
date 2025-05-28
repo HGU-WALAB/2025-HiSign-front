@@ -20,18 +20,21 @@ import { downloadPDF, downloadZip } from "../utils/DownloadUtils";
 const AdminDocuments = () => {
     const loginMember = useRecoilValue(loginMemberState);
     const navigate = useNavigate();
-
     const [documents, setDocuments] = useState([]);
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(10);
     const [viewMode, setViewMode] = useState("list");
-    const [searchQuery, setSearchQuery] = useState("");
-    const [statusFilter, setStatusFilter] = useState('all');
     const [selectedDocs, setSelectedDocs] = useState([]);
     const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 1024);
+
+    // 필터 및 검색 관련 const
+    const [searchQuery, setSearchQuery] = useState("");
     const [sortKey, setSortKey] = useState(localStorage.getItem("admin_sortKey") || "createdAt");
     const [sortOrder, setSortOrder] = useState(localStorage.getItem("admin_sortOrder") || "desc");
+    const [statusFilter, setStatusFilter] = useState('1');
+    const currentMonth = `${new Date().getMonth() + 1}월`;
+    const [monthFilter, setMonthFilter] = useState(currentMonth);
 
     useEffect(() => {
         localStorage.setItem("admin_sortKey", sortKey);
@@ -125,6 +128,11 @@ const AdminDocuments = () => {
             if (statusFilter === "rejected") return doc.status === 2 || doc.status === 6;
             return String(doc.status) === statusFilter;
         })
+        .filter((doc) => {
+            if (monthFilter === "all") return true;
+            return doc.requestName.includes(monthFilter);
+        })
+
         .sort((a, b) => {
             const dateA = new Date(a[sortKey] ?? 0); // null이면 new Date(0) → 1970-01-01
             const dateB = new Date(b[sortKey] ?? 0);
@@ -152,6 +160,7 @@ const AdminDocuments = () => {
 
     const isDownloadable = selectedDocs.length > 0 && selectedDocs.every(doc => doc.status === 1);
 
+    // 작업 정보 엑셀 저장
     const handleExcelDownload = () => {
         const worksheetData = selectedDocs.map(doc => ({
             문서명: doc.requestName,
@@ -170,6 +179,58 @@ const AdminDocuments = () => {
         const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
         saveAs(blob, "Ta근무일지.xlsx");
     };
+
+    // Ta 제출 현황 엑셀 다운로드
+    const handleTaExcelDownload = async () => {
+        if (monthFilter === 'all') {
+            alert("월을 선택해주세요.");
+            return;
+        }
+
+        try {
+            const res = await ApiService.excelTa(); // /api/ta
+            const taList = res.data;
+
+            const docsThisMonth = filteredDocuments;
+
+            const result = taList.map((ta) => {
+                // 해당 TA+강의명과 일치하는 모든 문서 찾기
+                const matchedDocs = docsThisMonth.filter(doc =>
+                    doc.requestName.includes(ta.taName) &&
+                    doc.requestName.includes(ta.lecture)
+                );
+
+                // 가장 최신 문서 선택 (createdAt 기준)
+                let latestDoc = null;
+                if (matchedDocs.length > 0) {
+                    latestDoc = matchedDocs.reduce((a, b) =>
+                        new Date(a.createdAt) > new Date(b.createdAt) ? a : b
+                    );
+                }
+
+                return {
+                    "TA명": ta.taName,
+                    "과목명": ta.lecture,
+                    "상태": latestDoc ? getStatusLabel(latestDoc.status) : ""
+                };
+            });
+
+            const worksheet = XLSX.utils.json_to_sheet(result);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "TA근무현황");
+
+            const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+            const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
+
+            saveAs(blob, `${monthFilter}_TA근무현황.xlsx`);
+        } catch (err) {
+            console.error("TA 엑셀 생성 오류:", err);
+            alert("TA 엑셀 다운로드 중 오류가 발생했습니다.");
+        }
+    };
+
+
+
 
     const [signers, setSigners] = useState([]);
     const [showSignersModal, setShowSignersModal] = useState(false);
@@ -254,15 +315,15 @@ const AdminDocuments = () => {
                         value={sortKey}
                         onChange={(e) => setSortKey(e.target.value)}
                         style={{
-                                padding: "4px 8px",
-                                border: "none",
-                                background: "transparent",
-                                outline: "none",
-                                fontSize: "14px",
-                                minWidth: "80px",
-                                height: "32px",
-                                cursor: "pointer",
-                            }}
+                            padding: "4px 8px",
+                            border: "none",
+                            background: "transparent",
+                            outline: "none",
+                            fontSize: "14px",
+                            minWidth: "80px",
+                            height: "32px",
+                            cursor: "pointer",
+                        }}
                     >
                         <option value="createdAt">생성일</option>
                         <option value="expiredAt">만료일</option>
@@ -273,15 +334,15 @@ const AdminDocuments = () => {
                         value={sortOrder}
                         onChange={(e) => setSortOrder(e.target.value)}
                         style={{
-                                padding: "4px 8px",
-                                border: "none",
-                                background: "transparent",
-                                outline: "none",
-                                fontSize: "14px",
-                                minWidth: "80px",
-                                height: "32px",
-                                cursor: "pointer",
-                            }}
+                            padding: "4px 8px",
+                            border: "none",
+                            background: "transparent",
+                            outline: "none",
+                            fontSize: "14px",
+                            minWidth: "80px",
+                            height: "32px",
+                            cursor: "pointer",
+                        }}
                     >
                         <option value="desc">최신순</option>
                         <option value="asc">오래된 순</option>
@@ -307,18 +368,67 @@ const AdminDocuments = () => {
                         <option value="4">만료</option>
                         <option value="7">검토중</option>
                     </select>
+
+                    <select
+                        value={monthFilter}
+                        onChange={(e) => setMonthFilter(e.target.value)}
+                        style={{
+                            padding: "4px 8px",
+                            border: "none",
+                            background: "transparent",
+                            outline: "none",
+                            fontSize: "14px",
+                            minWidth: "80px",
+                            height: "32px",
+                            cursor: "pointer",
+                        }}
+                    >
+                        <option value="all">월</option>
+                        <option value="1월">1월</option>
+                        <option value="2월">2월</option>
+                        <option value="3월">3월</option>
+                        <option value="4월">4월</option>
+                        <option value="5월">5월</option>
+                        <option value="6월">6월</option>
+                        <option value="7월">7월</option>
+                        <option value="8월">8월</option>
+                        <option value="9월">9월</option>
+                        <option value="10월">10월</option>
+                        <option value="11월">11월</option>
+                        <option value="12월">12월</option>
+                    </select>
+
                 </div>
 
                 <button
-                    onClick={handleExcelDownload}
+                    onClick={handleTaExcelDownload}
+                    disabled={monthFilter === "all"}
                     style={{
                         padding: "6px 10px",
-                        backgroundColor: "#28a745",
+                        backgroundColor: monthFilter === "all" ? "#ccc" : "#ffc107",
                         color: "#fff",
                         borderRadius: "4px",
                         border: "none",
                         fontSize: "13px",
-                        cursor: "pointer"
+                        cursor: monthFilter === "all" ? "not-allowed" : "pointer"
+                    }}
+                >
+                    제출 현황 다운로드
+                </button>
+
+
+                <button
+                    onClick={handleExcelDownload}
+                    disabled={!isDownloadable}
+                    style={{
+                        padding: "6px 10px",
+                        backgroundColor: !isDownloadable ? "#ccc" : "#28a745",
+                        color: "#fff",
+                        borderRadius: "4px",
+                        border: "none",
+                        fontSize: "13px",
+                        cursor: "pointer",
+                        marginLeft: "3px"
                     }}
                 >
                     엑셀 다운로드
@@ -335,7 +445,7 @@ const AdminDocuments = () => {
                         border: "none",
                         fontSize: "13px",
                         cursor: !isDownloadable ? "not-allowed" : "pointer",
-                        marginLeft: "8px"
+                        marginLeft: "3px"
                     }}
                 >
                     일괄 다운로드
@@ -704,7 +814,7 @@ const AdminDocuments = () => {
             {viewMode === "list" && (
                 <div style={{display: "flex", justifyContent: "center", marginTop: "20px"}}>
                     <Pagination count={Math.ceil(filteredDocuments.length / itemsPerPage)} color="default"
-                                page={currentPage} onChange={handlePageChange}/>
+                                page={currentPage} onChange={handlePageChange} style={{marginBottom: "1rem"}}/>
                 </div>
             )}
         </PageContainer>
