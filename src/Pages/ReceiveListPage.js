@@ -544,7 +544,7 @@ const ReceivedDocuments = () => {
             {viewMode === "list" && (
                 <div style={{display: "flex", justifyContent: "center", marginTop: "20px"}}>
                     <Pagination count={Math.ceil(filteredDocuments.length / itemsPerPage)} color="default"
-                                page={currentPage} onChange={handlePageChange}/>
+                                page={currentPage} onChange={handlePageChange} style={{marginBottom: "1rem"}}/>
                 </div>
             )}
 

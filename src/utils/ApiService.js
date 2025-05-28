@@ -248,7 +248,13 @@ const ApiService = {
       headers: { 'Content-Type': 'application/json; charset=UTF-8' },
       withCredentials: true,
     });
+  },
+
+  // 🧑‍💻Ta 엑셀 다운로드
+  excelTa: async () => {
+    return apiInstance.get('/ta');
   }
+
 };
 
 export default ApiService;
