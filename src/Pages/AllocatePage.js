@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import { Rnd } from "react-rnd";
 import { useNavigate } from "react-router-dom";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from 'recoil';
 import styled from 'styled-components';
 import CompleteButton from '../components/AllocatePage/CompleteButton';
 import PagingControl from "../components/PagingControl";
@@ -13,6 +13,7 @@ import { signerState } from "../recoil/atom/signerState";
 import { taskState } from "../recoil/atom/taskState";
 import { ButtonContainer, GrayButton, OutlineButton } from "../styles/CommonStyles";
 import SignatureService from "../utils/SignatureService";
+import { loginMemberState } from '../recoil/atom/loginMemberState';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
@@ -20,6 +21,7 @@ export const defaultColors = ['#FF6B6B', '#4ECDC4', '#FFD93D', '#1A535C', '#FF9F
 
 const AllocatePage = () => {
   const [documentData, setDocumentData] = useRecoilState(taskState);
+  const loginMember = useRecoilValue(loginMemberState);
   const [signers, setSigners] = useRecoilState(signerState);
   const [menuAnchor, setMenuAnchor] = useState(null);
   const [selectedSigner, setSelectedSigner] = useState(null);
@@ -27,6 +29,7 @@ const AllocatePage = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [hoveredField, setHoveredField] = useState(null);
   const navigate = useNavigate();
+  
 
   const handleMenuClick = (event, signer) => {
     setMenuAnchor(event.currentTarget);
@@ -60,36 +63,56 @@ const AllocatePage = () => {
       navigate(`/request-document`);
     }
   };
+  
 
   return (
     <MainContainer>
       <StepProgressBar currentStep={2} />
+
       <ContentWrapper>
         <Container>
-          
-        <DocumentHeader>
+       <DocumentHeader>
   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-    
-    <Typography variant="h6" style={{ fontWeight: 'bold' }}>
-      {documentData.title || '문서 제목'}
-    </Typography>
-    <Typography variant="body2" color="textSecondary" style={{ marginBottom: '6px' }}>
-      {documentData.requestName || '작업명 없음'}
-    </Typography>
-    
-    <Typography variant="body2" color="textSecondary">
-      선택한 파일: {documentData.fileName || '파일명 없음'}
-    </Typography>
+    <div style={{ display: 'flex', marginBottom: '4px' }}>
+      <Typography variant="body2" style={{ fontWeight: 'bold', width: '80px' }}>
+        작업명:
+      </Typography>
+      <Typography variant="body2">
+        {documentData.requestName || '작업명 없음'}
+      </Typography>
+    </div>
+
+ <div style={{ display: 'flex', marginBottom: '4px' }}>
+  <Typography variant="body2" style={{ fontWeight: 'bold', width: '80px' }}>
+    작성자:
+  </Typography>
+  <Typography variant="body2">
+    {loginMember?.name || '이름 없음'}
+  </Typography>
+</div>
+
+    <div style={{ display: 'flex' }}>
+      <Typography variant="body2" style={{ fontWeight: 'bold', width: '80px' }}>
+        문서 제목:
+      </Typography>
+      <Typography variant="body2">
+        {documentData.fileName || '파일명 없음'}
+      </Typography>
+    </div>
   </div>
 </DocumentHeader>
 
 
           <SignerList>
-            <Typography variant="h6">서명 인원</Typography>
-            <Typography variant="body2" color="textSecondary" style={{ marginBottom: '12px' }}>
+            <Typography variant="h6" stype = {{ fontWeight : 'bold'}}> 서명 인원</Typography>
+            <Typography variant="body3"style={{ marginBottom: '100px' }}>
               대상을 선택 후 위치를 지정하세요.
+             
+             
             </Typography>
+             <br></br>
             {signers.map((signer, index) => (
+              
   <Card
     key={signer.email}
     sx={{
@@ -104,9 +127,9 @@ const AllocatePage = () => {
       <CardContent>
         <Grid container spacing={1} alignItems="center">
           <Grid item xs={12} sm={6}>
-            <Typography variant="subtitle2" fontWeight="bold">
-              {signer.name}
-            </Typography>
+           <Typography variant="subtitle2" fontWeight="bold">
+  {index + 1}. {signer.name}
+</Typography>
             <Typography variant="body2" color="text.secondary">
               {signer.email}
             </Typography>
