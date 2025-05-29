@@ -104,7 +104,7 @@ const AllocatePage = () => {
 
 
           <SignerList>
-            <Typography variant="h6" stype = {{ fontWeight : 'bold'}}> 서명 인원</Typography>
+            <Typography variant="h6" stype = {{ fontWeight : 'bold'}}> 서명 인원: </Typography>
             <Typography variant="body3"style={{ marginBottom: '100px' }}>
               대상을 선택 후 위치를 지정하세요.
              
