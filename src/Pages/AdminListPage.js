@@ -29,17 +29,20 @@ const AdminDocuments = () => {
     const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 1024);
 
     // 필터 및 검색 관련 const
-    const [searchQuery, setSearchQuery] = useState("");
+    const [searchQuery, setSearchQuery] = useState(localStorage.getItem("admin_searchQuery") || "");
     const [sortKey, setSortKey] = useState(localStorage.getItem("admin_sortKey") || "createdAt");
     const [sortOrder, setSortOrder] = useState(localStorage.getItem("admin_sortOrder") || "desc");
-    const [statusFilter, setStatusFilter] = useState('1');
-    const currentMonth = `${new Date().getMonth() + 1}월`;
-    const [monthFilter, setMonthFilter] = useState(currentMonth);
+    const [statusFilter, setStatusFilter] = useState(localStorage.getItem("admin_statusFilter") || 'all');
+    // const currentMonth = `${new Date().getMonth() + 1}월`;
+    const [monthFilter, setMonthFilter] = useState(localStorage.getItem("admin_monthFilter") || 'all');
 
     useEffect(() => {
+        localStorage.setItem("admin_monthFilter", monthFilter);
+        localStorage.setItem("admin_statusFilter", statusFilter);
         localStorage.setItem("admin_sortKey", sortKey);
         localStorage.setItem("admin_sortOrder", sortOrder);
-    }, [sortKey, sortOrder]);
+    }, [monthFilter, statusFilter, searchQuery, sortKey, sortOrder]);
+
 
     useEffect(() => {
         const handleResize = () => setIsMobileView(window.innerWidth <= 1200);
@@ -134,7 +137,7 @@ const AdminDocuments = () => {
         })
 
         .sort((a, b) => {
-            const dateA = new Date(a[sortKey] ?? 0); // null이면 new Date(0) → 1970-01-01
+            const dateA = new Date(a[sortKey] ?? 0);
             const dateB = new Date(b[sortKey] ?? 0);
 
             const result = dateB - dateA;
@@ -186,9 +189,8 @@ const AdminDocuments = () => {
             alert("월을 선택해주세요.");
             return;
         }
-
         try {
-            const res = await ApiService.excelTa(); // /api/ta
+            const res = await ApiService.excelTa();
             const taList = res.data;
 
             const docsThisMonth = filteredDocuments;
@@ -228,9 +230,6 @@ const AdminDocuments = () => {
             alert("TA 엑셀 다운로드 중 오류가 발생했습니다.");
         }
     };
-
-
-
 
     const [signers, setSigners] = useState([]);
     const [showSignersModal, setShowSignersModal] = useState(false);
