@@ -16,6 +16,10 @@ const HisnetLogoutButton = () => {
     //console.log("➡️ 이동 중...");
     navigate("/", { replace: true });
 
+    localStorage.removeItem("admin_monthFilter");
+    localStorage.removeItem("admin_statusFilter");
+    localStorage.removeItem("admin_searchQuery");
+
     setTimeout(() => {
       //console.log("🧹 상태 초기화 중...");
       setMember({
