@@ -53,6 +53,7 @@ const CompleteButton = () => {
         type: document.type,
         password: document.password,
         memberName: member.name,
+        expirationDateTime: document.expirationDateTime,
         signers: signers
       };
   
