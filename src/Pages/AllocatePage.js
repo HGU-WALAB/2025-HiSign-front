@@ -29,7 +29,21 @@ const AllocatePage = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [hoveredField, setHoveredField] = useState(null);
   const navigate = useNavigate();
-  
+  let formattedDate = null;
+
+  if (documentData.expirationDateTime) {
+    const date = new Date(documentData.expirationDateTime);
+    if (!isNaN(date.getTime())) {
+      formattedDate = new Intl.DateTimeFormat("ko-KR", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+        hour12: false
+      }).format(date);
+    }
+  }
 
   const handleMenuClick = (event, signer) => {
     setMenuAnchor(event.currentTarget);
@@ -90,7 +104,14 @@ const AllocatePage = () => {
                 {loginMember?.name || '이름 없음'}
               </Typography>
             </div>
-
+            <div style={{ display: 'flex' }}>
+              <Typography variant="body1" style={{ fontWeight: 'bold', width: '80px' }}>
+                만료일:
+              </Typography>
+              <Typography variant="body1">
+                {formattedDate ?? '파일명 -'}
+              </Typography>
+            </div>
             <div style={{ display: 'flex' }}>
               <Typography variant="body1" style={{ fontWeight: 'bold', width: '80px' }}>
                 문서 제목:
