@@ -65,13 +65,21 @@ const PreviewPage = () => {
     }
   };
 
-  const handleSaveSignature = async (imageData) => {
+  const handleSaveSignature = async (imageData, saveConsent) => {
     const updatedFields = signing.signatureFields.map((field) =>
-      field.type === 0 ? { ...field, image: imageData } : field
+        field.type === 0 ? { ...field, image: imageData } : field
     );
-    setSigning((prev) => ({ ...prev, signatureFields: updatedFields }));
+
+    setSigning((prev) => ({
+      ...prev,
+      signatureFields: updatedFields,
+      saveConsent,
+    }));
+
     setShowPopup(false);
   };
+
+
 
   const handleLoadExistingSignature = async () => {
     try {
@@ -115,6 +123,7 @@ const PreviewPage = () => {
           position: field.position,
           imageName: field.type === 0 ? fileName : null,
           textData: field.textData || null,
+          saveConsent: signing.saveConsent ?? false,
         })),
       });
 
