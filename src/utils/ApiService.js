@@ -144,6 +144,20 @@ const ApiService = {
       responseType: "arraybuffer", // PDF 바이너리 받기
     });
   },
+  getDocToken: async (documentId, email) => {
+    try {
+      const response = await apiInstance.post(`/signature-requests/token`, {
+        documentId,
+        email
+      }, {
+        withCredentials: true
+      });
+      return response.data;  // { token: "..." }
+    } catch (error) {
+      console.error("문서 토큰 요청 실패:", error);
+      throw error;
+    }
+  },
 
 
   // =================================
