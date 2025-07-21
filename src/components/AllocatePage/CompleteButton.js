@@ -132,7 +132,10 @@ const CompleteButton = () => {
       warningText="바로 서명하시는 것을 추천합니다.\n먼저 서명하지 않으시면 검토 단계 이후에 서명이 가능합니다."
       open={showConfirmModal}
       loading={false}
-      onClose={() => setShowConfirmModal(false)}
+      onClose={() => {
+        setShowConfirmModal(false);
+        navigate("/request-document");
+        }}
       onConfirm={handleConfirmModalConfirm}
     />
   </>
