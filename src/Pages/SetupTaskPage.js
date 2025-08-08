@@ -13,6 +13,7 @@ import StepProgressBar from "../components/StepProgressBar";
 import { loginMemberState } from "../recoil/atom/loginMemberState";
 import { taskState } from "../recoil/atom/taskState";
 import { GrayButton, Label, NextButton, StyledBody } from "../styles/CommonStyles";
+import ApiService from "../utils/ApiService";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
@@ -29,6 +30,7 @@ const SetupTaskPage = () => {
   const [expirationOption, setExpirationOption] = useState("custom");
   const [taskType, setTaskType] = useState("taTask");
   const [selectedSubject, setSelectedSubject] = useState("");
+  const [subjectList, setSubjectList] = useState([]);
   const [selectedMonth, setSelectedMonth] = useState("");
   const [password, setPassword] = useState("");
   const [passwordMatch, setPasswordMatch] = useState(false);
@@ -48,6 +50,10 @@ const SetupTaskPage = () => {
         setExpirationTime(timePart?.slice(0, 5) || "23:59");
       }
     }
+
+    ApiService.getSubjects()
+    .then((subjects) => setSubjectList(subjects))
+    .catch(() => alert("과목 목록을 불러오지 못했습니다."));
   }, []);
 
   const today = new Date().toISOString().split("T")[0];
@@ -127,14 +133,8 @@ const SetupTaskPage = () => {
     let expiration = new Date();
 
     if (taskType === "taTask") {
-      const day = now.getDay(); // 0 (일) ~ 6 (토)
-      const daysToFriday = (5 - day + 7) % 7;
-      expiration.setDate(now.getDate() + daysToFriday);
+      expiration.setDate(now.getDate() + 30);
       expiration.setHours(17, 0, 0, 0);
-      // 금요일데 17시가 이미 지났으면 다음 주 금요일로
-      if (daysToFriday === 0 && expiration < now) {
-        expiration.setDate(expiration.getDate() + 7);
-      }
     } else {
       // basicTask인 경우, 사용자가 지정한 날짜 + 시간 사용
       const [year, month, day] = expirationDate.split("-").map(Number);
@@ -229,53 +229,9 @@ const SetupTaskPage = () => {
                         value={selectedSubject}
                         onChange={(e) => setSelectedSubject(e.target.value)}
                       >
-                        <option value="">과목을 선택하세요.</option>
-                        <option value="3D디지털 콘텐츠제작">3D 디지털 콘텐츠 제작</option>
-                        <option value="3D 프린터">3D 프린터</option>
-                        <option value="AI개론">AI개론</option>
-                        <option value="AI기반 경영 캡스톤">AI기반 경영 캡스톤</option>
-                        <option value="Algorithms Analysis">Algorithms Analysis</option>
-                        <option value="C 프로그래밍">C 프로그래밍</option>
-                        <option value="Data Structures">Data Structures</option>
-                        <option value="Database System">Database System</option>
-                        <option value="HSF">HSF</option>
-                        <option value="IoT실습">IoT실습</option>
-                        <option value="Java Programming">Java Programming</option>
-                        <option value="Logic Design">Logic Design</option>
-                        <option value="Operating Systems">Operating Systems</option>
-                        <option value="Python 프로그래밍">Python 프로그래밍</option>
-                        <option value="RF회로 설계">RF회로 설계</option>
-                        <option value="Software Engineering">Software Engineering</option>
-                        <option value="객체지향 설계패턴">객체지향 설계패턴</option>
-                        <option value="공학수학">공학수학</option>
-                        <option value="교양특론3">교양특론3</option>
-                        <option value="기초회로 및 논리실습">기초회로 및 논리실습</option>
-                        <option value="논리설계">논리설계</option>
-                        <option value="데이타구조">데이타구조</option>
-                        <option value="디지털신호처리">디지털신호처리</option>
-                        <option value="딥러닝 개론">딥러닝 개론</option>
-                        <option value="마이크로프로세서응용">마이크로프로세서응용</option>
-                        <option value="모바일 앱 개발">모바일 앱 개발</option>
-                        <option value="소프트웨어 입문">소프트웨어 입문</option>
-                        <option value="스타트업 제품 기획 및 개발">스타트업 제품 기획 및 개발</option>
-                        <option value="아이디어 개발 및 프로토타이핑">아이디어 개발 및 프로토타이핑</option>
-                        <option value="알고리듬분석">알고리듬분석</option>
-                        <option value="운영체제">운영체제</option>
-                        <option value="자바프로그래밍언어">자바프로그래밍언어</option>
-                        <option value="전자회로 1">전자회로 1</option>
-                        <option value="전자회로 및 통신실습">전자회로 및 통신실습</option>
-                        <option value="직업과 진로설계(전산전자)">직업과 진로설계(전산전자)</option>
-                        <option value="캡스톤디자인1">캡스톤디자인1</option>
-                        <option value="캡스톤디자인2">캡스톤디자인2</option>
-                        <option value="컴퓨터 및 전자공학개론">컴퓨터 및 전자공학개론</option>
-                        <option value="컴퓨터그래픽스">컴퓨터그래픽스</option>
-                        <option value="코딩테스트 서버관리">코딩테스트 서버관리</option>
-                        <option value="통신이론">통신이론</option>
-                        <option value="파이썬 프로그래밍">파이썬 프로그래밍</option>
-                        <option value="프로그래밍 스튜디오">프로그래밍 스튜디오</option>
-                        <option value="프로그래밍1">프로그래밍1</option>
-                        <option value="프론트엔드 입문">프론트엔드 입문</option>
-                        <option value="회로이론">회로이론</option>
+                        {subjectList.map((subject, index) => (
+                          <option key={index} value={subject}>{subject}</option>
+                        ))}
                       </Select>
                     </FormRow>
                     <FormRow>

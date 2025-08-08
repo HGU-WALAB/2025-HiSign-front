@@ -129,7 +129,7 @@ const CompleteButton = () => {
     <ConfirmModal
       title="서명자에 본인이 포함되어 있습니다."
       message="본인이 서명자로 들어가있습니다. 문서에 먼저 서명하시겠습니까?"
-      warningText="바로 서명하시는 것을 추천합니다.\n먼저 서명하지 않으시면 검토 단계 이후에 서명이 가능합니다."
+      warningText="바로 서명하시는 것을 강력히 추천드립니다."
       open={showConfirmModal}
       loading={false}
       onClose={() => {
