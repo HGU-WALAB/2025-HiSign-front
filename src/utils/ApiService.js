@@ -81,12 +81,12 @@ const ApiService = {
     if (!reason) throw new Error('취소 사유가 필요합니다.');
     return apiInstance.put(`/signature-requests/cancel/${documentId}`, { reason });
   },
-  
+
   // 🔐 서명자 검색
   searchSigners: async (query) => {
     return apiInstance.get(`/member/search?query=${query}`);
   },
-  
+
   searchSignersByEmail: async (email) => {
     return apiInstance.get(`/member/search/email?query=${email}`);
   },
@@ -109,7 +109,7 @@ const ApiService = {
   fetchDocumentInfo: async (documentId) => {
     return apiInstance.get(`/documents/info/${documentId}`);
   },
-    
+
   reqeustCheckTask: async (documentId) => {
     if (!documentId) throw new Error('문서 ID가 필요합니다.');
     return apiInstance.get(`/documents/request-check/${documentId}`);
@@ -132,7 +132,7 @@ const ApiService = {
       responseType: "arraybuffer", // ✅ 바이너리 데이터 수신
     });
   },
-  
+
   downloadDocumentsAsZip: async (documentIds) => {
     return apiInstance.post("/documents/download/zip", documentIds, {
       responseType: "arraybuffer",
@@ -240,6 +240,11 @@ const ApiService = {
     const res = await apiInstance.post(`/signature/sign`, signingData, {
       params: { documentId }
     });
+    return res.data;
+  },
+  // 🌐기존 서명 존재 여부 확인
+  checkExistingSignature: async (signerEmail) => {
+    const res = await apiInstance.get(`/signature/exists?signerEmail=${encodeURIComponent(signerEmail)}`);
     return res.data;
   },
 
