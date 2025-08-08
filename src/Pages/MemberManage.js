@@ -194,7 +194,6 @@ const MemberManage = () => {
                     <Typography variant="body2" color="textSecondary" gutterBottom>
                         쉼표로 구분: 이름,학번,이메일<br />
                         Ex) test,12345,test@gmail.com<br />
-                        &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
                         test2,6789,test2@gmail.com
                     </Typography>
 
