@@ -184,13 +184,20 @@ function Sidebar() {
                 active={currentPath === "/receive-document"}
                 label="[ 받은 작업 ] "
               />
-              {isAdmin && (
-                <LinkItem
-                  to="/admin-document"
-                  active={currentPath === "/admin-document"}
-                  label="[ 근무일지 관리 ] "
-                />
-              )}
+                {isAdmin && (
+                    <>
+                        <LinkItem
+                            to="/admin-document"
+                            active={currentPath.startsWith("/admin-document")}
+                            label="[ 근무일지 관리 ] "
+                        />
+                        <LinkItem
+                            to="/member-manage"
+                            active={currentPath.startsWith("/member-manage")}
+                            label="[ 사용자 관리 ] "
+                        />
+                    </>
+                )}
             </nav>
           )}
         </div>

@@ -289,6 +289,27 @@ const ApiService = {
       headers: { 'Content-Type': 'text/plain' } // 🔄 JSON이 아닌 순수 문자열 전송
     });
   },
+  // 🔐 회원 목록 가져오기
+  fetchMembers: async () => {
+    return apiInstance.get("/member/members");
+  },
+
+// 🔐 단일 회원 추가
+  addMember: async (memberDTO) => {
+    return apiInstance.post("/member/add", memberDTO);
+  },
+
+// 🔐 회원 활성화 상태 수정
+  updateMemberActive: async (uniqueId, active) => {
+    return apiInstance.patch(`/member/${uniqueId}/active`, { active });
+  },
+
+// 🔐 일괄 등록
+  bulkAddMembers: async (inputText) => {
+    return apiInstance.post("/member/bulk", inputText, {
+      headers: { "Content-Type": "text/plain" },
+    });
+  },
 };
 
 export default ApiService;

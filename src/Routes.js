@@ -17,6 +17,8 @@ import RequestedDocuments from "./Pages/RequestListPage";
 import SetupTaskPage from "./Pages/SetupTaskPage";
 import SignPage from './Pages/SignPage';
 import RequireLogin from './utils/RequireLogin';
+import ManageMemberPage from './Pages/MemberManage';
+
 
 function MyRoutes() {
     useRestoreLoginFromCookie();
@@ -60,6 +62,9 @@ function MyRoutes() {
                 } />
                 <Route path="/check-task/:documentId" element={
                     <RequireLogin><CheckTaskPage /></RequireLogin>
+                } />
+                <Route path="/member-manage" element={
+                    <RequireLogin><ManageMemberPage/></RequireLogin>
                 } />
             </Route>
         </Routes>
