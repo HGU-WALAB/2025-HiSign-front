@@ -12,6 +12,7 @@ import { Dropdown } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import * as XLSX from "xlsx";
+import SubjectEditorModal from "../components/ListPage/SubjectEditorModal";
 import { PageContainer } from "../components/PageContainer";
 import { loginMemberState } from "../recoil/atom/loginMemberState";
 import ApiService from "../utils/ApiService";
@@ -27,6 +28,7 @@ const AdminDocuments = () => {
     const [viewMode, setViewMode] = useState("list");
     const [selectedDocs, setSelectedDocs] = useState([]);
     const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 1024);
+    const [showSubjectEditor, setShowSubjectEditor] = useState(false);
 
     // 필터 및 검색 관련 const
     const [searchQuery, setSearchQuery] = useState(localStorage.getItem("admin_searchQuery") || "");
@@ -398,6 +400,22 @@ const AdminDocuments = () => {
                     </select>
 
                 </div>
+                
+                <button
+                    onClick={() => setShowSubjectEditor(true)}
+                    style={{
+                        padding: "6px 10px",
+                        backgroundColor: "#007bff",
+                        color: "#fff",
+                        borderRadius: "4px",
+                        border: "none",
+                        fontSize: "13px",
+                        cursor:"pointer",
+                        marginLeft: "3px"
+                    }}
+                >
+                    과목 목록 수정
+                </button>
 
                 <button
                     onClick={handleTaExcelDownload}
@@ -816,6 +834,7 @@ const AdminDocuments = () => {
                                 page={currentPage} onChange={handlePageChange} style={{marginBottom: "1rem"}}/>
                 </div>
             )}
+            <SubjectEditorModal open={showSubjectEditor} onClose={() => setShowSubjectEditor(false)} />
         </PageContainer>
     );
 };

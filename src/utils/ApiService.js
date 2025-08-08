@@ -267,8 +267,23 @@ const ApiService = {
   // 🧑‍💻Ta 엑셀 다운로드
   excelTa: async () => {
     return apiInstance.get('/ta');
-  }
+  },
 
+  getSubjects: async () => {
+    try {
+      const response = await apiInstance.get('/files/subjects');
+      return response.data; // List<String> 형식 (서버에서 줄바꿈 기준 split 가능)
+    } catch (error) {
+      console.error("과목 목록 불러오기 실패:", error);
+      throw error;
+    }
+  },
+
+  saveSubjects: async (content) => {
+    return apiInstance.post('/files/subjects', content, {
+      headers: { 'Content-Type': 'text/plain' } // 🔄 JSON이 아닌 순수 문자열 전송
+    });
+  },
 };
 
 export default ApiService;
