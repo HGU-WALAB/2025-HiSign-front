@@ -9,7 +9,8 @@ const ConfirmModal = ({
   onConfirm,
   title,
   message,
-  warningText
+  warningText,
+  styleType = "default"
 }) => {
 
   const handleConfirm = async () => {
@@ -26,12 +27,14 @@ const ConfirmModal = ({
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            width: 400,
+            width: { xs: '90%', sm: 500, md: 550 },
             bgcolor: 'background.paper',
             borderRadius: 2,
             boxShadow: 24,
             p: 4,
-            textAlign: 'center'
+            textAlign: 'center',
+            maxHeight: '80vh',
+            overflowY: 'auto',
           }}
         >
           {title && (
@@ -40,9 +43,17 @@ const ConfirmModal = ({
             </Typography>
           )}
 
-          <Typography variant="body1" sx={{ mb: 1 }}>
-            {message}
-          </Typography>
+          {styleType === "SelfIncluded" ? (
+            <Box sx={{ textAlign: 'left', mb: 3 }}>
+              <Typography variant="body1" sx={{ mb: 1, whiteSpace: 'pre-line' }}>
+                {message}
+              </Typography>
+            </Box>
+          ) : (
+            <Typography variant="body1" sx={{ mb: 3, whiteSpace: 'pre-line' }}>
+              {message}
+            </Typography>
+          )}
 
           <Typography variant="caption" sx={{ color: 'red', display: 'block', mb: 3 }}>
             {warningText}
