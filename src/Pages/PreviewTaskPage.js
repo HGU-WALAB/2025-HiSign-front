@@ -1,5 +1,5 @@
 // PreviewTaskPage.js
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
 import styled from "styled-components";
@@ -21,6 +21,10 @@ const PreviewPage = () => {
   const [loading, setLoading] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
   const [pdfScale, setPdfScale] = useState(1);
+
+  // ✅ 저장 동의 + 완료된 이미지 서명이 실제로 존재하는지 (백엔드 검사결과)
+  const [canLoadSavedSignature, setCanLoadSavedSignature] = useState(false);
+
   const loginMember = useRecoilValue(loginMemberState);
   const navigate = useNavigate();
 
@@ -28,9 +32,32 @@ const PreviewPage = () => {
     if (!signing.documentId) {
       alert("유효한 문서 정보가 없습니다. 다시 진행해 주세요");
       navigate("/");
+      return;
     }
-
   }, [signing.documentId, navigate]);
+
+  // ✅ 백엔드의 existsSavedSignature 결과로 버튼 노출 판단
+  useEffect(() => {
+    let mounted = true;
+
+    const run = async () => {
+      if (!signing?.signerEmail) {
+        setCanLoadSavedSignature(false);
+        return;
+      }
+      try {
+        const exists = await ApiService.checkExistingSignature(signing.signerEmail);
+        if (mounted) setCanLoadSavedSignature(Boolean(exists));
+      } catch {
+        if (mounted) setCanLoadSavedSignature(false);
+      }
+    };
+
+    run();
+    return () => {
+      mounted = false;
+    };
+  }, [signing?.signerEmail]);
 
   const handleReject = () => {
     setRejectReason("");
@@ -43,15 +70,14 @@ const PreviewPage = () => {
       return;
     }
 
-    setLoading(true); // ✅ 로딩 시작
-
+    setLoading(true);
     try {
       await ApiService.rejectDocument(
-        signing.documentId,
-        rejectReason,
-        signing.token,
-        signing.signerEmail,
-        signing.signerName
+          signing.documentId,
+          rejectReason,
+          signing.token,
+          signing.signerEmail,
+          signing.signerName
       );
 
       alert("요청이 거절되었습니다.");
@@ -61,7 +87,7 @@ const PreviewPage = () => {
       console.error("요청 거절 중 오류 발생:", error);
       alert("요청 거절에 실패했습니다.");
     } finally {
-      setLoading(false); // ✅ 로딩 종료 (성공/실패 모두에 대해 실행)
+      setLoading(false);
     }
   };
 
@@ -73,20 +99,31 @@ const PreviewPage = () => {
     setSigning((prev) => ({
       ...prev,
       signatureFields: updatedFields,
+      // 백엔드가 boolean을 받아도 되고, 숫자 0/1이어도 됩니다. 필요 시 아래 라인에서 정규화:
+      // saveConsent: saveConsent ? 1 : 0,
       saveConsent,
     }));
 
     setShowPopup(false);
   };
 
-
-
   const handleLoadExistingSignature = async () => {
+    try {
+      const ok = await ApiService.checkExistingSignature(signing.signerEmail);
+      if (!ok) {
+        alert("저장 동의된 이전 서명이 없어서 불러올 수 없습니다.");
+        return;
+      }
+    } catch {
+      alert("기존 서명 확인에 실패했습니다.");
+      return;
+    }
+
     try {
       const imageUrl = await ApiService.getLatestImageSignature(signing.signerEmail);
 
       const updatedFields = signing.signatureFields.map((field) =>
-        field.type === 0 ? { ...field, image: imageUrl } : field
+          field.type === 0 ? { ...field, image: imageUrl } : field
       );
 
       setSigning((prev) => ({
@@ -136,116 +173,132 @@ const PreviewPage = () => {
     }
   };
 
-  const isAllSigned = signing.signatureFields?.every((field) => field.image || field.textData);
+  const isAllSigned = useMemo(() => {
+    return signing.signatureFields?.every((field) => field.image || field.textData);
+  }, [signing.signatureFields]);
 
   return (
-    <MainContainer>
-      <ContentWrapper>
-        <Sidebar>
-          <Link
-            to={loginMember.uniqueId ? "/dashboard" : "/"}
-            style={{
-                display: "flex",
-                justifyContent: "center",
-                marginBottom: "1.5rem",
-            }}
+      <MainContainer>
+        <ContentWrapper>
+          <Sidebar>
+            <Link
+                to={loginMember.uniqueId ? "/dashboard" : "/"}
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  marginBottom: "1.5rem",
+                }}
             >
-            <img
-                src={`${process.env.PUBLIC_URL}/hisignlogo_resized.png`}
-                alt="HI-Sign 로고"
-                style={{ height: 120, maxWidth: "100%" }}
-            />
-          </Link>
-          <InfoSection>
-            <InfoItem><Label>작업 요청자:</Label><Value>{signing.requesterName}</Value></InfoItem>
-            <InfoItem><Label>작업명:</Label><Value>{signing.requestName}</Value></InfoItem>
-            <InfoItem><Label>작업 요청 상세:</Label><Value>{signing.description}</Value></InfoItem>
-            <InfoItem><Label>문서 이름:</Label><Value>{signing.documentName}</Value></InfoItem>
-            <InfoItem><Label>서명자:</Label><Value>{signing.signerName}</Value></InfoItem>
-            <InfoItem><Label>서명 상태:</Label><Value>{signing.isSigned ? "서명 완료" : "서명 대기중"}</Value></InfoItem>
-          </InfoSection>
-
-          <ButtonContainer>
-            {signing.isRejectable && <RejectButton onClick={handleReject}>거절하기</RejectButton>}
-            
-            {isAllSigned ? (
-              <OutlinedButton onClick={() => setShowPopup(true)}>다시 서명하기</OutlinedButton>
-            ) : (
-              <NextButton onClick={() => setShowPopup(true)}>서명하기</NextButton>
-            )}
-
-            {isAllSigned && (
-              <NextButton onClick={() => setShowCompleteModal(true)}>서명 완료</NextButton>
-            )}
-
-            {signing.hasExistingSignature && (
-              <OutlinedButton onClick={handleLoadExistingSignature}>
-                기존 서명 불러오기
-              </OutlinedButton>
-            )}
-          </ButtonContainer>
-
-        </Sidebar>
-
-        <PDFWrapper>
-          {signing.fileUrl && signing.signatureFields ? (
-            <DocumentContainer>
-              <PDFViewer
-                pdfUrl={signing.fileUrl}
-                setCurrentPage={setCurrentPage}
-                onScaleChange={setPdfScale}
-                type="sign"
+              <img
+                  src={`${process.env.PUBLIC_URL}/hisignlogo_resized.png`}
+                  alt="HI-Sign 로고"
+                  style={{ height: 120, maxWidth: "100%" }}
               />
-            </DocumentContainer>
-          ) : (
-            <LoadingMessage>문서 및 서명 정보를 불러오는 중...</LoadingMessage>
-          )}
-        </PDFWrapper>
-      </ContentWrapper>
+            </Link>
 
-      {showPopup && (
-        <SignaturePopup
-          field={signing.signatureFields[0]}
-          fieldIndex={0}
-          onClose={() => setShowPopup(false)}
-          onSave={handleSaveSignature}
-          applyToAll={true}
+            <InfoSection>
+              <InfoItem>
+                <Label>작업 요청자:</Label><Value>{signing.requesterName}</Value>
+              </InfoItem>
+              <InfoItem>
+                <Label>작업명:</Label><Value>{signing.requestName}</Value>
+              </InfoItem>
+              <InfoItem>
+                <Label>작업 요청 상세:</Label><Value>{signing.description}</Value>
+              </InfoItem>
+              <InfoItem>
+                <Label>문서 이름:</Label><Value>{signing.documentName}</Value>
+              </InfoItem>
+              <InfoItem>
+                <Label>서명자:</Label><Value>{signing.signerName}</Value>
+              </InfoItem>
+              <InfoItem>
+                <Label>서명 상태:</Label><Value>{signing.isSigned ? "서명 완료" : "서명 대기중"}</Value>
+              </InfoItem>
+            </InfoSection>
+
+            <ButtonContainer>
+              {signing.isRejectable && (
+                  <RejectButton onClick={handleReject}>거절하기</RejectButton>
+              )}
+
+              {isAllSigned ? (
+                  <OutlinedButton onClick={() => setShowPopup(true)}>다시 서명하기</OutlinedButton>
+              ) : (
+                  <NextButton onClick={() => setShowPopup(true)}>서명하기</NextButton>
+              )}
+
+              {isAllSigned && (
+                  <NextButton onClick={() => setShowCompleteModal(true)}>서명 완료</NextButton>
+              )}
+
+              {canLoadSavedSignature && (
+                  <OutlinedButton onClick={handleLoadExistingSignature}>
+                    기존 서명 불러오기
+                  </OutlinedButton>
+              )}
+            </ButtonContainer>
+          </Sidebar>
+
+          <PDFWrapper>
+            {signing.fileUrl && signing.signatureFields ? (
+                <DocumentContainer>
+                  <PDFViewer
+                      pdfUrl={signing.fileUrl}
+                      setCurrentPage={setCurrentPage}
+                      onScaleChange={setPdfScale}
+                      type="sign"
+                  />
+                </DocumentContainer>
+            ) : (
+                <LoadingMessage>문서 및 서명 정보를 불러오는 중...</LoadingMessage>
+            )}
+          </PDFWrapper>
+        </ContentWrapper>
+
+        {showPopup && (
+            <SignaturePopup
+                field={signing.signatureFields[0]}
+                fieldIndex={0}
+                onClose={() => setShowPopup(false)}
+                onSave={handleSaveSignature}
+                applyToAll={true}
+            />
+        )}
+
+        <ConfirmModal
+            open={showCompleteModal}
+            loading={loading}
+            onClose={() => setShowCompleteModal(false)}
+            onConfirm={handleSubmitSignature}
+            title="서명 완료"
+            message="서명을 완료하시겠습니까?"
+            warningText="*완료 후에는 취소하실 수 없습니다."
         />
-      )}
 
-      <ConfirmModal
-        open={showCompleteModal}
-        loading={loading}
-        onClose={() => setShowCompleteModal(false)}
-        onConfirm={handleSubmitSignature}
-        title="서명 완료"
-        message="서명을 완료하시겠습니까?"
-        warningText="*완료 후에는 취소하실 수 없습니다."
-      />
-
-      <RejectModal
-        isVisible={showRejectModal}
-        loading={loading}
-        onClose={() => setShowRejectModal(false)}
-        onConfirm={handleConfirmReject}
-        rejectReason={rejectReason}
-        setRejectReason={setRejectReason}
-        type="reject"
-      />
-    </MainContainer>
+        <RejectModal
+            isVisible={showRejectModal}
+            loading={loading}
+            onClose={() => setShowRejectModal(false)}
+            onConfirm={handleConfirmReject}
+            rejectReason={rejectReason}
+            setRejectReason={setRejectReason}
+            type="reject"
+        />
+      </MainContainer>
   );
 };
 
 export default PreviewPage;
 
-// Styled Components
+// ===================== Styled Components =====================
 
 const MainContainer = styled.div`
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   background-color: #f5f5f5;
-  padding-top: 0; /* 상단 마진 제거 */
+  padding-top: 0;
 `;
 
 const ContentWrapper = styled.div`
@@ -356,8 +409,6 @@ const OutlinedButton = styled(ButtonBase)`
     background-color: rgba(3, 163, 255, 0.05);
   }
 `;
-
-
 
 const RejectButton = styled(ButtonBase)`
   background-color: rgb(255, 0, 0);

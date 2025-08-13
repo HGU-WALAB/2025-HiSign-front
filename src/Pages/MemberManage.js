@@ -90,11 +90,18 @@ const MemberManage = () => {
 
     const filteredMembers = members
         .filter((m) => !(m.uniqueId?.startsWith("1") || m.uniqueId?.startsWith("5") || m.uniqueId?.startsWith("7")))
-        .filter((m) => m.name?.toLowerCase().includes(searchTerm.toLowerCase()));
+        .filter((m) => m.name?.toLowerCase().includes(searchTerm.toLowerCase()))
+        .sort((a, b) => {
+            if (a.active !== b.active) {
+                return a.active ? -1 : 1;
+            }
+            return a.name.localeCompare(b.name, 'ko');
+        });
+
 
     return (
         <PageContainer>
-            <Box px={{ xs: 2, sm: 6, md: 8 }}>
+            <Box px={{ xs: 2, sm: 6, md: 20 }}>
                 <h1 style={{ textAlign: "center", fontSize: "24px", fontWeight: "bold", paddingTop: "1rem" }}>
                     사용자 관리
                 </h1>
@@ -136,36 +143,39 @@ const MemberManage = () => {
                     </Button>
                 </Box>
 
-                <TableContainer component={Paper} sx={{ borderRadius: 3, boxShadow: 3 }}>
+                <TableContainer component={Paper} sx={{ borderRadius: 3, boxShadow: 3, }}>
                     <Table>
                         <TableHead>
                             <TableRow>
-                                <TableCell>이름</TableCell>
-                                <TableCell>이메일</TableCell>
+                                <TableCell sx={{ pr: 0 }}>이름</TableCell>
+                                <TableCell align="left" sx={{ pl: 0 }}>TA 활성화</TableCell>
+
                                 <TableCell>학번</TableCell>
-                                <TableCell align="center">TA 활성화</TableCell>
+                                <TableCell>이메일</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {filteredMembers.map((m, idx) => (
+                            {filteredMembers.map((m) => (
                                 <TableRow key={m.uniqueId} hover>
-                                    <TableCell>
+                                    <TableCell sx={{ pr: 0 }}>
                                         <Typography fontWeight="bold">{m.name}</Typography>
                                         <Typography variant="body2" color="text.secondary">
                                             {m.active ? "TA" : "학생"}
                                         </Typography>
                                     </TableCell>
-                                    <TableCell>{m.email}</TableCell>
-                                    <TableCell>{m.uniqueId}</TableCell>
-                                    <TableCell align="center">
+                                    <TableCell align="left" sx={{ pl: 0}}>
                                         <Switch
                                             checked={m.active}
                                             onChange={(e) => handleActiveToggle(m.uniqueId, e.target.checked)}
+                                            size="small"
                                         />
                                     </TableCell>
+                                    <TableCell>{m.uniqueId}</TableCell>
+                                    <TableCell>{m.email}</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
+
                     </Table>
                 </TableContainer>
             </Box>
@@ -175,10 +185,10 @@ const MemberManage = () => {
                     <Typography variant="h6" gutterBottom>회원 추가</Typography>
                     <TextField fullWidth margin="normal" label="이름" value={newMember.name}
                                onChange={(e) => setNewMember({ ...newMember, name: e.target.value })} />
-                    <TextField fullWidth margin="normal" label="이메일" value={newMember.email}
-                               onChange={(e) => setNewMember({ ...newMember, email: e.target.value })} />
                     <TextField fullWidth margin="normal" label="학번" value={newMember.uniqueId}
                                onChange={(e) => setNewMember({ ...newMember, uniqueId: e.target.value })} />
+                    <TextField fullWidth margin="normal" label="이메일" value={newMember.email}
+                               onChange={(e) => setNewMember({ ...newMember, email: e.target.value })} />
                     <Box display="flex" justifyContent="flex-end" gap={2} mt={2}>
                         <Button onClick={handleCloseAddModal}>취소</Button>
                         <Button variant="contained" onClick={handleAddMember} disabled={loading}>
