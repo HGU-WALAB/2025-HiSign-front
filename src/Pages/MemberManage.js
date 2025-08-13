@@ -1,9 +1,16 @@
-import { useEffect, useState } from "react";
 import {
-    Box, Button, Modal, Typography, TextField, Switch, CircularProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
+    Box, Button,
+    CircularProgress,
+    Modal,
+    Paper,
+    Switch,
+    Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
+    TextField,
+    Typography
 } from "@mui/material";
-import ApiService from "../utils/ApiService";
+import { useEffect, useState } from "react";
 import { PageContainer } from "../components/PageContainer";
+import ApiService from "../utils/ApiService";
 
 const MemberManage = () => {
     const [members, setMembers] = useState([]);
@@ -147,9 +154,8 @@ const MemberManage = () => {
                     <Table>
                         <TableHead>
                             <TableRow>
+                                <TableCell align="left" sx={{ pr: 0 }}>TA 활성화</TableCell>
                                 <TableCell sx={{ pr: 0 }}>이름</TableCell>
-                                <TableCell align="left" sx={{ pl: 0 }}>TA 활성화</TableCell>
-
                                 <TableCell>학번</TableCell>
                                 <TableCell>이메일</TableCell>
                             </TableRow>
@@ -157,18 +163,18 @@ const MemberManage = () => {
                         <TableBody>
                             {filteredMembers.map((m) => (
                                 <TableRow key={m.uniqueId} hover>
-                                    <TableCell sx={{ pr: 0 }}>
-                                        <Typography fontWeight="bold">{m.name}</Typography>
-                                        <Typography variant="body2" color="text.secondary">
-                                            {m.active ? "TA" : "학생"}
-                                        </Typography>
-                                    </TableCell>
-                                    <TableCell align="left" sx={{ pl: 0}}>
+                                    <TableCell align="left" sx={{ pr: 0}}>
                                         <Switch
                                             checked={m.active}
                                             onChange={(e) => handleActiveToggle(m.uniqueId, e.target.checked)}
                                             size="small"
                                         />
+                                    </TableCell>
+                                    <TableCell sx={{ pr: 0 }}>
+                                        <Typography fontWeight="bold">{m.name}</Typography>
+                                        <Typography variant="body2" color="text.secondary">
+                                            {m.active ? "TA" : "학생"}
+                                        </Typography>
                                     </TableCell>
                                     <TableCell>{m.uniqueId}</TableCell>
                                     <TableCell>{m.email}</TableCell>
@@ -202,9 +208,17 @@ const MemberManage = () => {
                 <Box sx={modalStyle}>
                     <Typography variant="h6" gutterBottom>일괄 추가</Typography>
                     <Typography variant="body2" color="textSecondary" gutterBottom>
-                        쉼표로 구분: 이름,학번,이메일<br />
-                        Ex) test,12345,test@gmail.com<br />
-                        test2,6789,test2@gmail.com
+                        • 작성요령 <br/>
+                        - 공백으로 구분하여 이름 학번 이메일 기입 해주세요<br/>
+                        - 다음학생은 다음 줄에 기입해주세요<br/>
+                        예시) <br/>
+                        김한동 22512345 handong30@handong.ac.kr<br />
+                        이갈대 22512346 galdae30@handong.ac.kr<br />
+                        박상자 22512347 box30@handong.ac.kr<br />
+                        <br />
+                        • 주의사항<br />
+                        - 추가된 사용자는 자동으로 TA로 활성화됩니다.<br />
+                        - 이미 존재하던 사용자는 추가되지 않고 TA로 활성화됩니다.<br />
                     </Typography>
 
                     <TextField
@@ -231,7 +245,7 @@ const modalStyle = {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: 400,
+    width: 500,
     bgcolor: 'background.paper',
     border: '2px solid #ccc',
     boxShadow: 24,

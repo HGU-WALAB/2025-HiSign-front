@@ -186,14 +186,14 @@ const SetupTaskPage = () => {
   const handleExit = () => {
     if(window.confirm('정말로 나가시겠습니까?\n나가시면 진행상황은 초기화 됩니다.')){
       setTaskState({
-      requestName: '',       
-      description: '',       
-      ownerId: null,         
-      fileName: '',          
-      fileUrl: null,        
+      requestName: '',
+      description: '',
+      ownerId: null,
+      fileName: '',
+      fileUrl: null,
       isRejectable : null,
       type: null,
-      password: null, 
+      password: null,
     });
     navigate(`/request-document`);
     }

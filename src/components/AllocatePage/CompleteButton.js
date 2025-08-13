@@ -117,7 +117,7 @@ const CompleteButton = () => {
 // 1단계: CompleteModal 확인 버튼
   const handleCompleteModalConfirm = async () => {
     if (selfIncluded) {
-      // 근무일지 본인 포함이면, 우선 안내모달(CompleteModal) 닫고 본인서명 ConfirmModal 띄움
+      //본인 포함이면, 우선 안내모달(CompleteModal) 닫고 본인서명 ConfirmModal 띄움
       setOpen(false);
       setShowConfirmModal(true);
       return;
