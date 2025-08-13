@@ -6,9 +6,12 @@ import ApiService from "../../utils/ApiService";
 const SignaturePopup = ({ field, fieldIndex, onClose, onSave, applyToAll = false }) => {
     const sigCanvas = useRef(null);
     const fileInputRef = useRef(null);
-    const [uploadedImage, setUploadedImage] = useState(null);
 
+    const [uploadedImage, setUploadedImage] = useState(null);
     const [saveConsent, setSaveConsent] = useState(null);
+
+    // 커스텀 확인 모달
+    const [showOverwriteModal, setShowOverwriteModal] = useState(false);
 
     const popupMaxWidth = 500;
     const popupPadding = 40;
@@ -16,35 +19,71 @@ const SignaturePopup = ({ field, fieldIndex, onClose, onSave, applyToAll = false
     const canvasWidth = rawAvailableWidth - popupPadding;
     const canvasHeight = canvasWidth / 2;
 
+    const getFinalImage = () => {
+        if (uploadedImage) return uploadedImage;
+        if (sigCanvas.current) {
+            const canvas = sigCanvas.current.getCanvas();
+            return createTransparentSignature(canvas);
+        }
+        return null;
+    };
+
     const handleSave = async () => {
         if (saveConsent === null) {
             alert("서명을 저장할지 선택해주세요.");
             return;
         }
 
+        // 저장 동의된 기존 서명 존재 여부 (백엔드: save_consent=TRUE + status=1 + imageName)
+        let exists = false;
         try {
-            const exists = await ApiService.checkExistingSignature(field.signerEmail);
-            if (exists) {
-                const overwrite = window.confirm("이미 저장된 서명이 있습니다. 새로운 서명으로 하시겠습니까?");
-                if (!overwrite) {
-                    return;
-                }
-            }
-        } catch (error) {
-            console.error("기존 서명 확인 실패:", error);
-            alert("기존 서명 여부 확인에 실패했습니다. 계속 진행합니다.");
+            exists = await ApiService.checkExistingSignature(field.signerEmail);
+        } catch (e) {
+            console.error("기존 서명 확인 실패:", e);
         }
 
-        let finalImage = null;
-        if (uploadedImage) {
-            finalImage = uploadedImage;
-        } else if (sigCanvas.current) {
-            const canvas = sigCanvas.current.getCanvas();
-            finalImage = createTransparentSignature(canvas);
+        if (exists) {
+            // OK/취소 대신: 확인(새 서명) / 기존 서명 불러오기
+            setShowOverwriteModal(true);
+            return;
         }
 
+        // 기존 서명 없음 → 바로 새 서명 저장
+        const finalImage = getFinalImage();
         onSave(finalImage, saveConsent);
         onClose();
+    };
+
+    // 모달: "확인" (새 서명 저장)
+    const handleOverwriteWithNew = () => {
+        const finalImage = getFinalImage();
+        onSave(finalImage, saveConsent);
+        setShowOverwriteModal(false);
+        onClose();
+    };
+
+    // 모달: "기존 서명 불러오기" (save_consent=1인 최신 서명 적용)
+    const handleLoadExistingAndApply = async () => {
+        try {
+            // 안전하게 한 번 더 확인 (없다면 진행 불가)
+            const ok = await ApiService.checkExistingSignature(field.signerEmail);
+            if (!ok) {
+                alert("저장 동의된 이전 서명이 없어 불러올 수 없습니다.");
+                setShowOverwriteModal(false);
+                return;
+            }
+
+            const imageUrl = await ApiService.getLatestImageSignature(field.signerEmail);
+
+            // 기존 서명 이미지를 바로 적용 + 동의는 true로 저장
+            onSave(imageUrl, true);
+            setShowOverwriteModal(false);
+            onClose();
+        } catch (error) {
+            console.error("기존 서명 불러오기 실패:", error);
+            alert("기존 서명을 불러오는 데 실패했습니다.");
+            setShowOverwriteModal(false);
+        }
     };
 
     const handleClear = () => {
@@ -77,7 +116,7 @@ const SignaturePopup = ({ field, fieldIndex, onClose, onSave, applyToAll = false
         if (!file) return;
 
         const reader = new FileReader();
-        reader.onload = (e) => {
+        reader.onload = (ev) => {
             const img = new Image();
             img.onload = () => {
                 const originalWidth = img.width;
@@ -109,11 +148,11 @@ const SignaturePopup = ({ field, fieldIndex, onClose, onSave, applyToAll = false
                     const paddedDataUrl = canvas.toDataURL("image/png");
                     setUploadedImage(paddedDataUrl);
                 } else {
-                    setUploadedImage(e.target.result);
+                    setUploadedImage(ev.target.result);
                 }
             };
 
-            img.src = e.target.result;
+            img.src = ev.target.result;
         };
 
         reader.readAsDataURL(file);
@@ -214,6 +253,35 @@ const SignaturePopup = ({ field, fieldIndex, onClose, onSave, applyToAll = false
                 </div>
                 <BigButton title="이미지 업로드" onClick={handleUploadClick} />
             </div>
+
+            {showOverwriteModal && (
+                <div style={overlayStyle}>
+                    <div style={modalStyle}>
+                        <div style={{ fontWeight: 600, marginBottom: 8 }}>저장된 서명이 있습니다</div>
+                        <div style={{ fontSize: 14, color: "#555", marginBottom: 16 }}>
+                            기존 서명을 불러오시겠습니까, 아니면 새 서명으로 저장하시겠습니까?
+                        </div>
+                        <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
+                            <BigButton title="기존 서명 불러오기" onClick={handleLoadExistingAndApply} />
+                            <BigButton inverted title="확인(새 서명 저장)" onClick={handleOverwriteWithNew} />
+                        </div>
+                        <div style={{ marginTop: 10, textAlign: "center" }}>
+                            <button
+                                style={{
+                                    background: "transparent",
+                                    border: "none",
+                                    color: "#888",
+                                    cursor: "pointer",
+                                    textDecoration: "underline",
+                                }}
+                                onClick={() => setShowOverwriteModal(false)}
+                            >
+                                닫기
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
@@ -270,4 +338,24 @@ const centerButtonGroupStyle = {
     transform: "translateX(-50%)",
     display: "flex",
     gap: 8,
+};
+
+/* 커스텀 모달 스타일 */
+const overlayStyle = {
+    position: "fixed",
+    inset: 0,
+    background: "rgba(0,0,0,0.3)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 2000,
+};
+
+const modalStyle = {
+    background: "white",
+    borderRadius: 12,
+    padding: 20,
+    minWidth: 300,
+    maxWidth: 420,
+    boxShadow: "0 10px 24px rgba(0,0,0,0.15)",
 };
