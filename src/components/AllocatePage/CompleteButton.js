@@ -17,24 +17,30 @@ const CompleteButton = () => {
   const [documentId, setDocumentId] = useState(null);
   const [loading, setLoading] = useState(false); // ✅ 로딩 상태 추가
   const [showConfirmModal, setShowConfirmModal] = useState(false); // ✅ ConfirmModal 상태
+  const [selfIncluded, setSelfIncluded] = useState(false);
   const member = useRecoilValue(loginMemberState);
+  const actionLabel = document.type === 1 ? "검토 요청" : "서명 요청";
   const navigate = useNavigate();
-
+  
   const handleOpenModal = () => {
+    // 서명 위치 검증은 그대로
     for (const signer of signers) {
       if (!signer.signatureFields || signer.signatureFields.length === 0) {
         alert("모든 서명자에게 서명 위치를 하나 이상 지정해주세요.");
         return;
       }
     }
-    setOpen(true);
+    const included = signers.some(s => s.email === member.email);
+    setSelfIncluded(included)
+    setOpen(true); // 먼저 CompleteModal
   };
 
   const handleCloseModal = () => {
     setOpen(false);
   };
 
-  const handleConfirm = async () => {
+  // 공통 업로드 함수: goSignAfter=true면 업로드 직후 서명 화면으로 이동
+  const doUpload = async (goSignAfter = false) => {
     setLoading(true);
     try {
       if (!document.fileUrl) {
@@ -76,16 +82,24 @@ const CompleteButton = () => {
           isRejectable: null,
           fileType: null,
         });
-        // ✅ 현재 사용자가 서명자에 포함되었는지 확인
-        const isSelfIncluded = signers.some(signer => signer.email === member.email);
         setSigners([]);
-        if (isSelfIncluded) {
-          setDocumentId(documentId);
-          setShowConfirmModal(true); // ConfirmModal 표시
+        if (goSignAfter) {
+          // 업로드 직후 바로 서명 이동
+          try {
+            const result = await ApiService.getDocToken(documentId, member.email);
+            const token = result.token;
+            if (token) {
+              navigate(`/checkEmail?token=${token}`);
+            } else {
+              alert("문서 토큰을 가져오지 못했습니다.");
+            }
+          } catch (e) {
+            console.error("문서 토큰 요청 실패:", e);
+            alert("문서 확인 중 오류가 발생했습니다.");
+          }
         } else {
           navigate("/request-document");
         }
-        
       } else {
         console.error("요청 실패:", uploadResponse);
         alert("요청 중 오류가 발생했습니다.");
@@ -96,47 +110,55 @@ const CompleteButton = () => {
     } finally {
       setLoading(false);
       setOpen(false);
+      setShowConfirmModal(false);
     }
   };
 
-  const handleConfirmModalConfirm = async () => {
-    try {
-      const result = await ApiService.getDocToken(documentId, member.email);
-      const token = result.token;
-      if (token) {
-        navigate(`/checkEmail?token=${token}`);
-      } else {
-        alert("문서 토큰을 가져오지 못했습니다.");
-      }
-    } catch (error) {
-      console.error("문서 토큰 요청 실패:", error);
-      alert("문서 확인 중 오류가 발생했습니다.");
+// 1단계: CompleteModal 확인 버튼
+  const handleCompleteModalConfirm = async () => {
+    if (selfIncluded) {
+      //본인 포함이면, 우선 안내모달(CompleteModal) 닫고 본인서명 ConfirmModal 띄움
+      setOpen(false);
+      setShowConfirmModal(true);
+      return;
     }
+    // 그 외에는 즉시 요청 확정
+    await doUpload(false);
+  };
+
+  // 2단계: ConfirmModal 확인 버튼 (본인 서명 경로)
+  const handleConfirmModalConfirm = async () => {
+    await doUpload(true);
   };
 
   return (
   <>
     <NextButton onClick={handleOpenModal} disabled={loading}>
-      ㅤ완료ㅤ
-    </NextButton> 
+      완료
+    </NextButton>
 
     <CompleteModal
       open={open}
       onClose={handleCloseModal}
-      onConfirm={handleConfirm}
+      onConfirm={handleCompleteModalConfirm}
       loading={loading}
+      isSelfIncluded={selfIncluded}
     />
     <ConfirmModal
-      title="서명자에 본인이 포함되어 있습니다."
-      message="본인이 서명자로 들어가있습니다. 문서에 먼저 서명하시겠습니까?"
-      warningText="바로 서명하시는 것을 강력히 추천드립니다."
+      title="본인 서명이 필요합니다."
+      message={
+        `본인이 서명자로 지정된 작업입니다.\n` +
+        `• 이 작업은 본인 서명을 완료해야 ${actionLabel}을 진행할 수 있습니다.\n` +
+        `• 서명을 진행하면 이후에는 내용을 수정할 수 없습니다.\n` +
+        `• 서명이 완료되면 즉시 ${actionLabel}이 전송됩니다.\n` +
+        `서명을 계속하시겠습니까?`
+      }
+      warningText={`서명 진행 시 수정 불가 · 서명 완료 후 자동 ${actionLabel} 전송`}
       open={showConfirmModal}
       loading={false}
-      onClose={() => {
-        setShowConfirmModal(false);
-        navigate("/request-document");
-        }}
+      onClose={() => {setShowConfirmModal(false);}}
       onConfirm={handleConfirmModalConfirm}
+      styleType="SelfIncluded"
     />
   </>
   );

@@ -4,19 +4,26 @@ import { BeatLoader } from "react-spinners";
 import { useRecoilValue } from 'recoil';
 import { taskState } from '../../recoil/atom/taskState';
 
-const CompleteModal = ({ open, onClose, onConfirm, loading}) => {
+const CompleteModal = ({ open, onClose, onConfirm, loading, isSelfIncluded = false }) => {
   const document = useRecoilValue(taskState);
 
   const handleConfirm = async () => {
     await onConfirm(); // 상위에서 비동기 처리, 로딩은 상위가 관리
   };
 
-  const confirmMessage =
-    document.type === 1
-      ? "검토 요청을 보내시겠습니까?"
-      : "요청을 완료하시겠습니까?";
+  const confirmMessage = (() => {
+    if (document.type === 1) {
+      // 근무일지
+      return isSelfIncluded
+        ? "근무일지 작성 지침을 확인하셨습니까?"
+        : "검토 요청을 보내시겠습니까?";
+    }
+    return "요청을 완료하시겠습니까?";
+  })();
 
   const warningText = "*요청을 보내시면 수정이 불가합니다.";
+  const showWarning =
+    !(document.type === 1 && isSelfIncluded); // 본인 서명 포함 근무일지면 경고 숨김
 
   return (
     <>
@@ -59,9 +66,11 @@ const CompleteModal = ({ open, onClose, onConfirm, loading}) => {
           </Typography>
 
           {/* 공통 경고 문구 */}
-          <Typography variant="caption" sx={{ color: 'red', display: 'block', mb: 1 }}>
-            {warningText}
-          </Typography>
+          {showWarning && (
+            <Typography variant="caption" sx={{ color: 'red', display: 'block', mb: 1 }}>
+              {warningText}
+            </Typography>
+          )}
 
           {/* 버튼 영역 (반응형 적용) */}
           <div

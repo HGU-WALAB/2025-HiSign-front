@@ -1,7 +1,8 @@
+import { Typography } from "@mui/material";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/esm/entry.webpack";
 import { useNavigate } from "react-router-dom";
@@ -31,15 +32,28 @@ const SetupTaskPage = () => {
   const [taskType, setTaskType] = useState("taTask");
   const [selectedSubject, setSelectedSubject] = useState("");
   const [subjectList, setSubjectList] = useState([]);
-  const [selectedMonth, setSelectedMonth] = useState("");
   const [password, setPassword] = useState("");
   const [passwordMatch, setPasswordMatch] = useState(false);
   const navigate = useNavigate();
 
+  // 현재 날짜 기준 값
+  const now = new Date();
+  const thisYear = now.getFullYear();
+  const thisMonth = now.getMonth() + 1;
+
+  // 상태: 기본값을 현재 년/월로 설정
+  const [selectedYear, setSelectedYear] = useState(String(thisYear));
+  const [selectedMonth, setSelectedMonth] = useState(`${thisMonth}월`);
+
+  // 년도 옵션: 현재년도 ~ 현재년도-5 (총 6개)
+  const yearOptions = useMemo(
+    () => Array.from({ length: 6 }, (_, i) => String(thisYear - i)),
+    [thisYear]
+  );
+  
   useEffect(() => {
     if (document) {
       setSelectedSubject(document.selectedSubject || "");
-      setSelectedMonth(document.selectedMonth || "");
       setRequestName(document.requestName || "");
       setDescription(document.description || "");
       setIsRejectable(document.isRejectable ?? 0);
@@ -94,8 +108,8 @@ const SetupTaskPage = () => {
 
   const handleNextStep = () => {
     if (taskType === "taTask") {
-      if (!selectedSubject || !selectedMonth) {
-        alert("과목명과 월을 모두 선택해 주세요.");
+      if (!selectedSubject) {
+        alert("과목명을 선택해 주세요.");
         return;
       }
       if (!document.fileUrl) {
@@ -147,12 +161,12 @@ const SetupTaskPage = () => {
     //console.log("만료일:", formattedExpiration);
     const finalRequestName =
       taskType === "taTask"
-        ? `${selectedSubject}_${selectedMonth}_${member.name}_${member.uniqueId}`
+        ? `${selectedSubject}_${selectedYear}_${selectedMonth}_${member.name}_${member.uniqueId}`
         : requestName;
     const isRejectableFinal = taskType === "taTask" ? 1 : isRejectable;
     const type = taskType === "taTask" ? 1 : 0;
     const finalDescription =
-      taskType === "taTask" ? `[${selectedSubject}] ${selectedMonth} TA 근무일지 입니다.` : description;
+      taskType === "taTask" ? `[${selectedSubject}] ${selectedYear}년 ${selectedMonth} TA 근무일지 입니다.` : description;
     const finalPassword = taskType === "taTask" ? "NONE" : password;
     setTaskState((prev) => ({
       ...prev,
@@ -172,14 +186,14 @@ const SetupTaskPage = () => {
   const handleExit = () => {
     if(window.confirm('정말로 나가시겠습니까?\n나가시면 진행상황은 초기화 됩니다.')){
       setTaskState({
-      requestName: '',       
-      description: '',       
-      ownerId: null,         
-      fileName: '',          
-      fileUrl: null,        
+      requestName: '',
+      description: '',
+      ownerId: null,
+      fileName: '',
+      fileUrl: null,
       isRejectable : null,
       type: null,
-      password: null, 
+      password: null,
     });
     navigate(`/request-document`);
     }
@@ -219,6 +233,7 @@ const SetupTaskPage = () => {
             <TwoColumnLayout>
               <LeftColumn>
                 {taskType === "taTask" && (
+                  <>
                   <FormCard>
                     <CardTitle>TA 근무일지 정보</CardTitle>
                     <FormRow>
@@ -229,28 +244,49 @@ const SetupTaskPage = () => {
                         value={selectedSubject}
                         onChange={(e) => setSelectedSubject(e.target.value)}
                       >
+                        <option value="">과목을 선택하세요.</option>
                         {subjectList.map((subject, index) => (
                           <option key={index} value={subject}>{subject}</option>
                         ))}
                       </Select>
                     </FormRow>
-                    <FormRow>
-                      <Label>
-                        근무 월 <RequiredMark>*</RequiredMark>
-                      </Label>
-                      <Select
-                        value={selectedMonth}
-                        onChange={(e) => setSelectedMonth(e.target.value)}
-                      >
-                        <option value="">월 선택하세요.</option>
-                        {[...Array(12)].map((_, i) => (
-                          <option key={i + 1} value={`${i + 1}월`}>
-                            {i + 1}월
-                          </option>
-                        ))}
-                      </Select>
-                    </FormRow>
+                    <div style={{display: "flex", gap: "10px"}}>
+                      <FormRow>
+                        <Label>
+                          근무년도 <RequiredMark>*</RequiredMark>
+                        </Label>
+                        <Select
+                          value={selectedYear}
+                          onChange={(e) => setSelectedYear(e.target.value)}
+                        >
+                          {yearOptions.map((y) => (
+                            <option key={y} value={y}>{y}</option>
+                          ))}
+                        </Select>
+                      </FormRow>
+                      <FormRow>
+                        <Label>
+                          근무 월 <RequiredMark>*</RequiredMark>
+                        </Label>
+                        <Select
+                          value={selectedMonth}
+                          onChange={(e) => setSelectedMonth(e.target.value)}
+                        >
+                          {Array.from({ length: 12 }, (_, i) => `${i + 1}월`).map((m) => (
+                            <option key={m} value={m}>{m}</option>
+                          ))}
+                        </Select>
+                      </FormRow>
+                    </div>
                   </FormCard>
+                  <FormCard>
+                    <CardTitle>TA 근무일지 작성 안내</CardTitle>
+                    <Typography variant="body2" gutterBottom>• 본인 수업시간 및 주말 또는 휴일 제외하여 근무일지 작성</Typography>
+                    <Typography variant="body2" gutterBottom>• 늦은밤이나 새벽시간 근무일시에서 제외하여 기재해야함</Typography>
+                    <Typography variant="body2" gutterBottom>• 시험감독, 채점, 과제체크(확인) 등 교수 본연의 업무에 해당되는 내용 작성 금지</Typography>
+                    <Typography variant="body2" gutterBottom>• 본인의 월 근로시간 확인 후 맞게 작성(초과작성 불가)</Typography>
+                  </FormCard>
+                  </>
                 )}
 
                 {taskType === "basicTask" && (
@@ -386,7 +422,8 @@ const SetupTaskPage = () => {
               <RightColumn>
                 <FormCard>
                   <CardTitle>
-                    문서 선택 <RequiredMark>*</RequiredMark>
+                    {taskType === "taTask" ? "근무일지 업로드" : "문서 선택"}
+                    <RequiredMark>*</RequiredMark>
                   </CardTitle>
                   <DocumentUploadSection>
                     {!document.fileUrl ? (
@@ -519,6 +556,7 @@ const CardTitle = styled.h3`
 
 // 폼 행
 const FormRow = styled.div`
+  flex: 1;
   margin-bottom: 15px;
 `;
 
